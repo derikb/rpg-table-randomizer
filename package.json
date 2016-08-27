@@ -1,0 +1,37 @@
+{
+  "name": "rpg-table-randomizer",
+  "version": "0.0.1",
+  "description": "Module for random tables for use in roleplaying games",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/derikb/rpg-table-randomizer.git"
+  },
+  "keywords": [
+    "rpg",
+    "role-playing games",
+    "randomizer",
+    "d&d",
+    "random tables",
+    "osr"
+  ],
+  "author": "Derik A Badman",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/derikb/rpg-table-randomizer/issues"
+  },
+  "homepage": "https://github.com/derikb/rpg-table-randomizer#readme",
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "eslint": "^3.4.0",
+    "eslint-config-standard": "^6.0.0",
+    "eslint-plugin-promise": "^2.0.1",
+    "eslint-plugin-standard": "^2.0.0"
+  },
+  "scripts": {
+	  "eslint": "./node_modules/.bin/eslint "
+  }
+}
