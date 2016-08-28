@@ -299,7 +299,7 @@ let Randomizer = function () {
 		let t = null;
 		if (token_parts[1] === 'this') {
 			// reroll on same table
-			console.log('this..'+curtable);
+			//console.log('this..'+curtable);
 			t = this.getTableByTitle(curtable);
 			//console.log(t);
 		} else {

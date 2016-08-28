@@ -4,3 +4,5 @@ Orange
 Green##direction
 
 2##Blue##season
+3-4 Indigo
+5-7 Violet

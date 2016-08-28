@@ -15,7 +15,7 @@ data = fs.readFileSync('./test/test_text_data.txt', 'utf8');
 normalizer.setData(data);
 console.log( normalizer.checkType() );
 console.log( normalizer.normalizeData() );
-
+console.log( normalizer.normalized_data.tables );
 
 data = fs.readFileSync('./test/test_html_data.html', 'utf8');
 

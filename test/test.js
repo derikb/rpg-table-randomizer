@@ -19,9 +19,7 @@ general_tables.forEach((t) => {
 
 
 rpgrandomizer.randomizer.setTableTitleLookup(function(title){
-	console.log('table lookup custom '+title);
-	//console.log(tables);
-	//return (tables[title]) ? tables[title] : null;
+	//console.log('table lookup custom '+title);
 	let t = _.findWhere(tables, { key: title });
 	if (typeof t === 'undefined') {
 		t = _.findWhere(tables, { title: title });
@@ -34,13 +32,11 @@ rpgrandomizer.randomizer.setTableTitleLookup(function(title){
 
 
 rpgrandomizer.randomizer.registerTokenType('name', (token_parts, full_token, curtable) => {
-
 	if (token_parts[1]) {
 		return `${token_parts[1]}-y`;
 	}
 	return '';
 });
-//console.log(tables);
 
 
 tables.forEach((table) => {

@@ -14,7 +14,7 @@ const capitalize = function (string) {
  * Flatten array into comma separated, capitalized string
  */
 const flatten = function(arr){
-	const o = '';
+	let o = '';
 	arr.forEach((v) => {
 		o += capitalize(v)+', ';
 	});

@@ -1,7 +1,5 @@
 'use strict';
 
-//console.log(require.resolve('../src/randomizer.js'));
-
 const randomizer = require('./randomizer.js');
 const random_table = require('./random_table.js');
 const table_normalizer = require('./table_normalizer.js');

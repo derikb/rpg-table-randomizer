@@ -1,7 +1,6 @@
 'use strict';
 
 const _ = require('underscore');
-const RandomTable = require('./random_table.js');
 
 /**
  * Take some data and normalize it into a config object for RandomTable
@@ -113,7 +112,7 @@ const TableNormalizer = function (data) {
 			
 			// parse numbers off front and subtables off back
 			const parse = v.match(/^(?:(?:[0-9]+\-)?([0-9]+)(##)?(?:\.\s*|:\s*|,\s*|\t+|\s*))?(.+?)(?:##(.+))?$/);
-			
+			console.log(parse);
 			if (parse) {
 				// console.log(parse);
 				l[k] = { label: parse[3].trim() };
@@ -177,21 +176,7 @@ const TableNormalizer = function (data) {
 		}
 		
 		// ?
-		
 		return this.normalized_data;
-	};
-	/**
-	 * Take the normalized data and output a table object
-	 */
-	this.getTable = function () {
-		if (_.isEmpty(this.normalized_data) || !_.isObject(this.normalized_data)) {
-			return null;
-		}
-		const table = new RandomTable(this.normalized_data);
-		if (table.validate() !== true) {
-			// return null;
-		}
-		return table;
 	};
 };
 

@@ -4,7 +4,8 @@
   "description": "Module for random tables for use in roleplaying games",
   "main": "src/index.js",
   "scripts": {
-    "eslint": "./node_modules/.bin/eslint "
+    "eslint": "./node_modules/.bin/eslint ",
+    "browserify": "./node_modules/.bin/browserify src/index.js -o dist/bundle.js -t [ babelify --presets [ es2015 ] ]"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,8 @@
   },
   "homepage": "https://github.com/derikb/rpg-table-randomizer#readme",
   "devDependencies": {
+    "babel-preset-es2015": "^6.14.0",
+    "babelify": "^7.3.0",
     "browserify": "^13.1.0",
     "eslint": "^3.4.0",
     "eslint-config-standard": "^6.0.0",
