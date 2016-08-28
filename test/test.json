@@ -1,0 +1,77 @@
+[
+	{
+		"id": "directions",
+		"title": "Directions",
+		"table": [
+			"North",
+			"South",
+			"East",
+			"West"
+		]
+	},
+	{
+		"id": "season",
+		"title": "Seasons",
+		"table": [
+			{ "label": "Winter" },
+			{ "label": "Spring" },
+			{ "label": "Summer" },
+			{ "label": "Autumn" }
+		]
+	},
+	{
+		"id": "color",
+		"title": "Colors",
+		"tables": {
+			"default": [
+				"Black",
+				"White",
+				"Grey",
+				"Blue",
+				"Red",
+				"Yellow",
+				"Gold",
+				"Silver",
+				"Crimson",
+				"Azure",
+				"Green",
+				"Orange",
+				"Violet"
+		    ]
+		}
+	},
+	{
+	  "id": "colonial_goals",
+	  "title": "Goals (Colonial)",
+	  "author": "Derik Badman",
+	  "tags": [
+	    "npcs",
+	    "colonial",
+	    "goals"
+	  ],
+	  "tables": {
+	    "default": [
+	      { "label": "Furtherance of Science / Studies / Art / Craft / Skill" },
+	      { "label": "Wealth / Business" },
+	      { "label": "Earthly Pleasures" },
+	      { "label": "To be loved / comradeship / romance" },
+	      { "label": "Power over others" },
+	      { "label": "Fame" },
+	      { "label": "Rank / Class Mobility" },
+	      { "label": "Preservation of the Status Quo / Order" },
+	      { "label": "Preservation of Nature" },
+	      { "label": "Glory / Risk Taking" },
+	      { "label": "Collecting" },
+	      { "label": "Religious Service" },
+	      { "label": "Freedom" },
+	      { "label": "Mystic Power" },
+	      { "label": "Patriotism" },
+	      { "label": "Discovery / Curiosity" },
+	      { "label": "Charity / Welfare of Others" },
+	      { "label": "Cruelty / Destruction" },
+	      { "label": "Self-Discipline" },
+	      { "label": "Revenge" }
+	    ]
+	  }
+	}
+]
