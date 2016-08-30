@@ -1,6 +1,6 @@
 'use strict';
 
-const _ = require('underscore');
+const r_helpers = require('./r_helpers');
 
 /**
  * Take some data and normalize it into a config object for RandomTable
@@ -23,9 +23,9 @@ const TableNormalizer = function (data) {
 	 */
 	this.checkType = function () {
 		const data = this.orig_data;
-		if (_.isEmpty(data)) {
+		if (r_helpers.isEmpty(data)) {
 			this.data_type = '';
-		} else if (_.isString(data)) {
+		} else if (r_helpers.isString(data)) {
 			// html should start with a tag.... right?
 			// @todo I'm sure there's a better way
 			try {
@@ -40,7 +40,7 @@ const TableNormalizer = function (data) {
 				return this.data_type;
 			}
 			this.data_type = 'text';
-		} else if (_.isObject(data)) {
+		} else if (r_helpers.isObject(data)) {
 			this.data_type = 'object';
 		}
 		return this.data_type;

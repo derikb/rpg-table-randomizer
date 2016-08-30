@@ -9,6 +9,63 @@ const path = require('path');
 
 const tables = []; // store the tables here
 
+
+/*
+const iterate = (obj, cb) => {
+	if (Array.isArray(obj)) {
+		obj.forEach(cb.bind(this, v, k, obj));
+	} else if (isObject(obj)) {
+		let keys = Object.keys(obj);
+		for (let k in keys) {
+			cb.bind(this, obj[k], k, obj);
+		}
+	}
+};
+*/
+
+
+let arr = [
+	'red',
+	'orange',
+	'yellow',
+];
+
+let object = {
+	red: {},
+	orange: {},
+	yellow: {}	
+};
+
+let length = 0;
+console.log(this);
+
+
+rpgrandomizer.r_helpers.iterate(arr, (v, k , l) => {
+	console.log(this.length);
+	console.log(v, k);
+});
+/*
+_.each(this.get('tables'), function (v, k, l) {
+			t_length++;
+			t_tables++;
+			if (Array.isArray(v)) {
+				t_length = t_length + v.length;
+			} else {
+				for (const key in v) {
+					if (v.hasOwnProperty(key)) { t_length++; }
+				}
+			}
+		}, this);
+*/
+
+process.exit(1);
+
+
+console.log( rpgrandomizer.r_helpers.isEmpty({ }) );
+console.log( rpgrandomizer.r_helpers.isEmpty({ a: 2 }) );
+console.log( rpgrandomizer.r_helpers.isEmpty('') );
+console.log( rpgrandomizer.r_helpers.isEmpty('pants') );
+
 //console.log( general_tables );
 
 //parse json data into table object

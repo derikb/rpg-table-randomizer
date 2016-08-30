@@ -2,30 +2,11 @@
 
 const _ = require('underscore');
 const randomizer = require('./randomizer.js');
-
-
-/**
- * Capitalize a string
- */
-const capitalize = function (string) {
-	return string.charAt(0).toUpperCase() + string.slice(1);
-}
-/**
- * Flatten array into comma separated, capitalized string
- */
-const flatten = function(arr){
-	let o = '';
-	arr.forEach((v) => {
-		o += capitalize(v)+', ';
-	});
-	o = $.trim(o);
-	o = o.replace(/,$/, '');
-	return o;
-}
+const r_helpers = require('./r_helpers.js');
 
 /**
  * RandomTable: Model for tables used by Randomizer
-* @param {Object} config the tables non-default attributes
+ * @param {Object} config the tables non-default attributes
  */
 
 const RandomTable = function (config) {
@@ -51,7 +32,7 @@ const RandomTable = function (config) {
 	/**
 	 * The primary attributes of this table
 	 */
-	this.attributes = _.extend(this.defaults(), config);
+	this.attributes = r_helpers.extend(this.defaults(), config);
 	/**
 	 * Retrieve an attribute
 	 * @param {String} attr an attribute
@@ -119,12 +100,12 @@ const RandomTable = function (config) {
 			error.general += 'Title cannot be blank. ';
 		}
 		
-		if (typeof attributes.tables === 'string' || _.isEmpty(attributes.tables)) {
+		if (typeof attributes.tables === 'string' || r_helpers.isEmpty(attributes.tables)) {
 			error.fields.push({ field: 'title', message: 'Table cannot be empty' });
 			error.general += 'Table cannot be empty. ';
 		}
 		
-		if (!_.isEmpty(error.fields) || !_.isEmpty(error.general)) {
+		if (!r_helpers.isEmpty(error.fields) || !r_helpers.isEmpty(error.general)) {
 			return error;
 		}
 		return true;
@@ -134,7 +115,7 @@ const RandomTable = function (config) {
 	 * For some reason related to ease of table creation????
 	 */
 	this.normalize = function () {
-		if (!_.isEmpty(this.get('table'))) {
+		if (!r_helpers.isEmpty(this.get('table'))) {
 			const tables = this.get('tables');
 			tables.default = this.get('table');
 			this.set('tables', tables);
@@ -142,7 +123,7 @@ const RandomTable = function (config) {
 		}
 /*
 		@todo normalize the table data so it's always an array of objects with the value property?
-		if (!_.isEmpty(this.get('tables'))) {
+		if (!r_helpers.isEmpty(this.get('tables'))) {
 			const tables = this.get('tables');
 				
 		}
@@ -162,7 +143,7 @@ const RandomTable = function (config) {
 		
 		if (sequence === 'rollall') {
 			// roll all the tables in order
-			sequence = _.keys(this.get('tables'));
+			sequence = Object.keys(this.get('tables'));
 		}
 		
 		if (sequence === '') {
@@ -172,7 +153,7 @@ const RandomTable = function (config) {
 				this.set('result', this.selectFromTable('default'), { silent: true });
 			} else {
 				// select first item from tables
-				const k = _.keys(this.get('tables'));
+				const k = Object.keys(this.get('tables'));
 				this.set('result', this.selectFromTable(k[0]), { silent: true });
 			}
 		} else if (typeof sequence === 'string') {
@@ -181,7 +162,7 @@ const RandomTable = function (config) {
 			var result = [];
 			sequence.forEach((v) => {
 				let r = '';
-				if (_.isString(v)) {
+				if (r_helpers.isString(v)) {
 					r = this.selectFromTable(v);
 					result = result.concat(r);
 					return;
@@ -214,14 +195,14 @@ const RandomTable = function (config) {
 		// console.log(table);
 		let o = []; // output for sequence of rolls/selections
 		const t = this.get('tables')[table]; // the table/subtable
-		const result = randomizer.rollRandom(t); // the random string or object from the table (this is the actual result but can include other instructions or parameters)
+		const result = randomizer.rollRandom(t); // the random string from the table (either the object property, a string value from an array, or the value property from a selected object)
 		let r = ''; // the string result from the table
 		let result_print = true; // are we going to show this result
 		
-		if (_.isUndefined(t[result])) {
+		if (r_helpers.isUndefined(t[result])) {
 			// table is an array
 			r = _.findWhere(t, { label: result });
-			if (_.isUndefined(r)) {
+			if (r_helpers.isUndefined(r)) {
 				// it's just an array of strings so we can stop here
 				o.push({ table: table, result: result, desc: '' });
 				return o;
@@ -236,7 +217,7 @@ const RandomTable = function (config) {
 		// if print==false we suppress the output from this table (good for top-level tables)
 		if (result_print === true) {
 			// add the description if there is one
-			const desc = (_.isString(r['description'])) ? r['description'] : '';
+			const desc = (r_helpers.isString(r['description'])) ? r['description'] : '';
 			// replace any tokens
 			const t_result = randomizer.findToken(result, this.get('key'));
 			o.push({ table: table, result: t_result, desc: desc });
@@ -248,30 +229,30 @@ const RandomTable = function (config) {
 		if (typeof subtable === 'undefined') {
 			// no subtables
 			return o;
-		} else if (_.isString(subtable)) {
+		} else if (r_helpers.isString(subtable)) {
 			// subtables is a string reference to a table so we run this function again
 			r2 = this.selectFromTable(subtable);
 			o = o.concat(r2);
-		} else if (_.isArray(subtable)) {
+		} else if (Array.isArray(subtable)) {
 			// subtables is an array, assume reference to other tables, roll on each in turn
 			subtable.forEach((v) => {
 				r2 = this.selectFromTable(v);
 				o = o.concat(r2);
 			});
-		} else if (_.isObject(subtable)) {
+		} else if (r_helpers.isObject(subtable)) {
 			// subtable is object assume embedded table(s)
 			// loop over keys
 			const k = Object.keys(subtable);
 			k.forEach((kx) => {
 				let result = randomizer.rollRandom(subtable[kx]);
 				let desc = '';
-				if (_.isUndefined(subtable[kx][result])) {
+				if (r_helpers.isUndefined(subtable[kx][result])) {
 					r2 = _.findWhere(subtable[kx], { label: result });
-					if (_.isObject(r2)) {
-						desc = (_.isString(r2.description)) ? r2.description : '';
+					if (r_helpers.isObject(r2)) {
+						desc = (r_helpers.isString(r2.description)) ? r2.description : '';
 					}
 				} else {
-					desc = (_.isString(subtable[kx][result]['description'])) ? subtable[kx][result]['description'] : '';
+					desc = (r_helpers.isString(subtable[kx][result]['description'])) ? subtable[kx][result]['description'] : '';
 				}
 				result = randomizer.findToken(result, this.get('key'));
 				
@@ -295,7 +276,7 @@ const RandomTable = function (config) {
 		const r = this.get('result'); // array
 		if (r === '' || r.length === 0) { return ''; }
 		
-		if (_.isString(r)) { return r; } // will this ever happen?
+		if (r_helpers.isString(r)) { return r; } // will this ever happen?
 		if (simple) { return r[0]['result']; } // @todo maybe use shift() instead, if editing this array won't be a problem. (else we could clone it...
 		
 		let o = '';
@@ -303,19 +284,19 @@ const RandomTable = function (config) {
 		r.forEach((v) => {
 			if (print_opt[v.table]) {
 				if (!print_opt[v.table].hide_table || print_opt[v.table].hide_table === 0) {
-					o += `${capitalize(v.table)}: `;
+					o += `${r_helpers.capitalize(v.table)}: `;
 				}
 				if (!print_opt[v.table].hide_result || print_opt[v.table].hide_result === 0) {
-					o += `${capitalize(v.result)}<br/>`;
+					o += `${r_helpers.capitalize(v.result)}<br/>`;
 				}
 				if (!print_opt[v.table].hide_desc || print_opt[v.table].hide_desc === 0) {
 					if (v.desc !== '') { o += `${v.desc}<br/>`; }
 				}
 			} else {
 				if (v.table === 'default') {
-					o += `${capitalize(v.result)}<br/>`;
+					o += `${r_helpers.capitalize(v.result)}<br/>`;
 				} else {
-					o += `${capitalize(v.table)}: ${capitalize(v.result)}<br/>`;
+					o += `${r_helpers.capitalize(v.table)}: ${r_helpers.capitalize(v.result)}<br/>`;
 				}
 				if (v.desc !== '') { o += `${v.desc}<br/>`; }
 			}
@@ -336,7 +317,7 @@ const RandomTable = function (config) {
 		_.each(this.get('tables'), function (v, k, l) {
 			t_length++;
 			t_tables++;
-			if (_.isArray(v)) {
+			if (Array.isArray(v)) {
 				t_length = t_length + v.length;
 			} else {
 				for (const key in v) {
@@ -371,7 +352,7 @@ const RandomTable = function (config) {
 			}
 			
 			if (k !== 'default') {
-				o += `<header>${capitalize(k)}</header>`;
+				o += `<header>${r_helpers.capitalize(k)}</header>`;
 				ct++;
 			}
 			o += '<ol class="list-unstyled">';
@@ -384,25 +365,25 @@ const RandomTable = function (config) {
 				tweight1 = tweight1 + weight1;
 				const num = (tweight0 === tweight1) ? tweight0 : `${tweight0}-${tweight1}`;
 								
-				if (_.isArray(lx) && _.isString(vx)) {
+				if (Array.isArray(lx) && r_helpers.isString(vx)) {
 					// its an Array of strings
-					o += `<li>${num}. ${capitalize(vx)}`;
+					o += `<li>${num}. ${r_helpers.capitalize(vx)}`;
 					ct++;
-				} else if (_.isString(kx)) {
-					o += `<li>${num}. ${capitalize(kx)}`;
+				} else if (r_helpers.isString(kx)) {
+					o += `<li>${num}. ${r_helpers.capitalize(kx)}`;
 					ct++;
 					// vx is an object
 					if (typeof vx.description !== 'undefined') {
 						o += ` - ${vx.description}`;
 					}
 					if (typeof vx.subtable !== 'undefined') {
-						if (_.isArray(vx.subtable)) {
-							o += `<div class="subtable_roll">Roll on: ${flatten(vx.subtable)}</div>`;
-						} else if (_.isString(vx.subtable)) {
-							o += `<div class="subtable_roll">Roll on: ${capitalize(vx.subtable)}</div>`;
+						if (Array.isArray(vx.subtable)) {
+							o += `<div class="subtable_roll">Roll on: ${r_helpers.flatten(vx.subtable)}</div>`;
+						} else if (r_helpers.isString(vx.subtable)) {
+							o += `<div class="subtable_roll">Roll on: ${r_helpers.capitalize(vx.subtable)}</div>`;
 						} else {
 							_.each(vx.subtable, function (vz, kv) {
-								o += `<div class="subtable_roll">Roll ${capitalize(kv)}:<ol class="list-inline">`;
+								o += `<div class="subtable_roll">Roll ${r_helpers.capitalize(kv)}:<ol class="list-inline">`;
 								let t2weight0 = 0;
 								let t2weight1 = 0;
 								_.each(vz, function (q, w, qw) {
@@ -410,12 +391,12 @@ const RandomTable = function (config) {
 									const weight2 = (typeof q.weight !== 'undefined') ? q.weight : 1;
 									t2weight1 = t2weight1 + weight2;
 									const num2 = (t2weight0 === t2weight1) ? t2weight0 : `${t2weight0}-${t2weight1}`;
-									if (_.isArray(qw) && _.isString(q)) {
-										o += `<li>${num2}. ${capitalize(q)}</li>`;
-									} else if (_.isString(w)) {
-										o += `<li>${num2}. ${capitalize(w)}</li>`;
+									if (Array.isArray(qw) && r_helpers.isString(q)) {
+										o += `<li>${num2}. ${r_helpers.capitalize(q)}</li>`;
+									} else if (r_helpers.isString(w)) {
+										o += `<li>${num2}. ${r_helpers.capitalize(w)}</li>`;
 									} else {
-										o += `<li>${num2}. ${capitalize(q.label)}</li>`;
+										o += `<li>${num2}. ${r_helpers.capitalize(q.label)}</li>`;
 									}
 								}, this);
 								o += '</ol></div>';
@@ -459,7 +440,7 @@ const RandomTable = function (config) {
 		const att = _.clone(this.attributes);
 		const props = Object.keys(att);
 		props.forEach((k) => {
-			if (!editmode && _.isEmpty(att[k])) {
+			if (!editmode && r_helpers.isEmpty(att[k])) {
 				delete att[k];
 			}
 		});
@@ -496,7 +477,7 @@ const RandomTable = function (config) {
 			table.forEach((v, k) => {
 				const e = {};
 				// account for tables that are just arrays of strings
-				if (_.isString(k)) {
+				if (r_helpers.isString(k)) {
 					e.label = k;
 				} else {
 					e.label = v.label;
@@ -509,7 +490,7 @@ const RandomTable = function (config) {
 				const v = table[k];
 				const e = {};
 				// account for tables that are just arrays of strings
-				if (_.isString(k)) {
+				if (r_helpers.isString(k)) {
 					e.label = k;
 				} else {
 					e.label = v.label;
@@ -609,10 +590,10 @@ const RTable_Collection = function () {
 		var a = a.get(this.sortAttribute),
 		b = b.get(this.sortAttribute);
 		
-		if (_.isString(a)) {
+		if (r_helpers.isString(a)) {
 			a = a.toLowerCase();
 		}
-		if (_.isString(b)) {
+		if (r_helpers.isString(b)) {
 			b = b.toLowerCase();
 		}
 		
@@ -650,7 +631,7 @@ const RTable_Collection = function () {
 	 */
 /*
 	getById: function(id) {
-		if (typeof id == 'undefined' || _.isEmpty(id) || id == '0') {
+		if (typeof id == 'undefined' || r_helpers.isEmpty(id) || id == '0') {
 			return {};
 		}
 		
@@ -728,10 +709,10 @@ const RTable_Collection = function () {
 			}
 			return true;
 		});
-		
-		_.each(t, function(v,k,l){
+		//@todo maybe broken
+		t.forEach((v, k, l) {
 			l[k] = v.outputObject(false);
-		}, this);
+		});
 		
 		return t;
 	}
