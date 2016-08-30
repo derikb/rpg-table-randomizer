@@ -1,17 +1,16 @@
 'use strict';
 
-const _ = require('underscore');
-const randomizer = require('./randomizer.js');
 const r_helpers = require('./r_helpers.js');
 const namedata = require('../sample/names.json');
 
 /**
  * Name generator...
+ * @param {Object} randomizer an instance of randomizer module
  */
-const RandomName = function () {
+const RandomName = function (randomizer) {
 	this.listCount = 10;
 	this.markov = {};
-	
+	this.randomizer = randomizer;
 	/**
 	 * Generate a bunch of names
 	 * @param {String} nametypes type of name
@@ -47,18 +46,18 @@ const RandomName = function () {
 	 */
 	this.holmesname = function () {
 		let name = '';
-		const scount = randomizer.getWeightedRandom(namedata.holmesian_scount.values, namedata.holmesian_scount.weights);
+		const scount = this.randomizer.getWeightedRandom(namedata.holmesian_scount.values, namedata.holmesian_scount.weights);
 	
 		for (let i = 1; i <= scount; i++) {
-			name += randomizer.rollRandom(namedata.holmesian_syllables); // array
+			name += this.randomizer.rollRandom(namedata.holmesian_syllables); // array
 			if (i < scount) {
-				name += randomizer.getWeightedRandom(['', ' ', '-'], [3, 2, 2]);
+				name += this.randomizer.getWeightedRandom(['', ' ', '-'], [3, 2, 2]);
 			}
 		}
 		name = r_helpers.capitalize(name.toLowerCase());
-		name += ' ' + randomizer.rollRandom(namedata.holmesian_title);
+		name += ' ' + this.randomizer.rollRandom(namedata.holmesian_title);
 		
-		name = randomizer.findToken(name);
+		name = this.randomizer.findToken(name);
 		
 		name = name.replace(/[\s\-]([a-z]{1})/g, (match) => {
 			return match.toUpperCase();
@@ -72,9 +71,9 @@ const RandomName = function () {
 	 */
 	this.demonname = function () {
 		let name = '';
-		const format = randomizer.getWeightedRandom([ ['first', 'last'], ['first', 'inner', 'last'], ['first', 'inner', 'inner', 'last'], ['first', 'inner', 'inner', 'inner', 'last'] ], [55, 35, 7, 3]);
+		const format = this.randomizer.getWeightedRandom([ ['first', 'last'], ['first', 'inner', 'last'], ['first', 'inner', 'inner', 'last'], ['first', 'inner', 'inner', 'inner', 'last'] ], [55, 35, 7, 3]);
 		for (let i = 0; i < format.length; i++) {
-			name += randomizer.rollRandom(namedata.demonic[format[i]]);
+			name += this.randomizer.rollRandom(namedata.demonic[format[i]]);
 		}
 		return name;
 	};
@@ -90,11 +89,11 @@ const RandomName = function () {
 		
 		if (typeof name_type === 'undefined' || name_type === '' || name_type === 'random') {
 			// randomize a type...
-			name_type = randomizer.rollRandom(_.keys(namedata.options));
+			name_type = this.randomizer.rollRandom(Object.keys(namedata.options));
 		}
 		if (typeof gender === 'undefined' || gender === 'random') {
 			// randomize a gender...
-			gender = randomizer.rollRandom(['male', 'female']);
+			gender = this.randomizer.rollRandom(['male', 'female']);
 		}
 		if (typeof style === 'undefined' || style !== 'first') {
 			style = '';
@@ -112,11 +111,11 @@ const RandomName = function () {
 			case 'dutch':
 			case 'turkish':
 			default:
-				name = r_helpers.capitalize(randomizer.rollRandom(namedata[name_type][gender]));
+				name = r_helpers.capitalize(this.randomizer.rollRandom(namedata[name_type][gender]));
 				if (typeof namedata[name_type]['surname'] !== 'undefined' && style !== 'first') {
-					name += r_helpers.capitalize(' ' + randomizer.rollRandom(namedata[name_type]['surname']));
+					name += r_helpers.capitalize(' ' + this.randomizer.rollRandom(namedata[name_type]['surname']));
 				}
-				name = randomizer.findToken(name).trim();
+				name = this.randomizer.findToken(name).trim();
 				break;
 		}
 		return name;
@@ -130,7 +129,7 @@ const RandomName = function () {
 		let name = '';
 		if (typeof name_type === 'undefined' || name_type === '' || name_type === 'random') {
 			// randomize a type...
-			name_type = randomizer.rollRandom(_.keys(namedata.options));
+			name_type = this.randomizer.rollRandom(Object.keys(namedata.options));
 		}
 		switch (name_type) {
 			case 'holmesian':
@@ -141,8 +140,8 @@ const RandomName = function () {
 			case 'dutch':
 			case 'turkish':
 			default:
-				name = r_helpers.capitalize(randomizer.rollRandom(namedata[name_type]['surname']));
-				name = randomizer.findToken(name);
+				name = r_helpers.capitalize(this.randomizer.rollRandom(namedata[name_type]['surname']));
+				name = this.randomizer.findToken(name);
 				break;
 		}
 		return name;
@@ -215,6 +214,29 @@ const RandomName = function () {
 		name = name.replace(/\s([a-z])/mg, (match, p1) => { return ` ${p1.toUpperCase()}`; });
 		return name.charAt(0).toUpperCase() + name.slice(1);
 	};
+	
+	this.randomizer.registerTokenType('name', (token_parts, full_token, curtable) => {
+		console.log('name token');
+		let string = '';
+		const n = this;
+		if (typeof token_parts[1] === 'undefined' || token_parts[1] === '' || token_parts[1] === 'random') {
+			parts[1] = '';
+		}
+		if (typeof token_parts[3] === 'undefined' || token_parts[3] !== 'first') {
+			token_parts[3] = '';
+		}
+		if (typeof token_parts[2] === 'undefined') {
+			string = n.generateSurname(token_parts[1]);
+		} else if (token_parts[2] === 'male') {
+			string = n.generateName(parts[1], 'male', token_parts[3]);
+		} else if (token_parts[2] === 'female') {
+			string = n.generateName(parts[1], 'female', token_parts[3]);
+		} else if (token_parts[2] === 'random') {
+			string = n.generateName(token_parts[1], 'random', token_parts[3]);
+		}
+		
+		return string;
+	});
 };
 
 /**
@@ -242,33 +264,17 @@ const Markov = function (config) {
 	 */
 	this.learn = function (key, txt) {
 		const mem = (this.memory[key]) ? this.memory[key] : {};
-		this.breakText(txt, learnPart);
-		
-		/**
-		 * add element to memory
-		 * @param {Array} key array for chain (converted to a,b,c by toString())
-		 * @param {String} value next element in chain
-		 */
-		function learnPart (key, value) {
+		// split up text then add the calculated parts to the memory for this ket
+		this.breakText(txt, (key, value) => {
 			// console.log(key);
 			if (!mem[key]) {
 				mem[key] = [];
 			}
 			mem[key].push(value);
 			return mem;
-		}
-		
+		});
 		this.memory[key] = mem;
 	};
-/*
-	this.learnPart = function (key, value) {
-		 if (!mem[key]) {
-			mem[key] = [];
-		}
-		mem[key].push(value);
-		return mem;
-	};
-*/
 	/**
 	 * Return a generated response
 	 * @param {String} key key for the chain (so we can store multiples
@@ -316,19 +322,6 @@ const Markov = function (config) {
 			prev.push(v);
 		});
 		cb(prev, '');
-		
-		/**
-		 * Apply the callback then move forward in the chain
-		 * @param {String} next the current value in the txt
-		 */
-/*
-		function step (next) {
-			 next = next.toLowerCase();
-			cb(prev, next);
-			prev.shift();
-			prev.push(next);
-		}
-*/
 	};
 	/**
 	 * Generate a starting array for the chain based on the order number

@@ -10,6 +10,8 @@ const path = require('path');
 const tables = []; // store the tables here
 
 
+console.log( rpgrandomizer.randomizer.token_types );
+
 /*
 const iterate = (obj, cb) => {
 	if (Array.isArray(obj)) {
@@ -58,8 +60,6 @@ _.each(this.get('tables'), function (v, k, l) {
 		}, this);
 */
 
-process.exit(1);
-
 
 console.log( rpgrandomizer.r_helpers.isEmpty({ }) );
 console.log( rpgrandomizer.r_helpers.isEmpty({ a: 2 }) );
@@ -87,13 +87,6 @@ rpgrandomizer.randomizer.setTableTitleLookup(function(title){
 	return t;
 });
 
-
-rpgrandomizer.randomizer.registerTokenType('name', (token_parts, full_token, curtable) => {
-	if (token_parts[1]) {
-		return `${token_parts[1]}-y`;
-	}
-	return '';
-});
 
 
 tables.forEach((table) => {

@@ -68,6 +68,7 @@ const extend = function (obj, props) {
 			obj[prop] = props[prop];
 		}
 	}
+	return obj;
 };
 /**
  * Iterate of Array or Object and apply callback
@@ -88,8 +89,9 @@ module.exports = {
 	isEmpty: isEmpty,
 	isString: isString,
 	isObject: isObject,
+	isUndefined: isUndefined,
 	capitalize: capitalize,
 	flatten: flatten,
-	extent: extend,
+	extend: extend,
 	iterate: iterate
 };
