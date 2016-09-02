@@ -60,7 +60,7 @@ const flatten = function (arr){
 	return o;
 };
 /**
- * Extend one object with anotyher
+ * Extend one object with another
  */
 const extend = function (obj, props) {
 	for (const prop in props) {
@@ -71,9 +71,11 @@ const extend = function (obj, props) {
 	return obj;
 };
 /**
+ * @todo maybe get this working?
  * Iterate of Array or Object and apply callback
  * Callback is passed value, key, obj
  */
+/*
 const iterate = (obj, cb) => {
 	if (Array.isArray(obj)) {
 		obj.forEach(cb.bind(this));
@@ -84,6 +86,7 @@ const iterate = (obj, cb) => {
 		}
 	}
 };
+*/
 
 module.exports = {
 	isEmpty: isEmpty,
