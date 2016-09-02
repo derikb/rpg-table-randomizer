@@ -50,7 +50,7 @@ const capitalize = function (string) {
 /**
  * Flatten array into comma separated, capitalized string
  */
-const flatten = function (arr){
+const flatten = function (arr) {
 	let o = '';
 	arr.forEach((v) => {
 		o += `${capitalize(v)}, `;
@@ -95,6 +95,5 @@ module.exports = {
 	isUndefined: isUndefined,
 	capitalize: capitalize,
 	flatten: flatten,
-	extend: extend,
-	iterate: iterate
+	extend: extend
 };
