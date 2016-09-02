@@ -220,7 +220,7 @@ const RandomName = function (randomizer) {
 		let string = '';
 		const n = this;
 		if (typeof token_parts[1] === 'undefined' || token_parts[1] === '' || token_parts[1] === 'random') {
-			parts[1] = '';
+			token_parts[1] = '';
 		}
 		if (typeof token_parts[3] === 'undefined' || token_parts[3] !== 'first') {
 			token_parts[3] = '';
@@ -228,9 +228,9 @@ const RandomName = function (randomizer) {
 		if (typeof token_parts[2] === 'undefined') {
 			string = n.generateSurname(token_parts[1]);
 		} else if (token_parts[2] === 'male') {
-			string = n.generateName(parts[1], 'male', token_parts[3]);
+			string = n.generateName(token_parts[1], 'male', token_parts[3]);
 		} else if (token_parts[2] === 'female') {
-			string = n.generateName(parts[1], 'female', token_parts[3]);
+			string = n.generateName(token_parts[1], 'female', token_parts[3]);
 		} else if (token_parts[2] === 'random') {
 			string = n.generateName(token_parts[1], 'random', token_parts[3]);
 		}
