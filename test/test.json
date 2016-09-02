@@ -10,6 +10,19 @@
 		]
 	},
 	{
+		"id": "one",
+		"title": "One Result",
+		"description": "Just a way to always get one result to make sure we are getting a result from the right table.",
+		"tables": {
+			"default": [
+				"one"
+			],
+			"two": [
+				"two"	
+			]
+		}
+	},
+	{
 		"id": "season",
 		"title": "Seasons",
 		"table": [

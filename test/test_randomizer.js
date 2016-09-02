@@ -4,11 +4,11 @@ const expect = require('chai').expect;
 
 const randomizer = require('../src/randomizer.js');
 const random_table = require('../src/random_table.js');
-const general_tables = require('../sample/general.json');
+const test_tables = require('./test.json');
 
 const tables = {};
 
-general_tables.forEach((t) => {
+test_tables.forEach((t) => {
 	tables[t.id] = new random_table(t);
 });
 
