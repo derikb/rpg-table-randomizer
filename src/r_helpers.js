@@ -20,14 +20,14 @@ const isEmpty = function (obj) {
  * @return {Boolean} is it an string?
  */
 const isString = function (obj) {
-	return toString.call(obj) === '[object String]';	
-}
+	return toString.call(obj) === '[object String]';
+};
 /**
  * Is it an Object (stolen from Underscore)
  * @param {Object|String|?} obj some type of things
  * @return {Boolean} is it an object?
  */
-const isObject = function(obj) {
+const isObject = function (obj) {
 	var type = typeof obj;
 	return type === 'function' || type === 'object' && !!obj;
 };
@@ -36,7 +36,7 @@ const isObject = function(obj) {
  * @param {Object|String|?} obj object to test
  * @return {Boolean} is it undefined
  */
-const isUndefined = function(obj) {
+const isUndefined = function (obj) {
 	return obj === void 0;
 };
 /**
@@ -50,10 +50,10 @@ const capitalize = function (string) {
 /**
  * Flatten array into comma separated, capitalized string
  */
-const flatten = function(arr){
+const flatten = function (arr){
 	let o = '';
 	arr.forEach((v) => {
-		o += capitalize(v)+', ';
+		o += `${capitalize(v)}, `;
 	});
 	o = o.trim();
 	o = o.replace(/,$/, '');
@@ -63,7 +63,7 @@ const flatten = function(arr){
  * Extend one object with anotyher
  */
 const extend = function (obj, props) {
-	for(let prop in props) {
+	for (const prop in props) {
 		if (props.hasOwnProperty(prop)) {
 			obj[prop] = props[prop];
 		}
@@ -78,8 +78,8 @@ const iterate = (obj, cb) => {
 	if (Array.isArray(obj)) {
 		obj.forEach(cb.bind(this));
 	} else if (isObject(obj)) {
-		let keys = Object.keys(obj);
-		for (let k in keys) {
+		const keys = Object.keys(obj);
+		for (const k in keys) {
 			cb.bind(this, obj[k], k, obj);
 		}
 	}
