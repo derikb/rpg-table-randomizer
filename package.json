@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "eslint": "./node_modules/.bin/eslint ",
-    "browserify": "./node_modules/.bin/browserify src/index.js --s rpg-table-randomizer -o dist/bundle.js -t [ babelify --presets [ es2015 ] ]"
+    "browserify": "./node_modules/.bin/browserify src/index.js --s rpg-table-randomizer -o dist/bundle.js -t [ babelify --presets [ es2015 ] ]",
+    "test": "mocha test/test_randomizer.js"
   },
   "repository": {
     "type": "git",

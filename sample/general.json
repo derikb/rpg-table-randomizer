@@ -10,6 +10,18 @@
 		]
 	},
 	{
+		"id": "one",
+		"title": "One Result",
+		"tables": {
+			"default": [
+				"one"
+			],
+			"two": [
+				"two"	
+			]
+		}
+	},
+	{
 		"id": "color",
 		"title": "Colors",
 		"table": [

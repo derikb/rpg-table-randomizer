@@ -152,71 +152,6 @@ let Randomizer = function () {
 		} else {
 			return token;
 		}
-		
-		// Only table and roll actions are accepted
-/*
-		switch (parts[0]) {
-			case 'table':
-				let multiplier = 1;
-				if (parts[1].indexOf('*') !== -1) {
-					var x = parts[1].split('*');
-					parts[1] = x[0];
-					multiplier = x[1];
-				}
-				
-				// what table do we roll on
-				let t = null;
-				if (parts[1] === 'this') {
-					// reroll on same table
-					t = this.getTableByTitle(curtable);
-				} else {
-					t = this.getTableByTitle(parts[1]);
-				}
-				if (t !== null && typeof t !== 'object') {
-					return token;
-				}
-				if (typeof parts[2] !== 'undefined' && parts[2].indexOf('*') !== -1) {
-					const x = parts[2].split('*');
-					parts[2] = x[0];
-					multiplier = x[1];
-				}
-				let subtable = (typeof parts[2] === 'undefined') ? '' : parts[2];
-				
-				for (var i = 1; i <= multiplier; i++) {
-					t.generateResult(subtable);
-					string += t.niceString(true) + ', ';
-				}
-				string = string.trim();
-				string = string.replace(/,$/, '');
-				
-				break;
-			case 'roll':
-				string = this.parseDiceNotation(parts[1]);
-				break;
-			case 'name':
-				var n = new Names();
-				if (typeof parts[1] === 'undefined' || parts[1] === '' || parts[1] === 'random') {
-					parts[1] = '';
-				}
-				if (typeof parts[3] === 'undefined' || parts[3] !== 'first') {
-					parts[3] = '';
-				}
-				if (typeof parts[2] === 'undefined') {
-					string = n.generateSurname(parts[1]);
-				} else if (parts[2] === 'male') {
-					string = n.generateName(parts[1], 'male', parts[3]);
-				} else if (parts[2] === 'female') {
-					string = n.generateName(parts[1], 'female', parts[3]);
-				} else if (parts[2] === 'random') {
-					string = n.generateName(parts[1], 'random', parts[3]);
-				}
-				break;
-			default:
-				string = '';
-		}
-
-		return string;
-		*/
 	};
 	/**
 	 * Look for tokens to perform replace action in convertToken
@@ -237,6 +172,7 @@ let Randomizer = function () {
 	 * @returns {Number} the result of the roll
 	 */
 	this.parseDiceNotation = function (string) {
+		string = (typeof string === 'undefined') ? '' : string.trim();
 		const m = string.match(/^([0-9]*)d([0-9]+)(?:([\+\-\*\/])([0-9]+))*$/);
 		if (m) {
 			if (typeof m[4] === 'undefined') { m[4] = 0; }
@@ -276,7 +212,7 @@ let Randomizer = function () {
 	 * Dice roll token.
 	 */
 	this.registerTokenType('roll', (token_parts, full_token, curtable) => {
-		return this.parseDiceNotation[token_parts[1]];
+		return this.parseDiceNotation(token_parts[1]);
 	});
 	/**
 	 * Table token lookup in the form:
@@ -290,7 +226,7 @@ let Randomizer = function () {
 		}
 		let multiplier = 1;
 		if (token_parts[1].indexOf('*') !== -1) {
-			var x = token_parts[1].split('*');
+			let x = token_parts[1].split('*');
 			token_parts[1] = x[0];
 			multiplier = x[1];
 		}
@@ -304,6 +240,7 @@ let Randomizer = function () {
 			//console.log(t);
 		} else {
 			t = this.getTableByTitle(token_parts[1]);
+			//console.log(t);
 		}
 		if (t === null || typeof t !== 'object') {
 			return full_token;
@@ -314,7 +251,7 @@ let Randomizer = function () {
 			multiplier = x[1];
 		}
 		let subtable = (typeof token_parts[2] === 'undefined') ? '' : token_parts[2];
-		
+
 		for (var i = 1; i <= multiplier; i++) {
 			t.generateResult(subtable);
 			string += t.niceString(true) + ', ';
