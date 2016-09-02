@@ -1,6 +1,5 @@
 'use strict';
 
-const _ = require('underscore');
 const randomizer = require('./randomizer.js');
 const r_helpers = require('./r_helpers.js');
 
@@ -73,7 +72,7 @@ const RandomTable = function (config) {
 	 * @property {String|Array} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
 	 * @property {Array} [table] default table. array of strings or objects. removed after initialization.
 	 * @property {Object} [tables] a property for each subtables. if table property is not set then the first propery of this Object is used to start rolling
-	 * @property {Object} [result] current result
+	 * @property {Array} [result] current result array of objects
 	 */
 	this.initialize = function () {
 		this.normalize();
@@ -121,6 +120,8 @@ const RandomTable = function (config) {
 			this.set('tables', tables);
 			this.unset('table');
 		}
+		
+		//if tables is an array, move the array to table.default
 /*
 		@todo normalize the table data so it's always an array of objects with the value property?
 		if (!r_helpers.isEmpty(this.get('tables'))) {
@@ -201,7 +202,10 @@ const RandomTable = function (config) {
 		
 		if (r_helpers.isUndefined(t[result])) {
 			// table is an array
-			r = _.findWhere(t, { label: result });
+			//r = _.findWhere(t, { label: result });
+			r = t.find((v) => {
+				return v.label === result;
+			});
 			if (r_helpers.isUndefined(r)) {
 				// it's just an array of strings so we can stop here
 				o.push({ table: table, result: result, desc: '' });
@@ -247,7 +251,10 @@ const RandomTable = function (config) {
 				let result = randomizer.rollRandom(subtable[kx]);
 				let desc = '';
 				if (r_helpers.isUndefined(subtable[kx][result])) {
-					r2 = _.findWhere(subtable[kx], { label: result });
+					//r2 = _.findWhere(subtable[kx], { label: result });
+					r2 = subtable[kx].find((v) => {
+						return v.label === result;
+					});
 					if (r_helpers.isObject(r2)) {
 						desc = (r_helpers.isString(r2.description)) ? r2.description : '';
 					}
@@ -308,6 +315,7 @@ const RandomTable = function (config) {
 	 * Show the table options as a list
 	 * @returns {String} the table as html lists
 	 */
+/*
 	this.niceList = function () {
 		// iterature through each table
 		
@@ -430,6 +438,7 @@ const RandomTable = function (config) {
 		o += '</div>';
 		return o;
 	};
+*/
 	/**
 	 * outputs the json data for the table (import/export)
 	 * @param {Boolean} [editmode=false] if false empty attributes will be stripped out
@@ -437,7 +446,8 @@ const RandomTable = function (config) {
 	 */
 	this.outputObject = function (editmode) {
 		if (typeof editmode === 'undefined') { editmode = false; }
-		const att = _.clone(this.attributes);
+		//clone the data, this will strip out any functions too.
+		const att = JSON.parse(JSON.stringify(this.attributes));
 		const props = Object.keys(att);
 		props.forEach((k) => {
 			if (!editmode && r_helpers.isEmpty(att[k])) {
@@ -504,17 +514,23 @@ const RandomTable = function (config) {
 	 * Get an object result in case we only have the label and need other data from it
 	 * @param {String} label The item we are looking for
 	 * @param {String} [table=default] the table to search
-	 * @returns {Object} the object associated with the label
+	 * @returns {Object} the object associated with the label or an empty one
 	 */
 	this.findObject = function (label, table) {
 		if (typeof table === 'undefined' || table === '') {
 			table = 'default';
 		}
 		const t = this.get('tables')[table];
-		if (typeof t[label] === 'undefined') {
-			return _.findWhere(t, { label: label });
+		if (t[label]) {
+			return t[label];
 		}
-		return t[label];
+		if (Array.isArray(t)) {
+			let obj = t.find((v) => {
+				return v.label === label;
+			});
+			return (typeof obj !== 'undefined') ? obj : {};
+		}
+		return {};
 	};
 	/**
 	  * find the result element for a specific table/subtable
@@ -525,198 +541,13 @@ const RandomTable = function (config) {
 		if (typeof table === 'undefined' || table === '') {
 			table = 'default';
 		}
-		return _.findWhere(this.get('result'), { table: table });
+		let obj = this.get('result').find((v) => {
+			return v.table === table;
+		});
+		return (typeof obj !== 'undefined') ? obj : {};
 	};
 	// initialize the table
 	this.initialize();
-};
-
-// RTable_Collection
-const RTable_Collection = function () {
-	
-//	sortAttribute: "title",
-//	sortDirection: 1,
-	
-	/**
-	 * A collection of RandomTables
-	 * Tables are added via appdata.tables (converted to an array of objects in AppRouter)
-	 *
-	 * @augments external:Backbone.Collection
-	 * @constructs
-	 */
-/*
-	initialize: function(){
-		
-	},
-*/
-	
-	/**
-	 * Add a RandomTable to the collection, trigger refresh so view updates
-	 * @param {Object} [model] A RandomTable model to add to the collection
-	 */
-/*
-	import: function (model) {
-		this.add(model);
-		this.trigger('refresh');
-	},
-*/
-	
-	/**
-	 * trigger a refresh on the collection
-	 */
-/*
-	refresh: function() {
-		this.trigger('refresh')
-	},
-*/
-	
-	/**
-	 * Sort the collection's Tables
-	 * @param {String} attr The field to sort by
-	 */
-/*
-	sortTables: function (attr) {
-		if (typeof attr == 'undefined') { attr = 'title'; this.sortDirection = 1; }
-		this.sortAttribute = attr;
-		this.sort();
-	},
-*/
-	
-	/**
-	 * Comparator function for sorting
-	 */
-/*
-	comparator: function(a, b) {
-		var a = a.get(this.sortAttribute),
-		b = b.get(this.sortAttribute);
-		
-		if (r_helpers.isString(a)) {
-			a = a.toLowerCase();
-		}
-		if (r_helpers.isString(b)) {
-			b = b.toLowerCase();
-		}
-		
-		if (a == b) return 0;
-		
-		//1 is ascending
-		if (this.sortDirection == 1) {
-			return a > b ? 1 : -1;
-		} else {
-			return a < b ? 1 : -1;
-		}
-	},
-*/
-	
-	/**
-	 * Search the collection
-	 * @param {String} query words to look for
-	 * @param {Function} callback function to perform with the matching models
-	 */
-/*
-	search: function( query, callback ){
-		var pattern = new RegExp( $.trim( query ).replace( / /gi, '|' ), "i");
-		callback.call( this, this.filter(function( model ){
-			if (pattern.test(model.attributes.title) || pattern.test(model.attributes.description) || pattern.test(model.attributes.author) || pattern.test(model.attributes.source)) {
-				return true;
-			}
-		}));
-	},
-*/
-
-	/**
-	 * Returns a table from the collection based on ID
-	 * @Param {String} id which random table to get
-	 * @returns {Object} the randomtable model
-	 */
-/*
-	getById: function(id) {
-		if (typeof id == 'undefined' || r_helpers.isEmpty(id) || id == '0') {
-			return {};
-		}
-		
-		var t = this.findWhere({ id: id });
-		if (typeof t == 'undefined') {
-			return {};
-		}
-		return t;
-	},
-*/
-	
-	/**
-	 * Return a table from the collection
-	 * @Param {String} title which random table to get
-	 * @returns {Object} the randomtable model
-	 */
-/*
-	getByTitle: function(title) {
-		if (typeof title == 'undefined' || title == '') {
-			return {};
-		}
-		//console.log(title);
-		//console.log(this.findWhere({ key: title }));
-		
-		var t = this.findWhere({ key: title });
-		if (typeof t == 'undefined') {
-			t = this.findWhere({ title: title });
-		}
-		if (typeof t == 'undefined') {
-			return {};
-		}
-		return t;
-	},
-*/
-	
-	/**
-	 * Return an array of tables from the collection
-	 * @Param {String} tag a tag to search on
-	 * @returns {Array} of randomtable models
-	 */
-/*
-	getByTags: function(tag) {
-		if (typeof tag == 'undefined' || tag == '') {
-			return [];
-		}
-		//console.log(tag);
-		var t = this.filter(function(model){
-			return ( _.indexOf(model.get('tags'), tag) >= 0 );
-		});
-		//console.log(t);
-		if (typeof t == 'undefined') {
-			return [];
-		}
-		return t;
-	},
-*/
-	
-	/**
-	 * Export the user saved custom tables
-	 * @param {String} [which=user] user will only output user saved tables, all will output all tables
-	 * @param {Boolean} [compress=false] if true JSON will not be indented with tabs/lines
-	 * @returns {Array} Array of table objects ?
-	 */
-/*
-	exportOutput: function(which, compress) {
-		if (typeof which == 'undefined') {
-			which = 'user';
-		}
-		if (typeof compress == 'undefined') {
-			compress = false;
-		}
-		var t = this.filter(function(model){
-			if (which == 'user') {
-				return ( typeof model.get('id') !== 'undefined' );
-			}
-			return true;
-		});
-		//@todo maybe broken
-		t.forEach((v, k, l) {
-			l[k] = v.outputObject(false);
-		});
-		
-		return t;
-	}
-*/
 };
 
 module.exports = RandomTable;
