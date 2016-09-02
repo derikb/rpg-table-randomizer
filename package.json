@@ -37,7 +37,5 @@
     "eslint-plugin-standard": "^2.0.0",
     "mocha": "^3.0.2"
   },
-  "dependencies": {
-    "underscore": "^1.8.3"
-  }
+  "dependencies": { }
 }

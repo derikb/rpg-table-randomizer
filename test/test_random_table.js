@@ -11,12 +11,22 @@ const test_tables = require('./test.json');
  */
 let test_table = null;
 
-describe('random_table module', function (){
+describe('random_table module', function () {
 	
-	beforeEach(function () {
+	before(function () {
 		test_table = null;
 	});
 
-	
+	describe('findObject method', function () {
+		
+		it('should find the desired element from the desired table', function () {
+			let sample_data = test_tables.find((v) => { return v.id === 'colonial_encounters_town'; });
+			test_table = new random_table(sample_data);
+			expect(test_table.findObject('Local priest')).to.eql( { "label": "Local priest",
+	        "subtable": "actions_men" } );
+	        expect(test_table.findObject('Arguing', 'actions_men')).to.eql( { "label": "Arguing" } );
+		});
+		
+	});
 
 });
