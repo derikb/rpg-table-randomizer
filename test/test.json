@@ -60,6 +60,11 @@
 			"value",
 			"default"
 		],
+		"print": {
+			"value": {
+				"hide_table": true
+			}
+		},
 		"tables": {
 			"default": [
 				"Blue"

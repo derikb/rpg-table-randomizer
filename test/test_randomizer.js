@@ -203,7 +203,6 @@ describe('Randomizer module', function (){
 	
 	describe('getTableResult function', function(){
 		it('should return a result', function () {
-			//console.log( randomizer.getTableResult(tables['one']) );
 			const result = randomizer.getTableResult(tables['one']);
 			expect(result).to.have.lengthOf(1);
 			expect(result.shift()).to.have.property('result', 'one');
@@ -211,7 +210,6 @@ describe('Randomizer module', function (){
 		
 		it('should return a sequence of results', function () {
 			const result = randomizer.getTableResult(tables['color2']);
-			//console.log(result);
 			expect(result).to.have.lengthOf(2);
 			expect(result.shift()).to.have.property('result', 'Light');
 			expect(result.shift()).to.have.property('result', 'Blue');
