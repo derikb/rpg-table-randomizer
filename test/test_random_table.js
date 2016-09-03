@@ -16,6 +16,18 @@ describe('random_table module', function () {
 	before(function () {
 		test_table = null;
 	});
+	
+	
+	describe('basic config', function(){
+		it('should set the basic config properties', function () {
+			const config = test_tables.find((v) => { return v.id === 'directions'; });
+			const test_table = new random_table(config);
+			expect(test_table.id).to.equal(config.id);
+			expect(test_table.key).to.equal(config.id);
+			expect(test_table.table).to.be.undefined;
+			expect(test_table.tables.default).to.equal(config.table);
+		});
+	});
 
 	describe('findObject method', function () {
 		

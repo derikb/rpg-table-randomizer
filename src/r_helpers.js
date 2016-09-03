@@ -6,7 +6,7 @@
  * @return {Boolean} is it empty?
  */
 const isEmpty = function (obj) {
-	if (obj === null) {
+	if (obj === null || obj === void 0) {
 		return true;
 	}
 	if (Array.isArray(obj) || isString(obj)) {

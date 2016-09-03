@@ -1,5 +1,7 @@
 'use strict';
 
+const r_helpers = require('./r_helpers.js');
+
 /**
  * Randomizer - handles app randomization functions
  * Module exports a single instance of Randomizer...
@@ -138,6 +140,156 @@ let Randomizer = function () {
 		return total;
 	};
 	/**
+	 * Generate a result from a RandomTable object
+	 * @param {Object} table the RandomTable
+	 * @param {String} [start=''] subtable to roll on
+	 * @return {Array} result array
+	 */
+	this.getTableResult = function (rtable, start) {
+		if (!r_helpers.isObject(rtable)) {
+			return [{ table: 'Error', result: 'No table found to roll on.', desc: '' }];
+		}
+		let result = [];
+		if (typeof start === 'undefined') {
+			start = '';
+		}
+		// we look in the start table for what to roll if the start wasn't explicitly set in the call
+		let sequence = (start === '') ? rtable.sequence : start;
+		
+		if (sequence === 'rollall') {
+			// roll all the tables in order
+			sequence = Object.keys(rtable.tables);
+		}
+		
+		if (sequence === '') {
+			// if no start attribute
+			// try for "default" table
+			if (typeof rtable.tables['default'] !== 'undefined') {
+				result = this.selectFromTable(rtable, 'default');
+			} else {
+				// select first item from tables
+				const tables = Object.keys(rtable.tables);
+				result = this.selectFromTable(rtable, tables[0]);
+			}
+		} else if (typeof sequence === 'string') {
+			result = this.selectFromTable(rtable, sequence);
+		} else {
+			sequence.forEach((seq) => {
+				let r = '';
+				if (r_helpers.isString(seq)) {
+					r = this.selectFromTable(rtable, seq);
+					result = result.concat(r);
+					return;
+				}
+				// its an object
+				const table = (seq.table) ? seq.table : '';
+				if (table == '') {
+					return;
+				}
+				const times = (typeof seq.times === 'number') ? seq.times : 1;
+				for (let i = 1; i <= times; i++) {
+					r = this.selectFromTable(table);
+					result = result.concat(r);
+				}
+			});
+		}
+		
+		rtable.result = result;
+		return result;	
+	};
+	/**
+	 * Get a result from a table/subtable in a RandomTable object
+	 * DANGER: you could theoretically put yourself in an endless loop if the data were poorly planned
+	 * ...but at worst that would just crash the users browser since there's no server processing involved... (???)
+	 * @todo we'll have to fix for this with a node version
+	 * @param {Object} rtable the RandomTable object
+	 * @param {String} table table to roll on
+	 * @returns {Array} array of object results { table: table that was rolled on, result: result string, desc: description string }
+	 */
+	this.selectFromTable = function (rtable, table) {
+		if (!r_helpers.isObject(rtable)) {
+			return [{ table: 'Error', result: 'No table found to roll on.', desc: '' }];
+		}
+		if (typeof table === 'undefined') {
+			return [{ table: 'Error', result: 'No table found to roll on.', desc: '' }];
+		}
+		// console.log(table);
+		let o = []; // output for sequence of rolls/selections
+		const t = rtable.tables[table]; // the table/subtable
+		const result = this.rollRandom(t); // the random string from the table (either the object property, a string value from an array, or the value property from a selected object)
+		let r = ''; // the string result from the table
+		let result_print = true; // are we going to show this result
+		
+		if (r_helpers.isUndefined(t[result])) {
+			// table is an array
+			// r = _.findWhere(t, { label: result });
+			r = t.find((v) => {
+				return v.label === result;
+			});
+			if (r_helpers.isUndefined(r)) {
+				// it's just an array of strings so we can stop here
+				o.push({ table: table, result: result, desc: '' });
+				return o;
+			}
+			result_print = (typeof r['print'] === 'undefined') ? true : r['print'];
+		} else {
+			r = t[result];
+			result_print = (typeof t[result]['print'] === 'undefined') ? true : t[result]['print'];
+		}
+		// r is now the result object
+		
+		// if print==false we suppress the output from this table (good for top-level tables)
+		if (result_print === true) {
+			// add the description if there is one
+			const desc = (r_helpers.isString(r['description'])) ? r['description'] : '';
+			// replace any tokens
+			const t_result = this.findToken(result, rtable.key);
+			o.push({ table: table, result: t_result, desc: desc });
+		}
+		
+		// are there subtables to roll on?
+		const subtable = r.subtable;
+		let r2 = ''; // subtable results
+		if (typeof subtable === 'undefined') {
+			// no subtables
+			return o;
+		} else if (r_helpers.isString(subtable)) {
+			// subtables is a string reference to a table so we run this function again
+			r2 = this.selectFromTable(rtable, subtable);
+			o = o.concat(r2);
+		} else if (Array.isArray(subtable)) {
+			// subtables is an array, assume reference to other tables, roll on each in turn
+			subtable.forEach((v) => {
+				r2 = this.selectFromTable(rtable, v);
+				o = o.concat(r2);
+			});
+		} else if (r_helpers.isObject(subtable)) {
+			// subtable is object assume embedded table(s)
+			// loop over keys
+			const k = Object.keys(subtable);
+			k.forEach((kx) => {
+				let result = this.rollRandom(subtable[kx]);
+				let desc = '';
+				if (r_helpers.isUndefined(subtable[kx][result])) {
+					// r2 = _.findWhere(subtable[kx], { label: result });
+					r2 = subtable[kx].find((v) => {
+						return v.label === result;
+					});
+					if (r_helpers.isObject(r2)) {
+						desc = (r_helpers.isString(r2.description)) ? r2.description : '';
+					}
+				} else {
+					desc = (r_helpers.isString(subtable[kx][result]['description'])) ? subtable[kx][result]['description'] : '';
+				}
+				result = this.findToken(result, rtable.key);
+				
+				o.push({ table: kx, result: result, desc: desc });
+			});
+		}
+		
+		return o;
+	};
+	/**
 	 * Perform token replacement.  Only table and roll actions are accepted
 	 * @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}}
 	 * @returns {String} The value with the token(s) replaced by the operation or else just the token (in case it was a mistake or at least to make the error clearer)
@@ -253,7 +405,7 @@ let Randomizer = function () {
 		let subtable = (typeof token_parts[2] === 'undefined') ? '' : token_parts[2];
 
 		for (var i = 1; i <= multiplier; i++) {
-			t.generateResult(subtable);
+			this.getTableResult(t, subtable);
 			string += t.niceString(true) + ', ';
 		}
 		string = string.trim();

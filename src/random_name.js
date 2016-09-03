@@ -1,95 +1,53 @@
 'use strict';
 
 const r_helpers = require('./r_helpers.js');
-const namedata = require('../sample/names.json');
 
 /**
  * Name generator...
  * @param {Object} randomizer an instance of randomizer module
+ * @param {Object} namedata a lot of names divided by type. see /samples/names.json for formatting
  */
-const RandomName = function (randomizer) {
+const RandomName = function (randomizer, namedata) {
 	this.listCount = 10;
 	this.markov = {};
 	this.randomizer = randomizer;
+	this.namedata = namedata;
 	/**
-	 * Generate a bunch of names
-	 * @param {String} nametypes type of name
-	 * @param {Bool} create new names or just pick from list
-	 * @return {Array} list of name objects
+	 * Generate a bunch of names, half male, half female
+	 * @param {String} [name_type] type of name or else it will randomly select
+	 * @param {Bool} [create=false] new names or just pick from list
+	 * @return {Object} arrays of names inside male/female property
 	 */
-	this.generateList = function (nametypes, create) {
-		const names = {};
+	this.generateList = function (name_type, create) {
+		const names = { male: [], female: [] };
 		if (typeof create === 'undefined') { create = false; }
-		
-		if (!Array.isArray(nametypes)) {
-			nametypes = [nametypes];
+		if (typeof name_type === 'undefined' || name_type === '') {
+			name_type = 'random';
 		}
 		
-		nametypes.forEach((v) => {
-			const a = { male: [], female: [] };
-			const n = this.listCount;
-			for (let i = 1; i <= n; i++) {
-				const gender = (i <= Math.ceil(n / 2)) ? 'male' : 'female';
-				if (create && v !== 'holmesian' && v !== 'demonic') {
-					a[gender].push(this.createName(v, gender, true));
-				} else {
-					a[gender].push(this.generateName(v, gender));
-				}
+		for (let i = 1; i <= this.listCount; i++) {
+			const gender = (i <= Math.ceil(this.listCount / 2)) ? 'male' : 'female';
+			if (create && name_type !== 'holmesian' && name_type !== 'demonic') {
+				names[gender].push(this.createName(name_type, gender, true));
+			} else {
+				names[gender].push(this.selectName(name_type, gender));
 			}
-			names[v] = a;
-		});
+		}
 		return names;
 	};
 	/**
-	 * Generate a Holmes name
-	 * @returns {String} name
-	 */
-	this.holmesname = function () {
-		let name = '';
-		const scount = this.randomizer.getWeightedRandom(namedata.holmesian_scount.values, namedata.holmesian_scount.weights);
-	
-		for (let i = 1; i <= scount; i++) {
-			name += this.randomizer.rollRandom(namedata.holmesian_syllables); // array
-			if (i < scount) {
-				name += this.randomizer.getWeightedRandom(['', ' ', '-'], [3, 2, 2]);
-			}
-		}
-		name = r_helpers.capitalize(name.toLowerCase());
-		name += ' ' + this.randomizer.rollRandom(namedata.holmesian_title);
-		
-		name = this.randomizer.findToken(name);
-		
-		name = name.replace(/[\s\-]([a-z]{1})/g, (match) => {
-			return match.toUpperCase();
-		});
-		return name;
-	};
-	/**
-	 * Demonic name
-	 * Taken from Jeff Rients, based on Goetia, as implemented here: http://www.random-generator.com/index.php?title=Goetic_Demon_Names
-	 * @return {String} a name
-	 */
-	this.demonname = function () {
-		let name = '';
-		const format = this.randomizer.getWeightedRandom([ ['first', 'last'], ['first', 'inner', 'last'], ['first', 'inner', 'inner', 'last'], ['first', 'inner', 'inner', 'inner', 'last'] ], [55, 35, 7, 3]);
-		for (let i = 0; i < format.length; i++) {
-			name += this.randomizer.rollRandom(namedata.demonic[format[i]]);
-		}
-		return name;
-	};
-	/**
-	 * Create a name
+	 * Select a name from one of the lists
 	 * @param {String} name_type What name list/process to use else random
 	 * @param {String} gender male, female, random, ''
 	 * @param {String} style first=first name only, else full name
 	 * @returns {String} a name
 	 */
-	this.generateName = function (name_type, gender, style) {
+	this.selectName = function (name_type, gender, style) {
 		let name = '';
 		
 		if (typeof name_type === 'undefined' || name_type === '' || name_type === 'random') {
 			// randomize a type...
-			name_type = this.randomizer.rollRandom(Object.keys(namedata.options));
+			name_type = this.randomizer.rollRandom(Object.keys(this.namedata.options));
 		}
 		if (typeof gender === 'undefined' || gender === 'random') {
 			// randomize a gender...
@@ -111,9 +69,9 @@ const RandomName = function (randomizer) {
 			case 'dutch':
 			case 'turkish':
 			default:
-				name = r_helpers.capitalize(this.randomizer.rollRandom(namedata[name_type][gender]));
-				if (typeof namedata[name_type]['surname'] !== 'undefined' && style !== 'first') {
-					name += r_helpers.capitalize(' ' + this.randomizer.rollRandom(namedata[name_type]['surname']));
+				name = r_helpers.capitalize(this.randomizer.rollRandom(this.namedata[name_type][gender]));
+				if (typeof this.namedata[name_type]['surname'] !== 'undefined' && style !== 'first') {
+					name += r_helpers.capitalize(' ' + this.randomizer.rollRandom(this.namedata[name_type]['surname']));
 				}
 				name = this.randomizer.findToken(name).trim();
 				break;
@@ -121,15 +79,15 @@ const RandomName = function (randomizer) {
 		return name;
 	};
 	/**
-	 * Create a sur/last name only
+	 * Select a sur/last name only from one of the lists
 	 * @param {String} name_type what list/process to use, else random
 	 * @returns {String} a name
 	 */
-	this.generateSurname = function (name_type) {
+	this.selectSurname = function (name_type) {
 		let name = '';
 		if (typeof name_type === 'undefined' || name_type === '' || name_type === 'random') {
 			// randomize a type...
-			name_type = this.randomizer.rollRandom(Object.keys(namedata.options));
+			name_type = this.randomizer.rollRandom(Object.keys(this.namedata.options));
 		}
 		switch (name_type) {
 			case 'holmesian':
@@ -140,7 +98,7 @@ const RandomName = function (randomizer) {
 			case 'dutch':
 			case 'turkish':
 			default:
-				name = r_helpers.capitalize(this.randomizer.rollRandom(namedata[name_type]['surname']));
+				name = r_helpers.capitalize(this.randomizer.rollRandom(this.namedata[name_type]['surname']));
 				name = this.randomizer.findToken(name);
 				break;
 		}
@@ -154,9 +112,12 @@ const RandomName = function (randomizer) {
 	 * @returns {String} a name
 	 */
 	this.createName = function (name_type, gender, surname) {
-		if (typeof name_type === 'undefined') { return ''; }
+		if (typeof name_type === 'undefined' || name_type === '' || name_type === 'random') {
+			// randomize a type...
+			name_type = this.randomizer.rollRandom(Object.keys(this.namedata.options));
+		}
 		if (typeof surname === 'undefined') { surname = false; }
-		if (!namedata[name_type]) { return ''; }
+		if (!this.namedata[name_type]) { return ''; }
 		if (typeof gender === 'undefined') { gender = ''; }
 		
 		const mkey = `${name_type}_${gender}`;
@@ -171,10 +132,10 @@ const RandomName = function (randomizer) {
 			// console.log('learn '+mkey);
 			let namelist = [];
 			if (gender === '') {
-				namelist = namedata[name_type]['male'];
-				namelist = namelist.concat(namedata[name_type]['female']);
+				namelist = this.namedata[name_type]['male'];
+				namelist = namelist.concat(this.namedata[name_type]['female']);
 			} else {
-				namelist = namedata[name_type][gender];
+				namelist = this.namedata[name_type][gender];
 			}
 			namelist.forEach((v) => {
 				this.markov.learn(mkey, v);
@@ -185,8 +146,8 @@ const RandomName = function (randomizer) {
 			const skey = name_type + '_last';
 			if (!this.markov.memory[skey]) {
 				// console.log('learn surname '+skey);
-				if (namedata[name_type]['surname']) {
-					const namelist = namedata[name_type]['surname'];
+				if (this.namedata[name_type]['surname']) {
+					const namelist = this.namedata[name_type]['surname'];
 					namelist.forEach((v) => {
 						this.markov.learn(skey, v);
 					});
@@ -205,16 +166,82 @@ const RandomName = function (randomizer) {
 	};
 	/**
 	 * Capitalize names, account for multiword lastnames like "Van Hausen"
-	 * Alternately could probably split on space, map array to capitalize and then join with space... would that be faster?
 	 * @param {String} name a name
 	 * @return {String} name capitalized
 	 */
 	this.capitalizeName = function (name) {
 		// need to find spaces in name and capitalize letter after space
-		name = name.replace(/\s([a-z])/mg, (match, p1) => { return ` ${p1.toUpperCase()}`; });
-		return name.charAt(0).toUpperCase() + name.slice(1);
+		const parts = name.split(' ');
+		const upper_parts = parts.map((w) => {
+			return `${r_helpers.capitalize(w)}`;
+		});
+		return upper_parts.join(' ');
 	};
+		/**
+	 * Generate a Holmes name
+	 * @returns {String} name
+	 */
+	this.holmesname = function () {
+		let name = '';
+		const scount = this.randomizer.getWeightedRandom(this.namedata.holmesian_scount.values, this.namedata.holmesian_scount.weights);
 	
+		for (let i = 1; i <= scount; i++) {
+			name += this.randomizer.rollRandom(this.namedata.holmesian_syllables); // array
+			if (i < scount) {
+				name += this.randomizer.getWeightedRandom(['', ' ', '-'], [3, 2, 2]);
+			}
+		}
+		name = r_helpers.capitalize(name.toLowerCase());
+		name += ' ' + this.randomizer.rollRandom(this.namedata.holmesian_title);
+		
+		name = this.randomizer.findToken(name);
+		
+		name = name.replace(/[\s\-]([a-z]{1})/g, (match) => {
+			return match.toUpperCase();
+		});
+		return name;
+	};
+	/**
+	 * Demonic name
+	 * Taken from Jeff Rients, based on Goetia, as implemented here: http://www.random-generator.com/index.php?title=Goetic_Demon_Names
+	 * @return {String} a name
+	 */
+	this.demonname = function () {
+		let name = '';
+		const format = this.randomizer.getWeightedRandom([ ['first', 'last'], ['first', 'inner', 'last'], ['first', 'inner', 'inner', 'last'], ['first', 'inner', 'inner', 'inner', 'last'] ], [55, 35, 7, 3]);
+		for (let i = 0; i < format.length; i++) {
+			name += this.randomizer.rollRandom(this.namedata.demonic[format[i]]);
+		}
+		return name;
+	};
+	/**
+	 * Add some name data
+	 * Note: you can overwrite existing name_types if you want
+	 * @param {String} name_type the shortname for the type
+	 * @param {Object} data names
+	 * @param {Array} data.male male names
+	 * @param {Array} data.female female names
+	 * @param {Array} data.surnames surnames
+	 * @param {String} [label] descriptive name of type (defaults to just the name_type)
+	 * @return {Boolean} success or failure
+	 */
+	this.registerNameType = function (name_type, data, label) {
+		if (typeof name_type === 'undefined' || label === '') {
+			return false;
+		}
+		if (typeof label === 'undefined' || label === '') {
+			label = name_type;
+		}
+		if (!data.male && !data.female && !data.surname) {
+			return false;
+		}
+		this.namedata[name_type] = data;
+		this.namedata.options[name_type] = label;
+		return true;
+	};
+	/**
+	 * Register the name token with the randomizer
+	 */
 	this.randomizer.registerTokenType('name', (token_parts, full_token, curtable) => {
 		console.log('name token');
 		let string = '';
@@ -226,13 +253,13 @@ const RandomName = function (randomizer) {
 			token_parts[3] = '';
 		}
 		if (typeof token_parts[2] === 'undefined') {
-			string = n.generateSurname(token_parts[1]);
+			string = n.selectSurname(token_parts[1]);
 		} else if (token_parts[2] === 'male') {
-			string = n.generateName(token_parts[1], 'male', token_parts[3]);
+			string = n.selectName(token_parts[1], 'male', token_parts[3]);
 		} else if (token_parts[2] === 'female') {
-			string = n.generateName(token_parts[1], 'female', token_parts[3]);
+			string = n.selectName(token_parts[1], 'female', token_parts[3]);
 		} else if (token_parts[2] === 'random') {
-			string = n.generateName(token_parts[1], 'random', token_parts[3]);
+			string = n.selectName(token_parts[1], 'random', token_parts[3]);
 		}
 		
 		return string;

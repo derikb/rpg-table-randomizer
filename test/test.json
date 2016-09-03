@@ -54,6 +54,22 @@
 		}
 	},
 	{
+		"id": "color2",
+		"title": "Colors 2",
+		"sequence": [
+			"value",
+			"default"
+		],
+		"tables": {
+			"default": [
+				"Blue"
+		    ],
+		    "value": [
+			    "Light"
+		    ]
+		}
+	},
+	{
 	  "id": "colonial_goals",
 	  "title": "Goals (Colonial)",
 	  "author": "Derik Badman",

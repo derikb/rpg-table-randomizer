@@ -3,13 +3,13 @@
 const expect = require('chai').expect;
 
 const randomizer = require('../src/randomizer.js');
-const random_table = require('../src/random_table.js');
+const RandomTable = require('../src/random_table.js');
 const test_tables = require('./test.json');
 
 const tables = {};
 
 test_tables.forEach((t) => {
-	tables[t.id] = new random_table(t);
+	tables[t.id] = new RandomTable(t);
 });
 
 describe('Randomizer module', function (){
@@ -188,16 +188,41 @@ describe('Randomizer module', function (){
 	//test the registered token type?
 	describe('table tokentype function', function(){
 		it('should return a random result from the table', function () {
-			expect(randomizer.token_types['table'](['table', 'color'], '{{table:color}}', 'something')).to.be.oneOf(tables['color'].attributes.tables.default);
+			expect(randomizer.token_types['table'](['table', 'color'], '{{table:color}}', 'something')).to.be.oneOf(tables['color'].tables.default);
 		});
 		
 		it('should return a random result from a subtable', function () {
-			let laborers = tables['colonial_occupations'].attributes.tables.laborer.map((v) => { return v.label; });
+			let laborers = tables['colonial_occupations'].tables.laborer.map((v) => { return v.label; });
 			
 			expect(randomizer.token_types['table'](['table', 'colonial_occupations', 'laborer'], '{{table:colonial_occupations:laborer}}', 'something')).to.be.oneOf(laborers);
 			
 			expect(randomizer.token_types['table'](['table', 'one*2'], '{{table:one*2}}', 'something')).to.be.equal('one, one');
 			expect(randomizer.token_types['table'](['table', 'one', 'two*3'], '{{table:one:two*3}}', 'something')).to.be.equal('two, two, two');
+		});
+	});
+	
+	describe('getTableResult function', function(){
+		it('should return a result', function () {
+			//console.log( randomizer.getTableResult(tables['one']) );
+			const result = randomizer.getTableResult(tables['one']);
+			expect(result).to.have.lengthOf(1);
+			expect(result.shift()).to.have.property('result', 'one');
+		});
+		
+		it('should return a sequence of results', function () {
+			const result = randomizer.getTableResult(tables['color2']);
+			//console.log(result);
+			expect(result).to.have.lengthOf(2);
+			expect(result.shift()).to.have.property('result', 'Light');
+			expect(result.shift()).to.have.property('result', 'Blue');
+		});
+	});
+	
+	describe('selectFromTable function', function(){
+		it('should return a result', function () {
+			const result = randomizer.getTableResult(tables['one'], 'two');
+			expect(result).to.have.lengthOf(1);
+			expect(result.shift()).to.have.property('result', 'two');
 		});
 	});
 	
