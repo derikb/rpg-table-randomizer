@@ -99,7 +99,7 @@ const TableNormalizer = function (data) {
 	};
 	/**
 	 * Try to parse text into table data
-	 * @returns {Object} parsed table data
+	 * @returns {Array} parsed table data
 	 */
 	this.parseText = function () {
 		let text = this.orig_data;
@@ -112,7 +112,7 @@ const TableNormalizer = function (data) {
 			
 			// parse numbers off front and subtables off back
 			const parse = v.match(/^(?:(?:[0-9]+\-)?([0-9]+)(##)?(?:\.\s*|:\s*|,\s*|\t+|\s*))?(.+?)(?:##(.+))?$/);
-			console.log(parse);
+			//console.log(parse);
 			if (parse) {
 				// console.log(parse);
 				l[k] = { label: parse[3].trim() };
@@ -162,12 +162,7 @@ const TableNormalizer = function (data) {
 				};
 				break;
 			case 'text':
-				parse_data = this.parseText();
-				this.normalized_data = {
-					tables: {
-						default: parse_data
-					}
-				};
+				this.normalized_data = this.parseText();
 				break;
 			case 'json':
 				parse_data = JSON.parse(this.orig_data);
