@@ -24,7 +24,7 @@ This is model and logic only there is no ui and only the most limited of view da
 
 ## Code Example
 
-A simple example setting up a very basic unweighted table (with no subtables), and then "rolling" on it:
+A simple example setting up a very basic unweighted table (with no subtables), then "rolling" on it, and also generating a dice roll and two random names:
 
 ```
 const rpg-table-randomizer = require('rpg-table-randomizer');
@@ -52,7 +52,7 @@ let roll = randomizer.roll('2d4+1');
 
 // roll equals a number between 3 and 9
 
-let my_old_character_name = random_name.createName('dutch', 'male');
+let my_old_character_name = random_name.selectName('dutch', 'male');
 
 // my_old_character_name equals a male name from the dutch name list
 
