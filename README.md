@@ -1,5 +1,22 @@
 # rpg-table-randomizer
 
+# Table of Contents
+1. [Synopsis](#synopsis)
+1. [Code Example](#code-example)
+1. [Motivation](#motivation)
+1. [Installation](#installation)
+1. [API Reference](#api-reference)
+  1. [randomizer](#randomizer)
+  1. [RandomTable](#randomtable)
+  1. [TableNormalizer](#tablenormalizer)
+  1. [random_name](#random_name)
+  1. [r_helpers](#r_helpers)
+1. [Tests](#tests)
+1. [Contributors](#contributors)
+1. [License](#license)
+  
+  
+
 ## Synopsis
 
 Module for randomization focused on tables used in roleplaying games.
@@ -382,8 +399,6 @@ Returns the type of data set via the constructor or setData()
 
 Tries to normalize the data for RandomTable usage... Probably the thing that will need the most tweaking over time.
 
-
-*More details soon*
 
 ### random_name
 
