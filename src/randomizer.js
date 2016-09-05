@@ -88,7 +88,7 @@ const Randomizer = function () {
 	 * @param {String} [mod_op=+] Operator for the modifier (+,-,/,*)
 	 * @returns {Number} Number rolled (die*number [mod_op][modifier])
 	 */
-	this.roll = function (die, number, modifier, mod_op) {
+	function parseDiceNotation (die, number, modifier, mod_op) {
 		modifier = (typeof modifier === 'undefined') ? 0 : parseInt(modifier, 10);
 		die = (typeof die === 'undefined') ? 6 : parseInt(die, 10);
 		mod_op = (typeof mod_op === 'undefined') ? '+' : mod_op;
@@ -323,15 +323,15 @@ const Randomizer = function () {
 	 * @params {String} string a die roll notation
 	 * @returns {Number} the result of the roll
 	 */
-	this.parseDiceNotation = function (string) {
+	this.roll = function (string) {
 		string = (typeof string === 'undefined') ? '' : string.trim();
 		const m = string.match(/^([0-9]*)d([0-9]+)(?:([\+\-\*\/])([0-9]+))*$/);
 		if (m) {
 			if (typeof m[4] === 'undefined') { m[4] = 0; }
 			if (m[1] !== '') {
-				return this.roll(parseInt(m[2], 10), parseInt(m[1], 10), parseInt(m[4], 10), m[3]);
+				return parseDiceNotation.call(this, parseInt(m[2], 10), parseInt(m[1], 10), parseInt(m[4], 10), m[3]);
 			} else {
-				return this.roll(parseInt(m[2], 10), '1', parseInt(m[4], 10), m[3]);
+				return parseDiceNotation.call(this, parseInt(m[2], 10), '1', parseInt(m[4], 10), m[3]);
 			}
 		}
 		return '';
@@ -364,7 +364,7 @@ const Randomizer = function () {
 	 * Dice roll token.
 	 */
 	this.registerTokenType('roll', (token_parts, full_token, curtable) => {
-		return this.parseDiceNotation(token_parts[1]);
+		return this.roll(token_parts[1]);
 	});
 	/**
 	 * Table token lookup in the form:

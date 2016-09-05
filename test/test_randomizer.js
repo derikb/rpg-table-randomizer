@@ -75,6 +75,7 @@ describe('Randomizer module', function (){
 		});
 	});
 	
+/*
 	describe('roll function', function (){
 		it('should return a result within the range', function () {
 			expect(randomizer.roll()).to.be.within(1, 6);
@@ -90,6 +91,7 @@ describe('Randomizer module', function (){
 			expect(randomizer.roll(6, 1, 2, '/')).to.be.within(1, 3);
 		});
 	});
+*/
 	
 	describe('arraySum function', function (){
 		it('should return the sum value of an array', function () {
@@ -137,21 +139,21 @@ describe('Randomizer module', function (){
 		});
 	});
 	
-	describe('parseDiceNotation function', function (){
+	describe('roll function', function (){
 		it('should return the expected range of numbers', function () {			
-			expect(randomizer.parseDiceNotation()).to.be.equal('');
-			expect(randomizer.parseDiceNotation('d4')).to.be.within(1, 4);
-			expect(randomizer.parseDiceNotation('1d4')).to.be.within(1, 4);
-			expect(randomizer.parseDiceNotation('2d4')).to.be.within(2, 8);
-			expect(randomizer.parseDiceNotation('1d4+0')).to.be.within(1, 4);
-			expect(randomizer.parseDiceNotation('d4+1')).to.be.within(2, 5);
-			expect(randomizer.parseDiceNotation('1d4+1')).to.be.within(2, 5);
-			expect(randomizer.parseDiceNotation('1d4+3')).to.be.within(4, 7);
-			expect(randomizer.parseDiceNotation('1d4-1')).to.be.within(0, 3);
-			expect(randomizer.parseDiceNotation('1d4*2')).to.be.within(2, 8);
-			expect(randomizer.parseDiceNotation('d4/2')).to.be.within(1, 2);
-			expect(randomizer.parseDiceNotation('d6/2')).to.be.within(1, 3);
-			expect(randomizer.parseDiceNotation('1d6/2')).to.be.within(1, 3);
+			expect(randomizer.roll()).to.be.equal('');
+			expect(randomizer.roll('d4')).to.be.within(1, 4);
+			expect(randomizer.roll('1d4')).to.be.within(1, 4);
+			expect(randomizer.roll('2d4')).to.be.within(2, 8);
+			expect(randomizer.roll('1d4+0')).to.be.within(1, 4);
+			expect(randomizer.roll('d4+1')).to.be.within(2, 5);
+			expect(randomizer.roll('1d4+1')).to.be.within(2, 5);
+			expect(randomizer.roll('1d4+3')).to.be.within(4, 7);
+			expect(randomizer.roll('1d4-1')).to.be.within(0, 3);
+			expect(randomizer.roll('1d4*2')).to.be.within(2, 8);
+			expect(randomizer.roll('d4/2')).to.be.within(1, 2);
+			expect(randomizer.roll('d6/2')).to.be.within(1, 3);
+			expect(randomizer.roll('1d6/2')).to.be.within(1, 3);
 		});
 	});
 
