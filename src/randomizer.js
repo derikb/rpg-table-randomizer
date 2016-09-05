@@ -26,6 +26,21 @@ const Randomizer = function () {
 		return min + Math.floor(Math.random() * (max - min + 1));
 	};
 	/**
+	 * Sum an array
+	 * @param {Array} arr an array of numbers
+	 * @returns {Number} Total value of numbers in array
+	 */
+	function arraySum (arr) {
+		let total = 0;
+		for (let i = 0; i < arr.length; i++) {
+			const v = parseFloat(arr[i]);
+			if (!isNaN(v)) {
+				total += v;
+			}
+		}
+		return total;
+	};
+	/**
 	 * Random value selection
 	 * @param {Array} values an array of strings from which to choose
 	 * @param {Array} weights a matching array of integers to weight the values (i.e. values and weights are in the same order)
@@ -33,7 +48,7 @@ const Randomizer = function () {
 	 */
 	this.getWeightedRandom = function (values, weights) {
 		let n = 0;
-		const num = this.random(1, this.arraySum(weights));
+		const num = this.random(1, arraySum.call(this, weights));
 		for (var i = 0; i < values.length; i++) {
 			n = n + weights[i];
 			if (n >= num) {
@@ -125,25 +140,10 @@ const Randomizer = function () {
 		return Math.round(sum);
 	};
 	/**
-	 * Sum an array
-	 * @param {Array} arr an array of numbers
-	 * @returns {Number} Total value of numbers in array
-	 */
-	this.arraySum = function (arr) {
-		let total = 0;
-		for (let i = 0; i < arr.length; i++) {
-			const v = parseFloat(arr[i]);
-			if (!isNaN(v)) {
-				total += v;
-			}
-		}
-		return total;
-	};
-	/**
 	 * Generate a result from a RandomTable object
-	 * @param {Object} table the RandomTable
+	 * @param {Object} rtable the RandomTable
 	 * @param {String} [start=''] subtable to roll on
-	 * @return {Array} result array
+	 * @return {Array} array of object results { table: table that was rolled on, result: result string, desc: optional description string }
 	 */
 	this.getTableResult = function (rtable, start) {
 		if (!r_helpers.isObject(rtable)) {
@@ -204,7 +204,7 @@ const Randomizer = function () {
 	 * @todo we'll have to fix for this with a node version
 	 * @param {Object} rtable the RandomTable object
 	 * @param {String} table table to roll on
-	 * @returns {Array} array of object results { table: table that was rolled on, result: result string, desc: description string }
+	 * @returns {Array} array of object results { table: table that was rolled on, result: result string, desc: optional description string }
 	 */
 	this.selectFromTable = function (rtable, table) {
 		if (!r_helpers.isObject(rtable)) {
@@ -294,7 +294,7 @@ const Randomizer = function () {
 	 * @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}}
 	 * @returns {String} The value with the token(s) replaced by the operation or else just the token (in case it was a mistake or at least to make the error clearer)
 	 */
-	this.convertToken = function (token, curtable) {
+	function convertToken (token, curtable) {
 		const parts = token.replace('{{', '').replace('}}', '').split(':');
 		if (parts.length === 0) { return token; }
 		
@@ -308,13 +308,14 @@ const Randomizer = function () {
 	/**
 	 * Look for tokens to perform replace action in convertToken
 	 * @param {String} string usually a result from a RandomTable
+	 * @param {String} curtable name of the RandomTable the string is from (needed for "this" tokens)
 	 * @returns {String} String with tokens replaced (if applicable)
 	 */
 	this.findToken = function (string, curtable) {
 		if (typeof curtable === 'undefined') { curtable = ''; }
 		const regexp = new RegExp('({{2}.+?}{2})', 'g');
 		const newstring = string.replace(regexp, (token) => {
-			return this.convertToken(token, curtable);
+			return convertToken.call(this, token, curtable);
 		});
 		return newstring;
 	};

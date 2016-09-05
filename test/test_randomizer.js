@@ -93,6 +93,7 @@ describe('Randomizer module', function (){
 	});
 */
 	
+/*
 	describe('arraySum function', function (){
 		it('should return the sum value of an array', function () {
 			let arr = [
@@ -115,7 +116,9 @@ describe('Randomizer module', function (){
 			expect(randomizer.arraySum(arr)).to.equal(3);
 		});
 	});
+*/
 	
+/*
 	describe('convertToken function', function (){
 		it('should return a results with the token converted', function () {
 			let curtable = '';
@@ -125,6 +128,7 @@ describe('Randomizer module', function (){
 			expect(randomizer.convertToken(token, curtable)).to.be.within(1,6);
 		});
 	});
+*/
 	
 	// these are pretty basic but should be ok if we also are testing the other modules and methods
 	describe('findToken function', function (){
