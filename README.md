@@ -1,6 +1,5 @@
 # rpg-table-randomizer
 
-# Table of Contents
 1. [Synopsis](#synopsis)
 1. [Code Example](#code-example)
 1. [Motivation](#motivation)
@@ -75,10 +74,38 @@ I also really like have a quick way to get a bunch of names.
 
 This module was written for use in nodejs but uses browserify to create a module that can be used in browser. Babel is used to convert ES2015 features, but I haven't tested in most browsers.
 
--npm install
--browser install
-
 There are no module requirements for production environment.
+
+### NPM
+
+Install the module via npm:
+
+```
+$ npm install rpg-table-randomizer
+```
+
+Require it where you want to use it:
+
+```
+const rpgrandomizer = require('rpg-table-randomizer');
+
+```
+
+### Browser
+
+This will theoretically work...
+
+#### Bower
+
+```
+$ bower install rpg-table-randomizer --save
+```
+
+#### Manually
+
+Download the latest release from github. Load the dist/rpg-table-randomizer.js file in your html.
+
+
 
 ## API Reference
 

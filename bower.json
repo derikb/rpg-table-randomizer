@@ -1,0 +1,27 @@
+{
+  "name": "rpg-table-randomizer",
+  "description": "Module for random tables for use in roleplaying games",
+  "main": "dist/rpg-table-randomizer.js",
+  "authors": [
+    "Derik A Badman"
+  ],
+  "license": "GPL-3.0",
+  "keywords": [
+    "rpg",
+    "role-playing",
+    "games",
+    "randomizer",
+    "d&d",
+    "random",
+    "tables",
+    "osr"
+  ],
+  "homepage": "https://github.com/derikb/rpg-table-randomizer",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
