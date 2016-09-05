@@ -1,97 +1,58 @@
-Random Table Import/Export Format
-=================================
+# Random Table Import/Export Format
 
-_If you want the easiest way, just read this first section on "Guided Table Creation."_
+_If you want the easiest way, just read this first section on "Simple Table Creation."_
 
-Guided Table Creation
----------------------
+## RandomTable Properties
 
-Using the guided form on the "Create Tables" page is the easiest way to add and edit random tables.
+These are properties on the RandomTable object. Most are optional.
 
-Each table or subtable has a title (if you don't provide one the default values will be used).
+* @property {String} [id] id for the table, primary key for database if used
+* @property {String} key identifier for the table, used in table token lookups
+* @property {String} title title of the table
+* @property {String} [author] author of the table
+* @property {String} [description] description of the table
+* @property {String} [source] source of the table (as in the citation)
+* @property {Array} [tags] subject tags
+* @property {String|Array} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
+* @property {Array} [table] default table. array of strings or objects. removed after initialization and put in tables.default
+* @property {Object} [tables] a property for each subtables. if sequence property is not set then the first property of this Object is used to start rolling
+* @property {Object} [print] objects to describe what parts of a (sub)table should be displayed in the results
+* @property {Object} [print.default] how to display the default table's results
+* @property {Object} [print.default.hide_table] set to 1 will not show the table name
+* @property {Object} [print.default.hide_result] set to 1 will not show the result on that (sub)table
+* @property {Object} [print.default.hide_desc] set to 1 will not show any description for a result on that (sub)table
+* @property {Array} [result] current result array of objects (don't set this on constructor, but you can access it later)
 
-Table data should be formatted as:
+At the most basic level `key`, `title`, and either `table` or `tables.default` need to be set for the RandomTable to be effective. If `table` is set its data will be moved to `tables.default` on initialization.
 
-* One result entry per line.
-* _(optional)_ To weight a random chance you have two options:
-    * For a die-like format, prefix the entry with a number or a number range and a space(s), comma, period, or colon: `1: first` `2-3. second` `4-6, third`.
-    * To directly weight the chances, prefix with a number followed by two pound signs: `2##This entry will be twice as likely` `4##This entry is four times as likely`.
-* _(optional)_ You can cause a roll on a subtable if the result is selected by adding two pounds signs and the title of a table to the end of a line: `Bandits##bandit_types` where "bandit_types" is the title of a subtable.
-* _(optional)_ You can insert tokens into the results to perform actions like generating numbers or rolling on other random tables. For instance:
-    * Roll a number: `{{roll:3d6+1}}` in the results will generate a new random number every time that result comes up. The section after the semi-colon should accept any form of `[A Number or Blank]d[Another number][An arithmatic operator: +, -, *, or /][Another number]` such as `{{roll:d6}}` `{{roll:d6*2}}` `{{roll:2d10+10}}`.
-    * Select from a table: `{{table:color}}` will randomly select a color. You can reference any other table in the app, but I still need to improve the table references (how to reference them and where to find those names).
-    
-Alternately, you can paste in HTML (select the "html" format option). In this case tags will be stripped and line breaks will be added at the end of list item `<li>`, table rows `<tr>`, div `<div>`, br `<br>`, and paragraph tags `<p>` (that should cover most of what people would use).
+## Tokens
 
-You can also convert bookmarklets from [Last Gasp Grimoire's Choose your own generator](http://www.lastgaspgrimoire.com/generators/choose-your-own-generator/). Just paste the bookmarklet text into the table data field and select "bookmarklet" from the format dropdown.
+Any result (with either the simple or advanced format) in a table can use tokens to generate random numbers, results from other tables, name, or other custom results.
 
-_That's all you really need to know. But if you want more options, read on..._
+### Roll a number
 
+`{{roll:3d6+1}}` in a result will generate a new random number every time that result comes up. The section after the semi-colon should accept any form of `[A Number or Blank]d[Another number][An arithmatic operator: +, -, *, or /][Another number]` such as `{{roll:d6}}` `{{roll:d6*2}}` `{{roll:2d10+10}}`.
 
-Freeform Table Creation
------------------------
+### Roll on other tables
 
-While there can be no easy to encapsulate all the possibilities for random tables, I've tried to create a format that is as simple as possible and can be easily read by other applications. I chose JSON as a format that can be handled by most programming languages and has a minimal amount of fussing with special characters, required fields, closing tags, etc.
+`{{table:color}}` in a result will generate a random color. Also available in a more general category are "direction", "ordinal", and "season".
 
-We are primarily dealing with four types of data:
+`{{table:TABLE}}` and `{{table:TABLE:SUBTABLE}}` will generate a result on the named table/subtable (using the table key). This is dependent on setting `randomizer.setTableKeyLookup()` to access a data store of RandomTable objects.
 
-* Numbers: As you expect. Can be positive or negative. `23` `-2` `14543556`
-* Strings: Combinations of letters, numbers, spaces, punctuation, etc. Anything from a single word, to a whole page of text. For our purposes you can include html in most cases (though it should be unnecessary). `"Chimera"` `"War dog"` `"The secret door is activated by pulling on the bust of Quarn the Pustulent which is sitting on the mantle."`
-* Lists (a.k.a. Array): A collection of strings. `[ "Elf", "Dwarf", "Human" ]`
-* Objects: A collection of names and their associated values.  `{ "race": "Elf", "class": "Fighter", "level": 2 }`
+To roll on subtables of the current table use `{{table:this:SUBTABLE_NAME}}`
 
-A few rules that must be followed
----------------------------------
+### Generate a Name
 
-### All text strings should be enclosed in double quotes (and NOT the fancy ones from Word).
+`{{name:NAMETYPE:GENDER:STYLE}}` will insert a name into the table. `nametype` is required and should be one of the name lists (flemish, dutch, etc. from random_name.table_data.options) or "random". `gender` is optional and can be male, female, or random. If left blank, only a surname will be generated. `style` is optional and only accepts the value "first", in which case only a first name will be generated.
 
-Numbers do not need quotes.
-Within the text strings all double quotes need to be preceded by a back-slash.
+### Custom token
 
-
-    "Dragons"
-    "A Big Book of Spells"
-    "13 gp"
-    13
-	
-    "A man called \"Tubs\" asks for help."
-    "The orc is screaming \"Oogadaboogada\" at you."
-	
-### List of strings are enclosed in brackets
-
-Separate the strings with commas, but don't add a comma after the last element in the list (IE in particular hates that).
-
-    [
-    	"Orc",
-    	"Goblin",
-    	"Kobold"
-    ]
-
-### Objects are enclosed in braces
-
-Names are followed by a colon and then the value. Name/value pairs are separated by commas. Do not put a comma after the last pair (like in lists above).
-
-Names must be strings. Values can be numbers, strings, lists, or objects.
-
-	{
-		"Intelligence": 16,
-		"Class": "Magic-User",
-		"Spells": [ "Sleep", "Magic Missile" ],
-		"Equipment": {
-			"Weapon": "Dagger",
-			"Armor": "None"
-		}
-	}
-
-### Spaces, tabs, and linebreaks (other than within the strings) don't matter
-
-The examples and actual data in the app use spaces for readability, but aren't necessary.
-
-	{"Intelligence":16,"Class":"Magic-User","Spells":["Sleep","Magic Missile"],"Equipment": {"Weapon": "Dagger","Armor": "None"}}
+You can register your own tokens with `randomizer.registerTokenType()`
 
 
-Formatting Random Tables
-------------------------
+## Table Data
+
+The `tables` property is an Object with properties for each subtable. All RandomTable objects will at least have a `default` table. Subtable names (i.e. the properties of the `tables` Object) are used for cross-referencing.
 
 I've tried to build in an escalating scale of complexity. Simple tables can be formatted very simply, but complex tables require more complexity to the formatting.
 
@@ -101,206 +62,152 @@ I've tried to build in as much forgiveness as possible into the format.
 
 A basic list of options with no extra information.
 
-	[
+```
+tables: {
+	default: [
 		"Orcs",
 		"Kobolds",
 		"Goblins"
 	]
+}
+```
 
 ### Simple weighted table
 
-	[
+```
+tables: {
+	default: [
 		{ "label": "Orcs", "weight": 1 },
 		{ "label": "Kobolds", "weight": 2 },
 		{ "label": "Goblins", "weight": 6 }
 	]
+}
+```
 
-Alternately (which makes the result easier to scan), it could be formatted as:
+### Simple table and subtable using tokens
 
-	{
-		"Orcs": { "weight": 1 },
-		"Kobolds": { "weight": 2 },
-		"Goblins": { "weight": 6 }
-	}
+```
+tables: {
+	default: [
+		{ "label": "{{roll:2d6}} Orcs", "weight": 1 },
+		{ "label": "{{roll:4d6}} Kobolds", "weight": 2 },
+		{ "label": "{{roll:1d4}} {{table:this:giant_types}} Giants", "weight": 6 }
+	]
+	giant_types: [
+		'Cloud',
+		'Hill',
+		'Stone'	
+	]
+}
+```
 
-### Simple Table with information (metadata)
-
-	{
-		"title": "Dungeon Stocking (Moldvay)",
-		"author": "Tom Moldvay",
-		"source": "D&D Basic Set",
-		"description": "Stocking a room in a dungeon. For fuller features see the Dungeon tab.",
-		"tags": [ "dungeons", "d&d" ],
-		"tables": {
-			"default": {
-				"monster": { "weight": 2 },
-				"trap": { "weight": 1 },
-				"special": { "weight": 1 },
-				"empty": { "weight": 2 }
-			}
-		}
-	}
-
-This table adds information about the table which helps with finding it in the table list and provides author/source information. The optional fields include:
-
-* `title`: Name the table
-* `author`: Credit where credit is due.
-* `source`: Book or website where the table came from (include a url/link)
-* `description`: What is this table? What is it for?
-* `tags`: a list of tags to categorize the table (you can filter on the tags in the table list)
-* `print`: a list of objects to describe what parts of a (sub)table should be displayed in the results
-    * `hide_table` set to 1 will not show the table name
-    * `hide_result` set to 1 will not show the result on that (sub)table
-    * `hide_desc` set to 1 will not show any description for a result on that (sub)table
-* `tables`: an object made up of table names and table data
 
 ### Complex Table with Subtables
 
-	{
-		"title": "Swamp Encounters",
-		"author": "Derik Badman",
-		"source": "",
-		"description": "",
-		"tags": ["swamp", "encounters"],
-		"print": {
-			"general": { "hide_table": 1, "hide_result": 1 },
-			"trap": { "hide_table": 1 },
-		},
-		"sequence": "general",	
-	 	"tables": {
-		 	"general": {
-		 		"Trap/Trick": { "subtable": "trap", "print": false, "weight": 1 },
-		 		"Building/Lair": { "subtable": "lair","print": false, "weight": 2 },
-		 		"Animal/Monster": { "subtable": "monster", "print": false, "weight": 3 },
-		 		"Human(oid)": { "subtable": "human", "print": false, "weight": 6 },
-		 		"Natural": { "subtable": "natural", "print": false, "weight": 2 },
-		 		"Special": { "subtable": "special", "print": false, "weight": 1 }
-		 	},
-		 	"trap": {
-		 		"Spiderweb": { "weight": 2 },
-		 		"Tripwire": { "weight": 2 },
-		 		"Net trap": { "weight": 3 },
-		 		"Pit trap": { "weight": 3 },
-		 		"Snare": { "weight": 3 },
-		 		"Rocks from above": { "weight": 1 }
-		 	},
-			"lair": {
-				"Village": { "weight": 1 },   
-				"Campsite": { "weight": 2 },
-				"Ruins": { "weight": 1 },
-				"Cave": { "weight": 1 },
-				"Tree lair": { "weight": 2 },
-				"Nest (ground)": { "weight": 2 },
-				"Nest (water)": { "weight": 2 },
-				"Altar/shrine": { "weight": 1 },
-				"Tower": { "weight": 1 }
-			},
-			"monster": {
-				"Insect swarm": { "weight": 2 },
-				"Frogs": { "weight": 2 },
-				"Alligators": { "weight": 2 },
-				"Giant Grasshoppers": { "weight": 1 },
-				"Spiders": { "weight": 2 },
-				"Fish": { "weight": 2 },
-				"Water Fowl": { "weight": 2 },
-				"Monkeys/Sloths": { "weight": 1 },
-				"Crabs/Crayfish": { "weight": 2 },
-				"Will-o-wisp": { "weight": 1 },
-				"Lizardmen/Snakemen": { "weight": 1 },
-				"Dragon": { "weight": 1 },
-				"Dryad": { "weight": 1 },
-				"Carnivorous Plant": { "weight": 2 },
-				"Zombies (drowners)": { },
-				"Wild Boar": {},
-				"Leeches": { "weight": 2 },
-				"Snakes": { "weight": 2 },
-				"[Other: Something large or dangerous]": {}
-			},
-			"human": {
-				"Militia": { "weight": 1, "subtable": "human actions" },
-				"Local Tribespeople": { "weight": 1, "subtable": "human actions" },
-				"Druid": { "weight": 1 },
-				"Cultist(s)": { "weight": 1 },
-				"Lost Child/Peasant": { "weight": 1 },
-				"NPC adventuring party": { "weight": 1, "subtable": "human actions" },
-				"Mage": { "weight": 1, "subtable": "human actions" },
-				"Bandit/Convict": { "weight": 1, "subtable": "human actions" }
-			},
-			"natural": {
-				"Weather event": { "weight": 1, "subtable": "weather event" },
-				"Fire": { "weight": 1 },
-				"Whirlpool": { "weight": 1 },
-				"Rapids": { "weight": 1 },
-				"Quicksand": { "weight": 1 },
-				"Heavy vines/brush": { "weight": 1 },
-				"Large Dead Tree": { "weight": 1 }
-			},
-			"special": {
-				"Magic Clearing": { "weight": 1 },
-				"Mushroom Circle": { "weight": 1 },
-				"Magic Pool": { "weight": 1 },
-				"Statue": { "weight": 1 },
-				"Grave(s)": { "weight": 1 },
-				"[Demon?]": { "weight": 1 }
-			},
-		 	"human actions": {
-			 	"Hunting": { "weight": 2 },
-			 	"Foraging": {},
-			 	"Lost": {},
-			 	"Camping": { "weight": 2 },
-			 	"Searching for someone": { "subtable": "human"  },
-			 	"Searching for something": {},
-			 	"Travelling": { "weight": 3 },
-			 	"Fighting": {},
-			 	"Religious ceremony": {},
-			 	"Dying": {},
-			 	"Dead": {},
-		 	},
-		 	"weather_event": {
-			 	"Light Fog/mist": { "weight": 2 },
-			 	"Heavy Fog/mist": { "weight": 2 },
-			 	"Light precipitation": { "weight": 2 },
-			 	"Heavy precipitation": {},
-			 	"Light Wind": { "weight": 2 },
-			 	"Heavy Wind": {},
-			 	"Thunder & Lightning": {},
-			 	"Heavy Clouds": {},
-			 	"Sun shower": {},
-			 	"Bright Sun": {},
-			 	"Major Weather event": { "description": "Hurricane, tornado, blizzard, flood, etc." }
-		 	}
-	 	}
+The `subtable` property in a result can have a number of properties that effect how the result is displayed, weighted, or what further tables are selected from.
+
+* @property {String} _label_ this is the human readable output from the table. If a the result is just a single string then it is assumed that string is the label
+* @property {Number} _weight_ a numeric value to weight the result in comparison with the other results
+* @property {String} _subtable_ the name of another subtable in the RandomTable object that should be rolled on when this result is retrieved
+* @property {String} _description_ an elaboration on the label that can be used when outputting/displaying results
+* @property {Boolean} _print_ should this result be included in various result outputs (good for use with the subtable property where you only want the result on the subtable to be displayed/output) 
+
+Here's an example using these various properties. The default table is rolled on first (it is weighted so in this case humanoids are most common). The result of the default table decides what subtable should be rolled on next. Some of the subtables then have further subtables to be rolled on (so the "human" subtable will often cause a roll on the "actions_human" subtable).
+
+```
+"tables": {
+	"default": {
+		{ label: "Trap/Trick", "subtable": "trap", "print": false, "weight": 1 },
+		{ label: "Building/Lair", "subtable": "lair","print": false, "weight": 2 },
+		{ label: "Animal/Monster", "subtable": "monster", "print": false, "weight": 3 },
+		{ label: "Human(oid)", "subtable": "human", "print": false, "weight": 6 },
+		{ label: "Natural", "subtable": "natural", "print": false, "weight": 2 },
+		{ label: "Special", "subtable": "special", "print": false, "weight": 1 }
+	},
+	"trap": {
+		{ label: "Spiderweb", "weight": 2 },
+		{ label: "Tripwire", "weight": 2 },
+		{ label: "Net trap", "weight": 3 },
+		{ label: "Pit trap", "weight": 3 },
+		{ label: "Snare", "weight": 3 },
+		{ label: "Rocks from above", "weight": 1 }
+	},
+	"lair": {
+		{ label: "Village", "weight": 1 },   
+		{ label: "Campsite", "weight": 2 },
+		{ label: "Ruins", "weight": 1 },
+		{ label: "Cave", "weight": 1 },
+		{ label: "Tree lair", "weight": 2 },
+		{ label: "Nest (ground)", "weight": 2 },
+		{ label: "Nest (water)", "weight": 2 },
+		{ label: "Altar/shrine", "weight": 1 },
+		{ label: "Tower", "weight": 1 }
+	},
+	"monster": {
+		{ label: "Insect swarm", "weight": 2 },
+		{ label: "Frogs", "weight": 2 },
+		{ label: "Alligators", "weight": 2 },
+		{ label: "Giant Grasshoppers", "weight": 1 },
+		{ label: "Spiders", "weight": 2 },
+		{ label: "Fish", "weight": 2 },
+		{ label: "Water Fowl", "weight": 2 },
+		{ label: "Monkeys/Sloths", "weight": 1 },
+		{ label: "Crabs/Crayfish", "weight": 2 },
+		{ label: "Will-o-wisp", "weight": 1 },
+		{ label: "Lizardmen/Snakemen", "weight": 1 },
+	},
+	"human": {
+		{ label: "Militia", "weight": 1, "subtable": "human_actions" },
+		{ label: "Local Tribespeople", "weight": 1, "subtable": "human_actions" },
+		{ label: "Druid", "weight": 1 },
+		{ label: "Cultist(s)", "weight": 1 },
+		{ label: "Lost Child/Peasant", "weight": 1 },
+		{ label: "NPC adventuring party", "weight": 1, "subtable": "human_actions" },
+		{ label: "Mage", "weight": 1, "subtable": "human_actions" },
+		{ label: "Bandit/Convict", "weight": 1, "subtable": "human_actions" }
+	},
+	"natural": {
+		{ label: "Weather event", "weight": 1, "subtable": "weather_event" },
+		{ label: "Fire", "weight": 1 },
+		{ label: "Whirlpool", "weight": 1 },
+		{ label: "Rapids", "weight": 1 },
+		{ label: "Quicksand", "weight": 1 },
+		{ label: "Heavy vines/brush", "weight": 1 },
+		{ label: "Large Dead Tree", "weight": 1 }
+	},
+	"special": {
+		{ label: "Magic Clearing", "weight": 1 },
+		{ label: "Mushroom Circle", "weight": 1 },
+		{ label: "Magic Pool", "weight": 1 },
+		{ label: "Statue", "weight": 1 },
+		{ label: "Grave(s)", "weight": 1 },
+		{ label: "[Demon?]", "weight": 1 }
+	},
+	"human_actions": {
+		{ label: "Hunting", "weight": 2 },
+		{ label: "Foraging" },
+		{ label: "Lost" },
+		{ label: "Camping", "weight": 2 },
+		{ label: "Searching for someone", "subtable": "human"  },
+		{ label: "Searching for something" },
+		{ label: "Travelling", "weight": 3 },
+		{ label: "Fighting" },
+		{ label: "Religious ceremony" },
+		{ label: "Dying" },
+		{ label: "Dead"  },
+	},
+	"weather_event": {
+		{ label: "Light Fog/mist", "weight": 2 },
+		{ label: "Heavy Fog/mist", "weight": 2 },
+		{ label: "Light precipitation", "weight": 2 },
+		{ label: "Heavy precipitation" },
+		{ label: "Light Wind", "weight": 2 },
+		{ label: "Heavy Wind" },
+		{ label: "Thunder & Lightning" },
+		{ label: "Heavy Clouds" },
+		{ label: "Sun shower" },
+		{ label: "Bright Sun" },
+		{ label: "Major Weather event", "description": "Hurricane, tornado, blizzard, flood, etc." }
 	}
-
-	
-### Other options
-
-The `sequence` property can be used to set what table or tables should be rolled on by default. This can be a single table name or a list of table names. If you set `sequence` to `rollall` all the tables will be rolled in order.
-
-Results within (sub)tables can have a variety of properties:
-
-* `description`: add extra textual description to a result (this will be output with the result)
-* `print`: if set to false the result from that table will not be output. This is helpful when a bunch of subtables are chained together. You may have a top-level table that doesn't need to be shown in the results.
-* `subtable`: a reference to a subtable _or_ a whole subtable object.
-
-#### Tokens
-
-You can also use tokens to generate random numbers or results from other tables in the app.
-
-##### Roll a number
-
-`{{roll:3d6+1}}` in a result will generate a new random number every time that result comes up. The section after the semi-colon should accept any form of `[A Number or Blank]d[Another number][An arithmatic operator: +, -, *, or /][Another number]` such as `{{roll:d6}}` `{{roll:d6*2}}` `{{roll:2d10+10}}`.
-
-##### Roll on other tables
-
-`{{table:color}}` in a result will generate a random color. Also available in a more general category are "direction", "ordinal", and "season".
-
-`{{table:TABLE}}` and `{{table:TABLE:SUBTABLE}}` will generate a result on the names table/subtable (using the table title).
-
-To roll on subtables of the current table use `{{table:this:SUBTABLE_NAME}}`
-
-_Still need to get this working well for user added tables._
-
-##### Generate a Name
-
-`{{name:NAMETYPE:GENDER:STYLE}}` will insert a name into the table. `nametype` is required and should be one of the name lists (flemish, dutch, holmesian) or "random". `gender` is optional and can be male, female, or random. If left blank, only a surname will be generated. `style` is optional and only accepts the value "first", in which case only a first name will be generated.
+}
+```

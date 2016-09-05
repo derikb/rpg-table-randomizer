@@ -330,8 +330,8 @@ A constructor for generating random table objects that can be used by the random
 #### RandomTable (config)
 
 * @property {String} id id for the table, primary key for database if used
-* @property {String} key identifier for the table
-* @property {String} [title] title of the table
+* @property {String} key identifier for the table, used in table token lookups
+* @property {String} title title of the table
 * @property {String} [author] author of the table
 * @property {String} [description] description of the table
 * @property {String} [source] source of the table (as in the citation)
@@ -348,7 +348,7 @@ A constructor for generating random table objects that can be used by the random
 
 Constructs a new RandomTable object or instantiates and existing one from some data source.
 
-For formatting the tables property see the document on such...
+For formatting the tables property see the [tableformat.md](tableformat.md) document.
 
 #### validate (attributes)
 
