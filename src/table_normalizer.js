@@ -112,7 +112,7 @@ const TableNormalizer = function (data) {
 			
 			// parse numbers off front and subtables off back
 			const parse = v.match(/^(?:(?:[0-9]+\-)?([0-9]+)(##)?(?:\.\s*|:\s*|,\s*|\t+|\s*))?(.+?)(?:##(.+))?$/);
-			//console.log(parse);
+			// console.log(parse);
 			if (parse) {
 				// console.log(parse);
 				let label = parse[3].trim();

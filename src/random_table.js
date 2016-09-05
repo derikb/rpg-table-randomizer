@@ -1,6 +1,5 @@
 'use strict';
 
-//const randomizer = require('./randomizer.js');
 const r_helpers = require('./r_helpers.js');
 
 /**
@@ -116,7 +115,7 @@ const RandomTable = function (config) {
 				if (v.desc !== '') { o += `${v.desc}\n`; }
 			}
 		});
-		o = o.trim(); //trim off final linebreak
+		o = o.trim(); // trim off final linebreak
 		return o;
 	};
 	/**

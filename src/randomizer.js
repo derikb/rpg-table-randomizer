@@ -7,7 +7,7 @@ const r_helpers = require('./r_helpers.js');
  * Module exports a single instance of Randomizer...
  * @constructor
  */
-let Randomizer = function () {
+const Randomizer = function () {
 	/**
 	 * Store the token types/processing
 	 */
@@ -67,9 +67,9 @@ let Randomizer = function () {
 				}
 			});
 		} else if (typeof data === 'object' && data !== null) {
-			let props = Object.keys(data);
+			const props = Object.keys(data);
 			props.forEach((k) => {
-				let v = data[k];
+				const v = data[k];
 				if (typeof v.weight !== 'undefined') {
 					weights.push(v.weight);
 				} else {
@@ -132,7 +132,7 @@ let Randomizer = function () {
 	this.arraySum = function (arr) {
 		let total = 0;
 		for (let i = 0; i < arr.length; i++) {
-			let v = parseFloat(arr[i]);
+			const v = parseFloat(arr[i]);
 			if (!isNaN(v)) {
 				total += v;
 			}
@@ -183,7 +183,7 @@ let Randomizer = function () {
 				}
 				// its an object
 				const table = (seq.table) ? seq.table : '';
-				if (table == '') {
+				if (table === '') {
 					return;
 				}
 				const times = (typeof seq.times === 'number') ? seq.times : 1;
@@ -195,7 +195,7 @@ let Randomizer = function () {
 		}
 		
 		rtable.result = result;
-		return result;	
+		return result;
 	};
 	/**
 	 * Get a result from a table/subtable in a RandomTable object
@@ -295,7 +295,7 @@ let Randomizer = function () {
 	 * @returns {String} The value with the token(s) replaced by the operation or else just the token (in case it was a mistake or at least to make the error clearer)
 	 */
 	this.convertToken = function (token, curtable) {
-		let parts = token.replace('{{', '').replace('}}', '').split(':');
+		const parts = token.replace('{{', '').replace('}}', '').split(':');
 		if (parts.length === 0) { return token; }
 		
 		// look for a token type we can run
@@ -378,7 +378,7 @@ let Randomizer = function () {
 		}
 		let multiplier = 1;
 		if (token_parts[1].indexOf('*') !== -1) {
-			let x = token_parts[1].split('*');
+			const x = token_parts[1].split('*');
 			token_parts[1] = x[0];
 			multiplier = x[1];
 		}
@@ -387,12 +387,12 @@ let Randomizer = function () {
 		let t = null;
 		if (token_parts[1] === 'this') {
 			// reroll on same table
-			//console.log('this..'+curtable);
+			// console.log('this..'+curtable);
 			t = this.getTableByTitle(curtable);
-			//console.log(t);
+			// console.log(t);
 		} else {
 			t = this.getTableByTitle(token_parts[1]);
-			//console.log(t);
+			// console.log(t);
 		}
 		if (t === null || typeof t !== 'object') {
 			return full_token;
@@ -402,7 +402,7 @@ let Randomizer = function () {
 			token_parts[2] = x[0];
 			multiplier = x[1];
 		}
-		let subtable = (typeof token_parts[2] === 'undefined') ? '' : token_parts[2];
+		const subtable = (typeof token_parts[2] === 'undefined') ? '' : token_parts[2];
 
 		for (var i = 1; i <= multiplier; i++) {
 			this.getTableResult(t, subtable);
