@@ -116,9 +116,9 @@ const RandomName = function (randomizer, namedata) {
 	};
 	/**
 	 * Create a name using Markov chains
-	 * @param {String} name_type what list/process to use, else random
-	 * @param {String} gender male or female or both
-	 * @param {Boolean} surname include a surname or not
+	 * @param {String} [name_type=random] what list/process to use
+	 * @param {String} [gender=random] male or female or both
+	 * @param {Boolean} [surname=false] include a surname or not
 	 * @returns {String} a name
 	 */
 	this.createName = function (name_type, gender, surname) {
@@ -187,7 +187,7 @@ const RandomName = function (randomizer, namedata) {
 		});
 		return upper_parts.join(' ');
 	};
-		/**
+	/**
 	 * Generate a Holmes name
 	 * @returns {String} name
 	 */
