@@ -308,7 +308,7 @@ const Randomizer = function () {
 	/**
 	 * Look for tokens to perform replace action in convertToken
 	 * @param {String} string usually a result from a RandomTable
-	 * @param {String} curtable name of the RandomTable the string is from (needed for "this" tokens)
+	 * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
 	 * @returns {String} String with tokens replaced (if applicable)
 	 */
 	this.findToken = function (string, curtable) {
@@ -338,19 +338,19 @@ const Randomizer = function () {
 		return '';
 	};
 	/**
-	 * Since tables are stored outside of this module, this function allows for the setting of a function which will be used to lookup a table by it's name
-	 * @param {Function} lookup a function that takes a table name and returns the table data object
+	 * Since tables are stored outside of this module, this function allows for the setting of a function which will be used to lookup a table by it's key
+	 * @param {Function} lookup a function that takes a table key and returns the table data object
 	 * @return {null} nothing
 	 */
-	this.setTableTitleLookup = function (lookup) {
-		this.getTableByTitle = lookup;
+	this.setTableKeyLookup = function (lookup) {
+		this.getTableByKey = lookup;
 	};
 	/**
 	 * Placeholder that should be replaced by a function outside this module
-	 * @param {String} name table name identifier
+	 * @param {String} key human readable table identifier
 	 * @return {null} nothing, when replaced this function should return a table object
 	 */
-	this.getTableByTitle = function (name) {
+	this.getTableByKey = function (key) {
 		return null;
 	};
 	/**
@@ -389,10 +389,10 @@ const Randomizer = function () {
 		if (token_parts[1] === 'this') {
 			// reroll on same table
 			// console.log('this..'+curtable);
-			t = this.getTableByTitle(curtable);
+			t = this.getTableByKey(curtable);
 			// console.log(t);
 		} else {
-			t = this.getTableByTitle(token_parts[1]);
+			t = this.getTableByKey(token_parts[1]);
 			// console.log(t);
 		}
 		if (t === null || typeof t !== 'object') {

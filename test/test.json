@@ -1,6 +1,6 @@
 [
 	{
-		"id": "directions",
+		"key": "directions",
 		"title": "Directions",
 		"table": [
 			"North",
@@ -10,7 +10,7 @@
 		]
 	},
 	{
-		"id": "one",
+		"key": "one",
 		"title": "One Result",
 		"description": "Just a way to always get one result to make sure we are getting a result from the right table.",
 		"tables": {
@@ -23,7 +23,7 @@
 		}
 	},
 	{
-		"id": "season",
+		"key": "season",
 		"title": "Seasons",
 		"table": [
 			{ "label": "Winter" },
@@ -33,7 +33,7 @@
 		]
 	},
 	{
-		"id": "color",
+		"key": "color",
 		"title": "Colors",
 		"tables": {
 			"default": [
@@ -54,7 +54,7 @@
 		}
 	},
 	{
-		"id": "color2",
+		"key": "color2",
 		"title": "Colors 2",
 		"sequence": [
 			"value",
@@ -75,7 +75,7 @@
 		}
 	},
 	{
-	  "id": "colonial_goals",
+	  "key": "colonial_goals",
 	  "title": "Goals (Colonial)",
 	  "author": "Derik Badman",
 	  "tags": [
@@ -109,7 +109,7 @@
 	  }
 	},
 	{
-	  "id": "colonial_encounters_town",
+	  "key": "colonial_encounters_town",
 	  "title": "Encounters Town (Colonial)",
 	  "author": "Derik Badman",
 	  "tags": [
@@ -180,7 +180,7 @@
 	  }
 	},
 	{
-	  "id": "colonial_occupations",
+	  "key": "colonial_occupations",
 	  "title": "Occupations (Colonial)",
 	  "author": "Derik Badman",
 	  "tags": [
@@ -273,7 +273,7 @@
 	  }
 	},
 	{
-	  "id": "colonial_companies",
+	  "key": "colonial_companies",
 	  "title": "Companies (Colonial)",
 	  "author": "Derik Badman",
 	  "description": "Quick company.",

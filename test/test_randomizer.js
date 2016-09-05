@@ -9,14 +9,14 @@ const test_tables = require('./test.json');
 const tables = {};
 
 test_tables.forEach((t) => {
-	tables[t.id] = new RandomTable(t);
+	tables[t.key] = new RandomTable(t);
 });
 
 describe('Randomizer module', function (){
 	
 	beforeEach(function () {
-		randomizer.setTableTitleLookup(function(title){
-			return tables[title] ? tables[title] : null;
+		randomizer.setTableKeyLookup(function(key){
+			return tables[key] ? tables[key] : null;
 		});
 	});
 	
@@ -161,18 +161,18 @@ describe('Randomizer module', function (){
 		});
 	});
 
-	describe('getTableByTitle function', function (){
+	describe('getTableByKey function', function (){
 		it('should return based on the titlelookup function', function () {
-			expect(randomizer.getTableByTitle('the table')).to.equal(null);
-			expect(randomizer.getTableByTitle('color')).to.equal(tables['color']);
+			expect(randomizer.getTableByKey('the table')).to.equal(null);
+			expect(randomizer.getTableByKey('color')).to.equal(tables['color']);
 		});
 	});
 		
-	describe('setTableTitleLookup function', function (){
+	describe('setTableKeyLookup function', function (){
 		it('should return the function result', function () {
 			let func = function (title){ return `hello ${title}`; };
-			randomizer.setTableTitleLookup(func);
-			expect(randomizer.getTableByTitle).to.equal(func);
+			randomizer.setTableKeyLookup(func);
+			expect(randomizer.getTableByKey).to.equal(func);
 		});
 	});
 	

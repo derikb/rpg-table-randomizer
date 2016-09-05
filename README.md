@@ -170,29 +170,29 @@ const result = randomizer.getTableResult(colortable);
 */
 ```
 
-#### setTableTitleLookup (lookup)
+#### setTableKeyLookup (lookup)
 
-* @param {Function} lookup a function that takes a table name and returns the table data object
+* @param {Function} _lookup_ a function that takes a table key and returns the table data object
 * @return {null} nothing
 
 Use this to set-up a way to retrieve RandomTable objects from a source. Necessary for cross-table tokens.
 
 ```
-const table_retrieve = function (title) {
-	// some method to find the table with the title of the title argument.
+const table_retrieve = function (key) {
+	// some method to find the table with the key of the key argument.
 	// and set it to the var table
 	return table;	
 };
 
-randomizer.setTableTitleLookup(table_retrieve);
+randomizer.setTableKeyLookup(table_retrieve);
 ```
 
-#### getTableByTitle (name)
+#### getTableByKey (key)
 
-* @param {String} name table name identifier
+* @param {String} key table key identifier
 * @return {null} nothing, when replaced this function should return a table object
 
-Used to access the function set with setTableTitleLookup(). Mostly used internally.
+Used to access the function set with setTableKeyLookup(). Mostly used internally.
 
 #### registerTokenType (name, process)
 

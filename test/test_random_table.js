@@ -19,10 +19,9 @@ describe('random_table module', function () {
 	
 	describe('basic config', function(){
 		it('should set the basic config properties', function () {
-			const config = test_tables.find((v) => { return v.id === 'directions'; });
+			const config = test_tables.find((v) => { return v.key === 'directions'; });
 			const test_table = new random_table(config);
-			expect(test_table.id).to.equal(config.id);
-			expect(test_table.key).to.equal(config.id);
+			expect(test_table.key).to.equal(config.key);
 			expect(test_table.table).to.be.undefined;
 			expect(test_table.tables.default).to.equal(config.table);
 		});
@@ -30,7 +29,7 @@ describe('random_table module', function () {
 	
 	describe('niceString method', function () {
 		it('should return a string...', function () {
-			let sample_data = test_tables.find((v) => { return v.id === 'color2'; });
+			let sample_data = test_tables.find((v) => { return v.key === 'color2'; });
 			test_table = new random_table(sample_data);
 			randomizer.getTableResult(test_table);
 			console.log(test_table.niceString());
@@ -42,7 +41,7 @@ describe('random_table module', function () {
 	
 	describe('findObject method', function () {
 		it('should find the desired element from the desired table', function () {
-			let sample_data = test_tables.find((v) => { return v.id === 'colonial_encounters_town'; });
+			let sample_data = test_tables.find((v) => { return v.key === 'colonial_encounters_town'; });
 			test_table = new random_table(sample_data);
 			expect(test_table.findObject('Local priest')).to.eql( { "label": "Local priest",
 	        "subtable": "actions_men" } );
@@ -53,7 +52,7 @@ describe('random_table module', function () {
 	
 	describe('findResultElem method', function () {
 		it('should return the result from the selected table', function () {
-			let sample_data = test_tables.find((v) => { return v.id === 'color2'; });
+			let sample_data = test_tables.find((v) => { return v.key === 'color2'; });
 			test_table = new random_table(sample_data);
 			randomizer.getTableResult(test_table);
 			const resultelem = test_table.findResultElem('value');
@@ -64,7 +63,7 @@ describe('random_table module', function () {
 	
 	describe('outputObject function', function () {
 		it('should return all non-function properties that are not empty', function () {
-			let sample_data = test_tables.find((v) => { return v.id === 'color2'; });
+			let sample_data = test_tables.find((v) => { return v.key === 'color2'; });
 			test_table = new random_table(sample_data);
 			const output = test_table.outputObject();
 			expect(output).to.be.object;
@@ -78,7 +77,7 @@ describe('random_table module', function () {
 		});
 		
 		it('should return all non-function properties', function () {
-			let sample_data = test_tables.find((v) => { return v.id === 'color2'; });
+			let sample_data = test_tables.find((v) => { return v.key === 'color2'; });
 			test_table = new random_table(sample_data);
 			const output = test_table.outputObject(true);
 			expect(output).to.be.object;
@@ -94,7 +93,7 @@ describe('random_table module', function () {
 	
 	describe('outputCode function', function () {
 		it('should return a json string of data', function () {
-			let sample_data = test_tables.find((v) => { return v.id === 'color2'; });
+			let sample_data = test_tables.find((v) => { return v.key === 'color2'; });
 			test_table = new random_table(sample_data);
 			const output = test_table.outputCode(false, false);
 			expect(output).to.be.a.string;
@@ -103,7 +102,7 @@ describe('random_table module', function () {
 		});
 		
 		it('should return a json string of data compressed (no linebreaks, spaces, etc)', function () {
-			let sample_data = test_tables.find((v) => { return v.id === 'color2'; });
+			let sample_data = test_tables.find((v) => { return v.key === 'color2'; });
 			test_table = new random_table(sample_data);
 			const output = test_table.outputCode(false, true);
 			expect(output).to.be.a.string;
