@@ -8,11 +8,9 @@ const name = require('../src/random_name.js');
 const namedata = require('../sample/names.json');
 const namer = new name(randomizer, namedata);
 
-
 describe('generateList function', function () {
 	it('should return listCount number of names', function () {
-		namer.listCount = 6;
-		const list = namer.generateList();
+		const list = namer.generateList(6);
 		expect(list).to.have.property('male');
 		expect(list).to.have.property('female');
 		expect(list.male).to.have.lengthOf(3);

@@ -8,25 +8,35 @@ const r_helpers = require('./r_helpers.js');
  * @param {Object} namedata a lot of names divided by type. see /samples/names.json for formatting
  */
 const RandomName = function (randomizer, namedata) {
-	this.listCount = 10;
+	/**
+	 * Stores the Markov object (See below)
+	 */
 	this.markov = {};
+	/**
+	 * Stores the randomizer
+	 */
 	this.randomizer = randomizer;
+	/**
+	 * Name data object
+	 */
 	this.namedata = namedata;
 	/**
 	 * Generate a bunch of names, half male, half female
+	 * @param {Number} [number=10] number of names in the list (half will be male, half will be female)
 	 * @param {String} [name_type] type of name or else it will randomly select
 	 * @param {Bool} [create=false] new names or just pick from list
 	 * @return {Object} arrays of names inside male/female property
 	 */
-	this.generateList = function (name_type, create) {
+	this.generateList = function (number, name_type, create) {
 		const names = { male: [], female: [] };
 		if (typeof create === 'undefined') { create = false; }
+		if (typeof number === 'undefined') { number = 10; }
 		if (typeof name_type === 'undefined' || name_type === '') {
 			name_type = 'random';
 		}
 		
-		for (let i = 1; i <= this.listCount; i++) {
-			const gender = (i <= Math.ceil(this.listCount / 2)) ? 'male' : 'female';
+		for (let i = 1; i <= number; i++) {
+			const gender = (i <= Math.ceil(number / 2)) ? 'male' : 'female';
 			if (create && name_type !== 'holmesian' && name_type !== 'demonic') {
 				names[gender].push(this.createName(name_type, gender, true));
 			} else {
