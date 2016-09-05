@@ -47,53 +47,11 @@ const isUndefined = function (obj) {
 const capitalize = function (string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 };
-/**
- * Flatten array into comma separated, capitalized string
- */
-const flatten = function (arr) {
-	let o = '';
-	arr.forEach((v) => {
-		o += `${capitalize(v)}, `;
-	});
-	o = o.trim();
-	o = o.replace(/,$/, '');
-	return o;
-};
-/**
- * Extend one object with another
- */
-const extend = function (obj, props) {
-	for (const prop in props) {
-		if (props.hasOwnProperty(prop)) {
-			obj[prop] = props[prop];
-		}
-	}
-	return obj;
-};
-/**
- * @todo maybe get this working?
- * Iterate of Array or Object and apply callback
- * Callback is passed value, key, obj
- */
-/*
-const iterate = (obj, cb) => {
-	if (Array.isArray(obj)) {
-		obj.forEach(cb.bind(this));
-	} else if (isObject(obj)) {
-		const keys = Object.keys(obj);
-		for (const k in keys) {
-			cb.bind(this, obj[k], k, obj);
-		}
-	}
-};
-*/
 
 module.exports = {
 	isEmpty: isEmpty,
 	isString: isString,
 	isObject: isObject,
 	isUndefined: isUndefined,
-	capitalize: capitalize,
-	flatten: flatten,
-	extend: extend
+	capitalize: capitalize
 };

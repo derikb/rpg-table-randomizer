@@ -1,8 +1,0 @@
-Red
-Orange
-4##Yellow
-Green##direction
-
-2##Blue##season
-3-4 Indigo
-5-7 Violet

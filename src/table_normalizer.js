@@ -115,7 +115,9 @@ const TableNormalizer = function (data) {
 			//console.log(parse);
 			if (parse) {
 				// console.log(parse);
-				l[k] = { label: parse[3].trim() };
+				let label = parse[3].trim();
+				label = label.replace(/^[-*]\s?/, '');
+				l[k] = { label: label };
 				
 				if (typeof parse[1] !== 'undefined') {
 					let weight = 1;
@@ -144,6 +146,15 @@ const TableNormalizer = function (data) {
 		return text;
 	};
 	/**
+	 * Parse markdown...?
+	 * @todo
+	 */
+	this.parseMarkdown = function () {
+		// deal with headers
+		// deal with lists and sublists.
+		
+	};
+	/**
 	 * Process the data and try to do something
 	 */
 	this.normalizeData = function () {
@@ -154,12 +165,7 @@ const TableNormalizer = function (data) {
 		let parse_data = null;
 		switch (type) {
 			case 'html':
-				parse_data = this.parseHtml();
-				this.normalized_data = {
-					table: {
-						default: parse_data
-					}
-				};
+				this.normalized_data = this.parseHtml();
 				break;
 			case 'text':
 				this.normalized_data = this.parseText();
