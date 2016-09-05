@@ -20,6 +20,7 @@ const TableNormalizer = function (data) {
 	};
 	/**
 	 * Decide what type of data it is so we can treat it appropriately.
+	 * @return {String} data_type
 	 */
 	this.checkType = function () {
 		const data = this.orig_data;

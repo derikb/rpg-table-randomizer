@@ -19,6 +19,11 @@ const RandomTable = function (config) {
 	 * @property {String|Array} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
 	 * @property {Array} [table] default table. array of strings or objects. removed after initialization.
 	 * @property {Object} [tables] a property for each subtables. if table property is not set then the first propery of this Object is used to start rolling
+	 * @property {Object} [print] objects to describe what parts of a (sub)table should be displayed in the results
+	 * @property {Object} [print.default] how to display the default table's results
+	 * @property {Object} [print.default.hide_table] set to 1 will not show the table name
+	 * @property {Object} [print.default.hide_result] set to 1 will not show the result on that (sub)table
+	 * @property {Object} [print.default.hide_desc] set to 1 will not show any description for a result on that (sub)table
 	 * @property {Array} [result] current result array of objects
 	 */
 	this.id = 0;
@@ -35,7 +40,7 @@ const RandomTable = function (config) {
 	 * Run on first construction
 	 * @param {Object} config data passed from the constructor
 	 */
-	this.initialize = function (config) {
+	const initialize = function (config) {
 		for (const prop in config) {
 			if (config.hasOwnProperty(prop)) {
 				this[prop] = config[prop];
@@ -55,19 +60,19 @@ const RandomTable = function (config) {
 	};
 	/**
 	 * validate fields before saving
-	 * @param {Object} attributes new attributes to save
+	 * @param {Object} properties new attributes to save
 	 * @returns {Object} error information
 	 */
-	this.validate = function (attributes) {
+	this.validate = function (properties) {
 		// console.log(attributes);
 		const error = { fields: [], general: '' };
 		
-		if (attributes.title === '') {
+		if (properties.title === '') {
 			error.fields.push({ field: 'title', message: 'Title cannot be blank' });
 			error.general += 'Title cannot be blank. ';
 		}
 		
-		if (typeof attributes.tables === 'string' || r_helpers.isEmpty(attributes.tables)) {
+		if (typeof properties.tables === 'string' || r_helpers.isEmpty(properties.tables)) {
 			error.fields.push({ field: 'title', message: 'Table cannot be empty' });
 			error.general += 'Table cannot be empty. ';
 		}
@@ -120,7 +125,7 @@ const RandomTable = function (config) {
 	};
 	/**
 	 * outputs the json data for the table (import/export)
-	 * @param {Boolean} [editmode=false] if false empty attributes will be stripped out
+	 * @param {Boolean} [editmode=false] if false empty properties will be stripped out
 	 * @returns {Object} table attributes
 	 */
 	this.outputObject = function (editmode) {
@@ -144,9 +149,9 @@ const RandomTable = function (config) {
 	};
 	/**
 	 * outputs the json data for the table (import/export)
-	 * @param {Boolean} [editmode=false] if false empty attributes will be stripped out
+	 * @param {Boolean} [editmode=false] if false empty properties will be stripped out
 	 * @param {Boolean} [compress=false] if true JSON will not have indentation, etc.
-	 * @returns {String} table attributes in JSON
+	 * @returns {String} table properties in JSON
 	 */
 	this.outputCode = function (editmode, compress) {
 		if (typeof editmode === 'undefined') { editmode = false; }
@@ -200,7 +205,7 @@ const RandomTable = function (config) {
 	/**
 	 * Initialize the table, set the data, normalize, etc.
 	 */
-	this.initialize(config);
+	initialize.call(this, config);
 };
 
 module.exports = RandomTable;
