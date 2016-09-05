@@ -4043,27 +4043,39 @@ var r_helpers = require('./r_helpers.js');
 var RandomName = function RandomName(randomizer, namedata) {
 	var _this2 = this;
 
-	this.listCount = 10;
+	/**
+  * Stores the Markov object (See below)
+  */
 	this.markov = {};
+	/**
+  * Stores the randomizer
+  */
 	this.randomizer = randomizer;
+	/**
+  * Name data object
+  */
 	this.namedata = namedata;
 	/**
   * Generate a bunch of names, half male, half female
+  * @param {Number} [number=10] number of names in the list (half will be male, half will be female)
   * @param {String} [name_type] type of name or else it will randomly select
   * @param {Bool} [create=false] new names or just pick from list
   * @return {Object} arrays of names inside male/female property
   */
-	this.generateList = function (name_type, create) {
+	this.generateList = function (number, name_type, create) {
 		var names = { male: [], female: [] };
 		if (typeof create === 'undefined') {
 			create = false;
+		}
+		if (typeof number === 'undefined') {
+			number = 10;
 		}
 		if (typeof name_type === 'undefined' || name_type === '') {
 			name_type = 'random';
 		}
 
-		for (var i = 1; i <= this.listCount; i++) {
-			var gender = i <= Math.ceil(this.listCount / 2) ? 'male' : 'female';
+		for (var i = 1; i <= number; i++) {
+			var gender = i <= Math.ceil(number / 2) ? 'male' : 'female';
 			if (create && name_type !== 'holmesian' && name_type !== 'demonic') {
 				names[gender].push(this.createName(name_type, gender, true));
 			} else {
@@ -4143,9 +4155,9 @@ var RandomName = function RandomName(randomizer, namedata) {
 	};
 	/**
   * Create a name using Markov chains
-  * @param {String} name_type what list/process to use, else random
-  * @param {String} gender male or female or both
-  * @param {Boolean} surname include a surname or not
+  * @param {String} [name_type=random] what list/process to use
+  * @param {String} [gender=random] male or female or both
+  * @param {Boolean} [surname=false] include a surname or not
   * @returns {String} a name
   */
 	this.createName = function (name_type, gender, surname) {
@@ -4225,9 +4237,9 @@ var RandomName = function RandomName(randomizer, namedata) {
 		return upper_parts.join(' ');
 	};
 	/**
- * Generate a Holmes name
- * @returns {String} name
- */
+  * Generate a Holmes name
+  * @returns {String} name
+  */
 	this.holmesname = function () {
 		var name = '';
 		var scount = this.randomizer.getWeightedRandom(this.namedata.holmesian_scount.values, this.namedata.holmesian_scount.weights);
@@ -4442,6 +4454,11 @@ var RandomTable = function RandomTable(config) {
   * @property {String|Array} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
   * @property {Array} [table] default table. array of strings or objects. removed after initialization.
   * @property {Object} [tables] a property for each subtables. if table property is not set then the first propery of this Object is used to start rolling
+  * @property {Object} [print] objects to describe what parts of a (sub)table should be displayed in the results
+  * @property {Object} [print.default] how to display the default table's results
+  * @property {Object} [print.default.hide_table] set to 1 will not show the table name
+  * @property {Object} [print.default.hide_result] set to 1 will not show the result on that (sub)table
+  * @property {Object} [print.default.hide_desc] set to 1 will not show any description for a result on that (sub)table
   * @property {Array} [result] current result array of objects
   */
 	this.id = 0;
@@ -4458,7 +4475,7 @@ var RandomTable = function RandomTable(config) {
   * Run on first construction
   * @param {Object} config data passed from the constructor
   */
-	this.initialize = function (config) {
+	var initialize = function initialize(config) {
 		for (var prop in config) {
 			if (config.hasOwnProperty(prop)) {
 				this[prop] = config[prop];
@@ -4478,19 +4495,19 @@ var RandomTable = function RandomTable(config) {
 	};
 	/**
   * validate fields before saving
-  * @param {Object} attributes new attributes to save
+  * @param {Object} properties new attributes to save
   * @returns {Object} error information
   */
-	this.validate = function (attributes) {
+	this.validate = function (properties) {
 		// console.log(attributes);
 		var error = { fields: [], general: '' };
 
-		if (attributes.title === '') {
+		if (properties.title === '') {
 			error.fields.push({ field: 'title', message: 'Title cannot be blank' });
 			error.general += 'Title cannot be blank. ';
 		}
 
-		if (typeof attributes.tables === 'string' || r_helpers.isEmpty(attributes.tables)) {
+		if (typeof properties.tables === 'string' || r_helpers.isEmpty(properties.tables)) {
 			error.fields.push({ field: 'title', message: 'Table cannot be empty' });
 			error.general += 'Table cannot be empty. ';
 		}
@@ -4551,7 +4568,7 @@ var RandomTable = function RandomTable(config) {
 	};
 	/**
   * outputs the json data for the table (import/export)
-  * @param {Boolean} [editmode=false] if false empty attributes will be stripped out
+  * @param {Boolean} [editmode=false] if false empty properties will be stripped out
   * @returns {Object} table attributes
   */
 	this.outputObject = function (editmode) {
@@ -4577,9 +4594,9 @@ var RandomTable = function RandomTable(config) {
 	};
 	/**
   * outputs the json data for the table (import/export)
-  * @param {Boolean} [editmode=false] if false empty attributes will be stripped out
+  * @param {Boolean} [editmode=false] if false empty properties will be stripped out
   * @param {Boolean} [compress=false] if true JSON will not have indentation, etc.
-  * @returns {String} table attributes in JSON
+  * @returns {String} table properties in JSON
   */
 	this.outputCode = function (editmode, compress) {
 		if (typeof editmode === 'undefined') {
@@ -4637,7 +4654,7 @@ var RandomTable = function RandomTable(config) {
 	/**
   * Initialize the table, set the data, normalize, etc.
   */
-	this.initialize(config);
+	initialize.call(this, config);
 };
 
 module.exports = RandomTable;
@@ -4675,6 +4692,21 @@ var Randomizer = function Randomizer() {
 		return min + Math.floor(Math.random() * (max - min + 1));
 	};
 	/**
+  * Sum an array
+  * @param {Array} arr an array of numbers
+  * @returns {Number} Total value of numbers in array
+  */
+	function arraySum(arr) {
+		var total = 0;
+		for (var i = 0; i < arr.length; i++) {
+			var v = parseFloat(arr[i]);
+			if (!isNaN(v)) {
+				total += v;
+			}
+		}
+		return total;
+	};
+	/**
   * Random value selection
   * @param {Array} values an array of strings from which to choose
   * @param {Array} weights a matching array of integers to weight the values (i.e. values and weights are in the same order)
@@ -4682,7 +4714,7 @@ var Randomizer = function Randomizer() {
   */
 	this.getWeightedRandom = function (values, weights) {
 		var n = 0;
-		var num = this.random(1, this.arraySum(weights));
+		var num = this.random(1, arraySum.call(this, weights));
 		for (var i = 0; i < values.length; i++) {
 			n = n + weights[i];
 			if (n >= num) {
@@ -4737,7 +4769,7 @@ var Randomizer = function Randomizer() {
   * @param {String} [mod_op=+] Operator for the modifier (+,-,/,*)
   * @returns {Number} Number rolled (die*number [mod_op][modifier])
   */
-	this.roll = function (die, number, modifier, mod_op) {
+	function parseDiceNotation(die, number, modifier, mod_op) {
 		modifier = typeof modifier === 'undefined' ? 0 : parseInt(modifier, 10);
 		die = typeof die === 'undefined' ? 6 : parseInt(die, 10);
 		mod_op = typeof mod_op === 'undefined' ? '+' : mod_op;
@@ -4774,25 +4806,10 @@ var Randomizer = function Randomizer() {
 		return Math.round(sum);
 	};
 	/**
-  * Sum an array
-  * @param {Array} arr an array of numbers
-  * @returns {Number} Total value of numbers in array
-  */
-	this.arraySum = function (arr) {
-		var total = 0;
-		for (var i = 0; i < arr.length; i++) {
-			var v = parseFloat(arr[i]);
-			if (!isNaN(v)) {
-				total += v;
-			}
-		}
-		return total;
-	};
-	/**
   * Generate a result from a RandomTable object
-  * @param {Object} table the RandomTable
+  * @param {Object} rtable the RandomTable
   * @param {String} [start=''] subtable to roll on
-  * @return {Array} result array
+  * @return {Array} array of object results { table: table that was rolled on, result: result string, desc: optional description string }
   */
 	this.getTableResult = function (rtable, start) {
 		var _this = this;
@@ -4855,7 +4872,7 @@ var Randomizer = function Randomizer() {
   * @todo we'll have to fix for this with a node version
   * @param {Object} rtable the RandomTable object
   * @param {String} table table to roll on
-  * @returns {Array} array of object results { table: table that was rolled on, result: result string, desc: description string }
+  * @returns {Array} array of object results { table: table that was rolled on, result: result string, desc: optional description string }
   */
 	this.selectFromTable = function (rtable, table) {
 		var _this2 = this;
@@ -4947,7 +4964,7 @@ var Randomizer = function Randomizer() {
   * @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}}
   * @returns {String} The value with the token(s) replaced by the operation or else just the token (in case it was a mistake or at least to make the error clearer)
   */
-	this.convertToken = function (token, curtable) {
+	function convertToken(token, curtable) {
 		var parts = token.replace('{{', '').replace('}}', '').split(':');
 		if (parts.length === 0) {
 			return token;
@@ -4963,6 +4980,7 @@ var Randomizer = function Randomizer() {
 	/**
   * Look for tokens to perform replace action in convertToken
   * @param {String} string usually a result from a RandomTable
+  * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
   * @returns {String} String with tokens replaced (if applicable)
   */
 	this.findToken = function (string, curtable) {
@@ -4973,7 +4991,7 @@ var Randomizer = function Randomizer() {
 		}
 		var regexp = new RegExp('({{2}.+?}{2})', 'g');
 		var newstring = string.replace(regexp, function (token) {
-			return _this3.convertToken(token, curtable);
+			return convertToken.call(_this3, token, curtable);
 		});
 		return newstring;
 	};
@@ -4982,7 +5000,7 @@ var Randomizer = function Randomizer() {
   * @params {String} string a die roll notation
   * @returns {Number} the result of the roll
   */
-	this.parseDiceNotation = function (string) {
+	this.roll = function (string) {
 		string = typeof string === 'undefined' ? '' : string.trim();
 		var m = string.match(/^([0-9]*)d([0-9]+)(?:([\+\-\*\/])([0-9]+))*$/);
 		if (m) {
@@ -4990,27 +5008,27 @@ var Randomizer = function Randomizer() {
 				m[4] = 0;
 			}
 			if (m[1] !== '') {
-				return this.roll(parseInt(m[2], 10), parseInt(m[1], 10), parseInt(m[4], 10), m[3]);
+				return parseDiceNotation.call(this, parseInt(m[2], 10), parseInt(m[1], 10), parseInt(m[4], 10), m[3]);
 			} else {
-				return this.roll(parseInt(m[2], 10), '1', parseInt(m[4], 10), m[3]);
+				return parseDiceNotation.call(this, parseInt(m[2], 10), '1', parseInt(m[4], 10), m[3]);
 			}
 		}
 		return '';
 	};
 	/**
-  * Since tables are stored outside of this module, this function allows for the setting of a function which will be used to lookup a table by it's name
-  * @param {Function} lookup a function that takes a table name and returns the table data object
+  * Since tables are stored outside of this module, this function allows for the setting of a function which will be used to lookup a table by it's key
+  * @param {Function} lookup a function that takes a table key and returns the table data object
   * @return {null} nothing
   */
-	this.setTableTitleLookup = function (lookup) {
-		this.getTableByTitle = lookup;
+	this.setTableKeyLookup = function (lookup) {
+		this.getTableByKey = lookup;
 	};
 	/**
   * Placeholder that should be replaced by a function outside this module
-  * @param {String} name table name identifier
+  * @param {String} key human readable table identifier
   * @return {null} nothing, when replaced this function should return a table object
   */
-	this.getTableByTitle = function (name) {
+	this.getTableByKey = function (key) {
 		return null;
 	};
 	/**
@@ -5025,7 +5043,7 @@ var Randomizer = function Randomizer() {
   * Dice roll token.
   */
 	this.registerTokenType('roll', function (token_parts, full_token, curtable) {
-		return _this4.parseDiceNotation(token_parts[1]);
+		return _this4.roll(token_parts[1]);
 	});
 	/**
   * Table token lookup in the form:
@@ -5049,10 +5067,10 @@ var Randomizer = function Randomizer() {
 		if (token_parts[1] === 'this') {
 			// reroll on same table
 			// console.log('this..'+curtable);
-			t = _this4.getTableByTitle(curtable);
+			t = _this4.getTableByKey(curtable);
 			// console.log(t);
 		} else {
-			t = _this4.getTableByTitle(token_parts[1]);
+			t = _this4.getTableByKey(token_parts[1]);
 			// console.log(t);
 		}
 		if (t === null || (typeof t === 'undefined' ? 'undefined' : _typeof(t)) !== 'object') {
@@ -5100,6 +5118,7 @@ var TableNormalizer = function TableNormalizer(data) {
 	};
 	/**
   * Decide what type of data it is so we can treat it appropriately.
+  * @return {String} data_type
   */
 	this.checkType = function () {
 		var data = this.orig_data;
