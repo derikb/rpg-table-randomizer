@@ -1,12 +1,13 @@
 {
   "name": "rpg-table-randomizer",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Module for random tables for use in roleplaying games",
   "main": "src/index.js",
   "scripts": {
     "eslint": "./node_modules/.bin/eslint ",
     "eslint:src": "./node_modules/.bin/eslint src/",
     "browserify": "./node_modules/.bin/browserify src/index.js --s rpg-table-randomizer -o dist/rpg-table-randomizer.js -t [ babelify --presets [ es2015 ] ]",
+    "browserify:min": "./node_modules/.bin/browserify src/index.js --s rpg-table-randomizer -o dist/rpg-table-randomizer.min.js -t [ babelify --presets [ es2015 ] ] -d -p [minifyify --map dist/rpg-table-randomizer.js.map --output dist/rpg-table-randomizer.js.map]",
     "test": "mocha test/test_random_table.js test/test_randomizer.js test/test_name.js test/test_normalizer.js test/test_r_helpers.js"
   },
   "repository": {

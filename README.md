@@ -76,7 +76,7 @@ This module was written for use in nodejs but uses browserify to create a module
 
 There are no module requirements for production environment.
 
-### NPM
+### Node
 
 Install the module via npm:
 
@@ -103,8 +103,7 @@ $ bower install rpg-table-randomizer --save
 
 #### Manually
 
-Download the latest release from github. Load the dist/rpg-table-randomizer.js file in your html.
-
+Download the latest release from github. Load the dist/rpg-table-randomizer.min.js file in your html. For debugging purposes there is the source map file or the unminified version, all in the dist/ directory.
 
 
 ## API Reference
