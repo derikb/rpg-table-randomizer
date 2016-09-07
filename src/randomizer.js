@@ -407,7 +407,7 @@ const Randomizer = function () {
 
 		for (var i = 1; i <= multiplier; i++) {
 			this.getTableResult(t, subtable);
-			string += t.niceString(true) + ', ';
+			string += t.niceString() + ', ';
 		}
 		string = string.trim();
 		string = string.replace(/,$/, '');
