@@ -1,74 +1,71 @@
 [
 	{
-		"id": "directions",
+		"key": "directions",
 		"title": "Directions",
-		"table": [
-			"North",
-			"South",
-			"East",
-			"West"
-		]
-	},
-	{
-		"id": "one",
-		"title": "One Result",
 		"tables": {
 			"default": [
-				"one"
-			],
-			"two": [
-				"two"	
+				"North",
+				"South",
+				"East",
+				"West"
+			]
+		}
+	},
+	},
+	{
+		"key": "color",
+		"title": "Colors",
+		"tables": {
+			"default": [
+				"Black",
+				"White",
+				"Grey",
+				"Blue",
+				"Red",
+				"Yellow",
+				"Gold",
+				"Silver",
+				"Crimson",
+				"Azure",
+				"Green",
+				"Orange",
+				"Violet"
+			]
+		}		
+	},
+	{
+		"key": "ordinal",
+		"title": "Ordinals",
+		"tables": {
+			"default": [
+				"First",
+				"Second",
+				"Third",
+				"Fourth",
+				"Fifth",
+				"Sixth",
+				"Seventh",
+				"Eighth",
+				"Ninth",
+				"Tenth",
+				"Last"
 			]
 		}
 	},
 	{
-		"id": "color",
-		"title": "Colors",
-		"table": [
-			"Black",
-			"White",
-			"Grey",
-			"Blue",
-			"Red",
-			"Yellow",
-			"Gold",
-			"Silver",
-			"Crimson",
-			"Azure",
-			"Green",
-			"Orange",
-			"Violet"
-		]			
-	},
-	{
-		"id": "ordinal",
-		"title": "Ordinals",
-		"table": [
-			"First",
-			"Second",
-			"Third",
-			"Fourth",
-			"Fifth",
-			"Sixth",
-			"Seventh",
-			"Eighth",
-			"Ninth",
-			"Tenth",
-			"Last"
-		]
-	},
-	{
-		"id": "season",
+		"key": "season",
 		"title": "Seasons",
-		"table": [
-			"Winter",
-			"Spring",
-			"Summer",
-			"Autumn"
-		]
+		"tables": {
+			"default": [
+				"Winter",
+				"Spring",
+				"Summer",
+				"Autumn"
+			]
+		}
 	},
 	{
-	  "id": "colonial_goals",
+	  "key": "colonial_goals",
 	  "title": "Goals (Colonial)",
 	  "author": "Derik Badman",
 	  "tags": [
@@ -102,7 +99,7 @@
 	  }
 	},
 	{
-	  "id": "colonial_occupations",
+	  "key": "colonial_occupations",
 	  "title": "Occupations (Colonial)",
 	  "author": "Derik Badman",
 	  "tags": [
@@ -195,7 +192,7 @@
 	  }
 	},
 	{
-	  "id": "colonial_companies",
+	  "key": "colonial_companies",
 	  "title": "Companies (Colonial)",
 	  "author": "Derik Badman",
 	  "description": "Quick company.",
@@ -216,15 +213,15 @@
 	  	"alignment"
 	  ],
 	  "tables": {
-	  	"name": [
-	  		{ "label": "The {{table:this:name_1}} {{table:this:name_2}} {{table:this:name_3}}" },
-	  		{ "label": "The {{table:this:name_1}} {{table:this:name_2}} & {{table:this:name_2}} {{table:this:name_3}}" },
-	  		{ "label": "The {{table:this:name_1}} {{table:this:name_3}}" }
-	  	],
-	  	"name_1": [
-	  		{ "label": "Angeln" },
-	  		{ "label": "Ghent" },
-	  		{ "label": "New World" },
+		"name": [
+			{ "label": "The {{table:this:name_1}} {{table:this:name_2}} {{table:this:name_3}}" },
+			{ "label": "The {{table:this:name_1}} {{table:this:name_2}} & {{table:this:name_2}} {{table:this:name_3}}" },
+			{ "label": "The {{table:this:name_1}} {{table:this:name_3}}" }
+		],
+		"name_1": [
+			{ "label": "Angeln" },
+			{ "label": "Ghent" },
+			{ "label": "New World" },
 	  		{ "label": "Royal" },
 	  		{ "label": "{{name:flemish}}" },
 	  		{ "label": "{{name:cornish}}" },

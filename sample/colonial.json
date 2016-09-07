@@ -1,8 +1,6 @@
-appdata = (typeof appdata == "undefined") ? {} : appdata;
-appdata.tables = (typeof appdata.tables == "undefined") ? {} : appdata.tables;
-
-//!colonial_personality
-appdata.tables.colonial_personality = {
+[
+	{
+	"key": "colonial_personality",
   "title": "Personality Traits (Colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -44,10 +42,9 @@ appdata.tables.colonial_personality = {
       { "label": "Paranoid" }
     ]
   }
-};
-
-//!colonial_appearance
-appdata.tables.colonial_appearance = {
+},
+ {
+	"key": "colonial_appearance",
   "title": "Appearance/Behavior (Colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -89,11 +86,10 @@ appdata.tables.colonial_appearance = {
       { "label": "Constantly eating / drinking" }
     ]
   }
-};
-
-//!colonial_goals
-appdata.tables.colonial_goals = {
-  "title": "Goals (Colonial)",
+},
+{
+	"key": "colonial_goals"
+  "title": "NPC Goals (Colonial)",
   "author": "Derik Badman",
   "tags": [
     "npcs",
@@ -124,10 +120,9 @@ appdata.tables.colonial_goals = {
       { "label": "Revenge" }
     ]
   }
-};
-
-//!colonial_occupations
-appdata.tables.colonial_occupations = {
+},
+{
+	"key": "colonial_occupations",
   "title": "Occupations (Colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -218,10 +213,9 @@ appdata.tables.colonial_occupations = {
       { "label": "Faction Leader" }
     ]
   }
-};
-
-//!colonial_companies
-appdata.tables.colonial_companies = {
+},
+{
+	"key": "colonial_companies",
   "title": "Companies (Colonial)",
   "author": "Derik Badman",
   "description": "Quick company.",
@@ -305,11 +299,10 @@ appdata.tables.colonial_companies = {
       { "label": "Neutral Evil" }
     ]
   }
-};
+},
 
-//!colonial_factions
-appdata.tables.colonial_factions = {
-  "id": "colonial_factions",
+{
+  "key": "colonial_factions",
   "title": "Factions (colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -345,10 +338,10 @@ appdata.tables.colonial_factions = {
     	{ "label": "Smuggler" }
     ]
   }
-};
+},
 
-//!colonial_societies
-appdata.tables.colonial_societies = {
+{
+	"key": "colonial_societies",
   "title": "Societies (colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -392,11 +385,9 @@ appdata.tables.colonial_societies = {
     	"Activity"
     ],
   }
-};
-
-
-//!colonial_heresies
-appdata.tables.colonial_religions = {
+},
+{
+	"key": "colonial_religions",
   "title": "Religions (colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -438,11 +429,10 @@ appdata.tables.colonial_religions = {
     	"???"
     ]
   }
-};
+},
 
-
-//!colonial_encounters_road
-appdata.tables.colonial_encounters_road = {
+{
+	"key": "colonial_encounters_road",
   "title": "Encounters Road (Colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -510,43 +500,43 @@ appdata.tables.colonial_encounters_road = {
       { "label": "Livestock (Goat, pig, sheep)", "subtable": "actions_animal" }
     ],
 	"monsters": {
-		"???": { "subtable": "actions_animal" },
-		"Demon, Disguised": { "weight": 1 },
-		"Undead": { },
-		"[Something flying overhead]": {},
-		"[Other: Something large or dangerous]": {}
+		{ "label": "???", "subtable": "actions_animal" },
+		{ "label": "Demon, Disguised", "weight": 1 },
+		{ "label": "Undead" },
+		{ "label": "[Something flying overhead]" },
+		{ "label": "[Other: Something large or dangerous]" }
 	},
 	"other": {
-		"Barricade (trees)": { "weight": 2 },
-	 	"Barricade (wagons)": { "weight": 2 },
-	 	"Tripwire": { "weight": 2 },
-	 	"Net trap": { "weight": 1 },
-	 	"Pit trap": { "weight": 1 },
-	 	"Snare": { "weight": 1 },
-	 	"Inn": { "weight": 3 },
-		"Altar/shrine": { "weight": 3 },
-		"Campsite": { "weight": 3 },
-		"Village": { "weight": 1 },
-		"Weather event": { "weight": 1, "print": false, "subtable": "weather" },
-		"Thick Mud": { },
-		"Stream": {},
-		"Fire": { "weight": 1 },
-		"Fallen Tree": { "weight": 1 },
-		"Statue": { "weight": 1 },
-		"Grave(s)": { "weight": 1 },
+		{ "label": "Barricade (trees)", "weight": 2 },
+	 	{ "label": "Barricade (wagons)", "weight": 2 },
+	 	{ "label": "Tripwire", "weight": 2 },
+	 	{ "label": "Net trap", "weight": 1 },
+	 	{ "label": "Pit trap", "weight": 1 },
+	 	{ "label": "Snare", "weight": 1 },
+	 	{ "label": "Inn", "weight": 3 },
+		{ "label": "Altar/shrine", "weight": 3 },
+		{ "label": "Campsite", "weight": 3 },
+		{ "label": "Village", "weight": 1 },
+		{ "label": "Weather event", "weight": 1, "print": false, "subtable": "weather" },
+		{ "label": "Thick Mud", },
+		{ "label": "Stream" },
+		{ "label": "Fire", "weight": 1 },
+		{ "label": "Fallen Tree", "weight": 1 },
+		{ "label": "Statue", "weight": 1 },
+		{ "label": "Grave(s)", "weight": 1 },
 	},
 	"weather": {
-	 	"Light Fog/mist": { "weight": 2 },
-	 	"Heavy Fog/mist": { "weight": 2 },
-	 	"Light precipitation": { "weight": 2 },
-	 	"Heavy precipitation": {},
-	 	"Light Wind": { "weight": 2 },
-	 	"Heavy Wind": {},
-	 	"Storm": {},
-	 	"Heavy Clouds": { "weight": 2 },
-	 	"Sun shower": { "weight": 2 },
-	 	"Bright Sun": { "weight": 2 },
-	 	"Major Weather event": { "description": "Hurricane, tornado, blizzard, flood, etc." }
+	 	{ "label": "Light Fog/mist", "weight": 2 },
+	 	{ "label": "Heavy Fog/mist", "weight": 2 },
+	 	{ "label": "Light precipitation", "weight": 2 },
+	 	{ "label": "Heavy precipitation" },
+	 	{ "label": "Light Wind", "weight": 2 },
+	 	{ "label": "Heavy Wind" },
+	 	{ "label": "Storm" },
+	 	{ "label": "Heavy Clouds", "weight": 2 },
+	 	{ "label": "Sun shower", "weight": 2 },
+	 	{ "label": "Bright Sun", "weight": 2 },
+	 	{ "label": "Major Weather event", "description": "Hurricane, tornado, blizzard, flood, etc." }
  	},
  	"hexdressing": [
       {  "label": "Tree fallen across the road" },
@@ -574,10 +564,10 @@ appdata.tables.colonial_encounters_road = {
       {  "label": "Large trees overhand the road obscuring the sky" }
     ] 	
   }
-};
+},
 
-//!colonial_encounters_forest
-appdata.tables.colonial_encounters_forest = {
+{
+	"key": "colonial_encounters_forest",
   "title": "Encounters Forest (Colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -651,49 +641,49 @@ appdata.tables.colonial_encounters_forest = {
       { "label": "Livestock (Goat, pig, sheep)", "subtable": "actions_animal" }
     ],
 	"monsters": {
-		"???": { "subtable": "actions_animal" },
-		"Lizard Men": { "subtable": "actions_men" },
-		"Kobold": { "subtable": "actions_men" },
-		"Demon, Disguised": { "weight": 1 },
-		"Undead": { },
-		"[Something flying overhead]": {},
-		"[Other: Something large or dangerous]": {}
+		{ "label": "???", "subtable": "actions_animal" },
+		{ "label": "Lizard Men", "subtable": "actions_men" },
+		{ "label": "Kobold", "subtable": "actions_men" },
+		{ "label": "Demon, Disguised", "weight": 1 },
+		{ "label": "Undead" },
+		{ "label": "[Something flying overhead]" },
+		{ "label": "[Other: Something large or dangerous]" }
 	},
 	"other": {
-	 	"Tripwire": { "weight": 2 },
-	 	"Net trap": { "weight": 1 },
-	 	"Pit trap": { "weight": 1 },
-	 	"Snare": { "weight": 1 },
-	 	"Spider Webs": { "weight": 1 },
-		"Altar/shrine": { "weight": 3 },
-		"Campsite": { "weight": 3 },
-		"Village": { "weight": 1 },
-		"Homestead": { "weight": 1 },
-		"Weather event": { "weight": 1, "print": false, "subtable": "weather" },
-		"Thick Mud": { },
-		"Stream": {},
-		"Fire": { "weight": 1 },
-		"Fallen Tree": { "weight": 1 },
-		"Statue": { "weight": 1 },
-		"Grave(s)": { "weight": 1 },
-		"Magic Clearing": { "weight": 1 },
-		"Mushroom Circle": { "weight": 1 },
-		"Magic Pool": { "weight": 1 },
-		"Tree lair": { "weight": 2 },
-		"Nest (ground)": { "weight": 2 },
+	 	{ "label": "Tripwire", "weight": 2 },
+	 	{ "label": "Net trap", "weight": 1 },
+	 	{ "label": "Pit trap", "weight": 1 },
+	 	{ "label": "Snare", "weight": 1 },
+	 	{ "label": "Spider Webs", "weight": 1 },
+		{ "label": "Altar/shrine", "weight": 3 },
+		{ "label": "Campsite", "weight": 3 },
+		{ "label": "Village", "weight": 1 },
+		{ "label": "Homestead", "weight": 1 },
+		{ "label": "Weather event", "weight": 1, "print": false, "subtable": "weather" },
+		{ "label": "Thick Mud" },
+		{ "label": "Stream" },
+		{ "label": "Fire", "weight": 1 },
+		{ "label": "Fallen Tree", "weight": 1 },
+		{ "label": "Statue", "weight": 1 },
+		{ "label": "Grave(s)", "weight": 1 },
+		{ "label": "Magic Clearing", "weight": 1 },
+		{ "label": "Mushroom Circle", "weight": 1 },
+		{ "label": "Magic Pool", "weight": 1 },
+		{ "label": "Tree lair", "weight": 2 },
+		{ "label": "Nest (ground)", "weight": 2 },
 	},
 	"weather": {
-	 	"Light Fog/mist": { "weight": 2 },
-	 	"Heavy Fog/mist": { "weight": 2 },
-	 	"Light precipitation": { "weight": 2 },
-	 	"Heavy precipitation": {},
-	 	"Light Wind": { "weight": 2 },
-	 	"Heavy Wind": {},
-	 	"Storm": {},
-	 	"Heavy Clouds": { "weight": 2 },
-	 	"Sun shower": { "weight": 2 },
-	 	"Bright Sun": { "weight": 2 },
-	 	"Major Weather event": { "description": "Hurricane, tornado, blizzard, flood, etc." }
+	 	{ "label": "Light Fog/mist", "weight": 2 },
+	 	{ "label": "Heavy Fog/mist", "weight": 2 },
+	 	{ "label": "Light precipitation", "weight": 2 },
+	 	{ "label": "Heavy precipitation" },
+	 	{ "label": "Light Wind", "weight": 2 },
+	 	{ "label": "Heavy Wind" },
+	 	{ "label": "Storm" },
+	 	{ "label": "Heavy Clouds", "weight": 2 },
+	 	{ "label": "Sun shower", "weight": 2 },
+	 	{ "label": "Bright Sun", "weight": 2 },
+	 	{ "label": "Major Weather event", "description": "Hurricane, tornado, blizzard, flood, etc." }
  	},
  	"hexdressing": [
       { "label": "Clearing" },
@@ -739,10 +729,10 @@ appdata.tables.colonial_encounters_forest = {
       { "label": "Area of fruit/nut trees." }
     ]
   }
-};
+},
 
-//!colonial_encounters_rivers
-appdata.tables.colonial_encounters_rivers = {
+{
+	"key": "colonial_encounters_rivers",
   "title": "Encounters Rivers (Colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -808,41 +798,41 @@ appdata.tables.colonial_encounters_rivers = {
       { "label": "{{table:colonial_encounters_forest:animals}} drinking" }
     ],
 	"monsters": {
-		"???": { "subtable": "actions_animal" },
-		"[Something flying overhead]": {},
-		"[Other: Something large or dangerous]": {}
+		{ "label": "???": { "subtable": "actions_animal" },
+		{ "label": "[Something flying overhead]": {},
+		{ "label": "[Other: Something large or dangerous]": {}
 	},
 	"other": {
-	 	"Campsite": { "weight": 3 },
-		"Village": { "weight": 1 },
-		"Homestead": { "weight": 1 },
-		"Weather event": { "weight": 1, "print": false, "subtable": "weather" },
-		"Thick Mud": { },
-		"Side Stream": {},
-		"Fallen Tree": { "weight": 1 },
-		"Statue": { "weight": 1 },
-		"Magic Pool": { "weight": 1 },
-		"Rapids": { "weight": 2 },
-		"Nest": { "weight": 2 },
+	 	{ "label": "Campsite", "weight": 3 },
+		{ "label": "Village", "weight": 1 },
+		{ "label": "Homestead", "weight": 1 },
+		{ "label": "Weather event", "weight": 1, "print": false, "subtable": "weather" },
+		{ "label": "Thick Mud" },
+		{ "label": "Side Stream" },
+		{ "label": "Fallen Tree", "weight": 1 },
+		{ "label": "Statue", "weight": 1 },
+		{ "label": "Magic Pool", "weight": 1 },
+		{ "label": "Rapids", "weight": 2 },
+		{ "label": "Nest", "weight": 2 },
 	},
 	"weather": {
-	 	"Light Fog/mist": { "weight": 2 },
-	 	"Heavy Fog/mist": { "weight": 2 },
-	 	"Light precipitation": { "weight": 2 },
-	 	"Heavy precipitation": {},
-	 	"Light Wind": { "weight": 2 },
-	 	"Heavy Wind": {},
-	 	"Storm": {},
-	 	"Heavy Clouds": { "weight": 2 },
-	 	"Sun shower": { "weight": 2 },
-	 	"Bright Sun": { "weight": 2 },
-	 	"Major Weather event": { "description": "Hurricane, tornado, blizzard, flood, etc." }
+	 	{ "label": "Light Fog/mist", "weight": 2 },
+	 	{ "label": "Heavy Fog/mist", "weight": 2 },
+	 	{ "label": "Light precipitation", "weight": 2 },
+	 	{ "label": "Heavy precipitation" },
+	 	{ "label": "Light Wind", "weight": 2 },
+	 	{ "label": "Heavy Wind" },
+	 	{ "label": "Storm" },
+	 	{ "label": "Heavy Clouds", "weight": 2 },
+	 	{ "label": "Sun shower", "weight": 2 },
+	 	{ "label": "Bright Sun", "weight": 2 },
+	 	{ "label": "Major Weather event", "description": "Hurricane, tornado, blizzard, flood, etc." }
  	}
   }
 };
 
-//!colonial_encounters_swamp
-appdata.tables.colonial_encounters_swamp = {
+{
+	"key": "colonial_encounters_swamp",
   "title": "Encounters Swamp (Colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -920,61 +910,61 @@ appdata.tables.colonial_encounters_swamp = {
       { "label": "Insect swarm", "subtable": "actions_animal" }
     ],
 	"monsters": {
-		"Tentacled Octopus Monster": { "weight": 1 },
-		"Will-o-wisp": { "weight": 1 },
-		"Lizardmen/Snakemen": { "weight": 1 },
-		"Dragon": { "weight": 1 },
-		"Dryad": { "weight": 1 },
-		"Carnivorous Plant": { "weight": 1 },
-		"Zombies (drowners)": { },
-		"[Other: Something large or dangerous]": {}
+		{ "label": "Tentacled Octopus Monster", "weight": 1 },
+		{ "label": "Will-o-wisp","weight": 1 },
+		{ "label": "Lizardmen/Snakemen", "weight": 1 },
+		{ "label": "Dragon", "weight": 1 },
+		{ "label": "Dryad", "weight": 1 },
+		{ "label": "Carnivorous Plant", "weight": 1 },
+		{ "label": "Zombies (drowners)" },
+		{ "label": "[Other: Something large or dangerous]" }
 	},
 	"other": {
-		"Weather event": { "weight": 1, "subtable": "weather" },
-		"Fire": { "weight": 1 },
-		"Whirlpool": { "weight": 1 },
-		"Rapids": { "weight": 1 },
-		"Quicksand": { "weight": 1 },
-		"Heavy vines/brush": { "weight": 1 },
-		"Large Dead Tree": { "weight": 1 },
-		"Magic Clearing": { "weight": 1 },
-		"Mushroom Circle": { "weight": 1 },
-		"Magic Pool": { "weight": 1 },
-		"Statue": { "weight": 1 },
-		"Grave(s)": { "weight": 1 },
-		"Spiderweb": { "weight": 2 },
- 		"Tripwire": { "weight": 2 },
- 		"Net trap": { "weight": 3 },
- 		"Pit trap": { "weight": 3 },
- 		"Snare": { "weight": 3 },
- 		"Rocks from above": { "weight": 1 },
-	 	"Altar/shrine": { "weight": 3 },
-		"Campsite": { "weight": 3 },
-		"Village": { "weight": 1 },	
-		"Stream": {},
-		"Fallen Tree": { "weight": 1 },
-		"Tree lair": { "weight": 2 },
-		"Nest (ground)": { "weight": 2 },
-		"Nest (water)": { "weight": 2 },
+		{ "label": "Weather event", "weight": 1, "subtable": "weather" },
+		{ "label": "Fire", "weight": 1 },
+		{ "label": "Whirlpool", "weight": 1 },
+		{ "label": "Rapids", "weight": 1 },
+		{ "label": "Quicksand", "weight": 1 },
+		{ "label": "Heavy vines/brush", "weight": 1 },
+		{ "label": "Large Dead Tree", "weight": 1 },
+		{ "label": "Magic Clearing", "weight": 1 },
+		{ "label": "Mushroom Circle", "weight": 1 },
+		{ "label": "Magic Pool", "weight": 1 },
+		{ "label": "Statue", "weight": 1 },
+		{ "label": "Grave(s)", "weight": 1 },
+		{ "label": "Spiderweb", "weight": 2 },
+ 		{ "label": "Tripwire", "weight": 2 },
+ 		{ "label": "Net trap", "weight": 3 },
+ 		{ "label": "Pit trap", "weight": 3 },
+ 		{ "label": "Snare", "weight": 3 },
+ 		{ "label": "Rocks from above", "weight": 1 },
+	 	{ "label": "Altar/shrine", "weight": 3 },
+		{ "label": "Campsite", "weight": 3 },
+		{ "label": "Village", "weight": 1 },	
+		{ "label": "Stream" },
+		{ "label": "Fallen Tree", "weight": 1 },
+		{ "label": "Tree lair", "weight": 2 },
+		{ "label": "Nest (ground)", "weight": 2 },
+		{ "label": "Nest (water)", "weight": 2 },
 	},
 	"weather": {
-	 	"Light Fog/mist": { "weight": 2 },
-	 	"Heavy Fog/mist": { "weight": 2 },
-	 	"Light precipitation": { "weight": 2 },
-	 	"Heavy precipitation": {},
-	 	"Light Wind": { "weight": 2 },
-	 	"Heavy Wind": {},
-	 	"Storm": {},
-	 	"Heavy Clouds": { "weight": 2 },
-	 	"Sun shower": { "weight": 2 },
-	 	"Bright Sun": { "weight": 2 },
-	 	"Major Weather event": { "description": "Hurricane, tornado, blizzard, flood, etc." }
+	 	{ "label": "Light Fog/mist", "weight": 2 },
+	 	{ "label": "Heavy Fog/mist", "weight": 2 },
+	 	{ "label": "Light precipitation", "weight": 2 },
+	 	{ "label": "Heavy precipitation" },
+	 	{ "label": "Light Wind", "weight": 2 },
+	 	{ "label": "Heavy Wind" },
+	 	{ "label": "Storm" },
+	 	{ "label": "Heavy Clouds", "weight": 2 },
+	 	{ "label": "Sun shower", "weight": 2 },
+	 	{ "label": "Bright Sun", "weight": 2 },
+	 	{ "label": "Major Weather event", "description": "Hurricane, tornado, blizzard, flood, etc." }
  	}
   }
-};
+},
 
-//!colonial_encounters_town
-appdata.tables.colonial_encounters_town = {
+{
+	"key": "colonial_encounters_town",
   "title": "Encounters Town (Colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -1043,11 +1033,10 @@ appdata.tables.colonial_encounters_town = {
       { "label": "Something Campaign/Adventure Specific" }
     ]
   }
-};
+},
 
-
-//!colonial_settlement_locations
-appdata.tables.colonial_settlement_locations = {
+{
+	"key": "colonial_settlement_locations",
   "title": "Settlement Locations (Colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -1084,11 +1073,10 @@ appdata.tables.colonial_settlement_locations = {
       { "label": "Promenade" }
     ]
   }
-};
+},
 
-
-//!colonial_settlement_townevents
-appdata.tables.colonial_settlement_townevents = {
+{
+	"key": "colonial_settlement_townevents",
   "title": "What's going on in this town?",
   "author": "Derik Badman",
   "tags": [
@@ -1120,11 +1108,11 @@ appdata.tables.colonial_settlement_townevents = {
       { "label": "The local beer was spiked… with hallucinogens." }
     ]
   }
-};
+},
 
 
-//!colonial_settlement_riled
-appdata.tables.colonial_settlement_riled = {
+{
+	"key": "colonial_settlement_riled",
   "title": "What's got the people riled up?",
   "author": "Derik Badman",
   "tags": [
@@ -1147,10 +1135,10 @@ appdata.tables.colonial_settlement_riled = {
       { "label": "Political scandal" }
     ]
   }
-};
+},
 
-//!settlement flemish names
-appdata.tables.colonial_settlement_flemish_names = {
+{
+  "key": "colonial_settlement_flemish_names",
   "title": "Flemish Town Names",
   "tags": [
     "colonial",
