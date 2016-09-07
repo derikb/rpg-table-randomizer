@@ -81,7 +81,7 @@ There are no module requirements for production environment.
 Install the module via npm:
 
 ```
-$ npm install rpg-table-randomizer
+$ npm install --save rpg-table-randomizer
 ```
 
 Require it where you want to use it:
@@ -93,7 +93,11 @@ const rpgrandomizer = require('rpg-table-randomizer');
 
 ### Browser
 
-This will theoretically work...
+This will theoretically work.
+
+There are two versions of the module packaged for browsers and each is also available in minified form:
+* `dist/rpg-table-randomizer.js` and `dist/rpg-table-randomizer.min.js` offers the full module
+* `dist/rpg-table-randomizer_noname.js` and `dist/rpg-table-randomizer_noname.min.js` offers the module without the random name data. This makes the file more than half as small, but if you want to use the random name generator you need to add name data using `random_name.registerNameType()`
 
 #### Bower
 
@@ -103,7 +107,7 @@ $ bower install rpg-table-randomizer --save
 
 #### Manually
 
-Download the latest release from github. Load the dist/rpg-table-randomizer.min.js file in your html. For debugging purposes there is the source map file or the unminified version, all in the dist/ directory.
+Download the latest release from github. Load the `dist/rpg-table-randomizer.min.js` file in your html. For debugging purposes there is the source map file or the unminified version, all in the `dist/` directory.
 
 
 ## API Reference
