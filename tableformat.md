@@ -16,6 +16,7 @@ These are properties on the RandomTable object. Most are optional.
 * @property {String|Array} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
 * @property {Array} [table] default table. array of strings or objects. removed after initialization and put in tables.default
 * @property {Object} [tables] a property for each subtables. if sequence property is not set then the first property of this Object is used to start rolling
+* @property {Array} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
 * @property {Object} [print] objects to describe what parts of a (sub)table should be displayed in the results
 * @property {Object} [print.default] how to display the default table's results
 * @property {Object} [print.default.hide_table] set to 1 will not show the table name
@@ -211,3 +212,39 @@ Here's an example using these various properties. The default table is rolled on
 	}
 }
 ```
+
+### Macro Tables
+
+If you want to generate a result from across a number of tables, you can create a macro table. By setting the `macro` property you can tell the randomizer to get a result from each table in the macro array.
+
+```
+{
+	"key": "mission_generator",
+	"title": "Mission generator",
+	"author": "Derik Badman",
+	"tags": [
+		"mission",
+	],
+	"macro": [
+		"mission_action",
+		"mission_patron",
+		"mission_antagonist",
+		"mission_complication",
+		"mission_reward"
+	]
+}
+```
+
+In this case, passing this table to ```randomizer.getTableResult()``` will generate a result array on the able with one element for each of the "mission_*" tables listed in the `macro` property.
+
+```
+[
+	{ table: 'mission_action', result: 'Object: Person\nAction: Kill'},
+	{ table: 'mission_patron', result: 'Guild Leader' },
+	{ table: 'mission_antagonist', result: 'Settlement' },
+	{ table: 'mission_complication', result: 'Object of mission is dead/destroyed' },
+	{ table: 'mission_reward', result: 'Standing with a faction' }
+]
+```
+
+If the `macro` property is set the `sequence` and `tables` properties will be ignored.

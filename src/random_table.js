@@ -19,6 +19,7 @@ const RandomTable = function (config) {
 	 * @property {String|Array} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
 	 * @property {Array} [table] default table. array of strings or objects. removed after initialization.
 	 * @property {Object} [tables] a property for each subtables. if table property is not set then the first propery of this Object is used to start rolling
+	 * @property {Array} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
 	 * @property {Object} [print] objects to describe what parts of a (sub)table should be displayed in the results
 	 * @property {Object} [print.default] how to display the default table's results
 	 * @property {Object} [print.default.hide_table] set to 1 will not show the table name
@@ -35,6 +36,7 @@ const RandomTable = function (config) {
 	this.tags = [];
 	this.sequence = ''; // where to start rolling and if other tables should always be rolled on
 	this.tables = {};
+	this.macro = [];
 	this.result = [];
 	/**
 	 * Run on first construction
@@ -72,9 +74,9 @@ const RandomTable = function (config) {
 			error.general += 'Title cannot be blank. ';
 		}
 		
-		if (typeof properties.tables === 'string' || r_helpers.isEmpty(properties.tables)) {
-			error.fields.push({ field: 'title', message: 'Table cannot be empty' });
-			error.general += 'Table cannot be empty. ';
+		if (r_helpers.isEmpty(properties.tables) && r_helpers.isEmpty(properties.macro)) {
+			error.fields.push({ field: 'tables', message: 'Both Tables and Macro cannot be empty' });
+			error.general += 'Both Tables and Macro cannot be empty. ';
 		}
 		
 		if (!r_helpers.isEmpty(error.fields) || !r_helpers.isEmpty(error.general)) {

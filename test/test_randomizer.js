@@ -5,6 +5,7 @@ const expect = require('chai').expect;
 const randomizer = require('../src/randomizer.js');
 const RandomTable = require('../src/random_table.js');
 const test_tables = require('./test.json');
+const mission_tables = require('../sample/colonial_mission.json');
 
 const tables = {};
 
@@ -75,61 +76,6 @@ describe('Randomizer module', function (){
 		});
 	});
 	
-/*
-	describe('roll function', function (){
-		it('should return a result within the range', function () {
-			expect(randomizer.roll()).to.be.within(1, 6);
-			expect(randomizer.roll(4)).to.be.within(1, 4);
-			expect(randomizer.roll(4, 2)).to.be.within(2, 8);
-			expect(randomizer.roll(4, 1, 0)).to.be.within(1, 4);
-			expect(randomizer.roll(4, 1, 1)).to.be.within(2, 5);
-			expect(randomizer.roll(4, 1, 1, '+')).to.be.within(2, 5);
-			expect(randomizer.roll(4, 1, 3, '+')).to.be.within(4, 7);
-			expect(randomizer.roll(4, 1, 1, '-')).to.be.within(0, 3);
-			expect(randomizer.roll(4, 1, 2, '*')).to.be.within(2, 8);
-			expect(randomizer.roll(4, 1, 2, '/')).to.be.within(1, 2);
-			expect(randomizer.roll(6, 1, 2, '/')).to.be.within(1, 3);
-		});
-	});
-*/
-	
-/*
-	describe('arraySum function', function (){
-		it('should return the sum value of an array', function () {
-			let arr = [
-				1,
-				2,
-				3
-			];
-			expect(randomizer.arraySum(arr)).to.equal(6);
-			arr = [
-				'1',
-				'2',
-				'3'
-			];
-			expect(randomizer.arraySum(arr)).to.equal(6);
-			arr = [
-				null,
-				{ a: 'string' },
-				'3'
-			];
-			expect(randomizer.arraySum(arr)).to.equal(3);
-		});
-	});
-*/
-	
-/*
-	describe('convertToken function', function (){
-		it('should return a results with the token converted', function () {
-			let curtable = '';
-			let token = '{{foo:bar}}';
-			expect(randomizer.convertToken(token, curtable)).to.equal('{{foo:bar}}');
-			token = '{{roll:d6}}';
-			expect(randomizer.convertToken(token, curtable)).to.be.within(1,6);
-		});
-	});
-*/
-	
 	// these are pretty basic but should be ok if we also are testing the other modules and methods
 	describe('findToken function', function (){
 		it('should find the tokens and convert them', function () {
@@ -137,9 +83,9 @@ describe('Randomizer module', function (){
 			//roll
 			expect(randomizer.findToken('this is a token {{roll:d1}}', '')).to.equal('this is a token 1');
 			//table
-			expect(randomizer.findToken('this is a token {{table:one}}', '')).to.equal('this is a token one');
+			expect(randomizer.findToken('this is a token {{table:one}}', '')).to.equal('this is a token One');
 			//subtable
-			expect(randomizer.findToken('this is a token {{table:one:two}}', '')).to.equal('this is a token two');
+			expect(randomizer.findToken('this is a token {{table:one:two}}', '')).to.equal('this is a token Two: Two');
 		});
 	});
 	
@@ -199,11 +145,12 @@ describe('Randomizer module', function (){
 		
 		it('should return a random result from a subtable', function () {
 			let laborers = tables['colonial_occupations'].tables.laborer.map((v) => { return v.label; });
+			const result = randomizer.token_types['table'](['table', 'colonial_occupations', 'laborer'], '{{table:colonial_occupations:laborer}}', 'something');
+			const i = result.split(':').pop().trim();
+			expect(i).to.be.oneOf(laborers);
 			
-			expect(randomizer.token_types['table'](['table', 'colonial_occupations', 'laborer'], '{{table:colonial_occupations:laborer}}', 'something')).to.be.oneOf(laborers);
-			
-			expect(randomizer.token_types['table'](['table', 'one*2'], '{{table:one*2}}', 'something')).to.be.equal('one, one');
-			expect(randomizer.token_types['table'](['table', 'one', 'two*3'], '{{table:one:two*3}}', 'something')).to.be.equal('two, two, two');
+			expect(randomizer.token_types['table'](['table', 'one*2'], '{{table:one*2}}', 'something')).to.be.equal('One, One');
+			expect(randomizer.token_types['table'](['table', 'one', 'two*3'], '{{table:one:two*3}}', 'something')).to.be.equal('Two: Two, Two: Two, Two: Two');
 		});
 	});
 	
@@ -229,5 +176,27 @@ describe('Randomizer module', function (){
 			expect(result.shift()).to.have.property('result', 'two');
 		});
 	});
+	
+	
+
+	describe('complicated group of tables linked together', function () {
+		mission_tables.forEach((t) => {
+			tables[t.key] = new RandomTable(t);
+		});
+		
+		it('should return results from a number of tables', function () {
+			const result = randomizer.getTableResult(tables['mission_generator']);
+			// console.log( result );
+			expect(result).to.be.an('array');
+			expect(result.shift()).to.have.property('table', 'mission_action');
+			expect(result.shift()).to.have.property('table', 'mission_patron');
+			expect(result.shift()).to.have.property('table', 'mission_antagonist');
+			expect(result.shift()).to.have.property('table', 'mission_complication');
+			expect(result.shift()).to.have.property('table', 'mission_reward');
+		});
+		
+	});
+
+	
 	
 });

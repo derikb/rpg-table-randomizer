@@ -153,6 +153,20 @@ const Randomizer = function () {
 		if (typeof start === 'undefined') {
 			start = '';
 		}
+		
+		// if macro is set then we ignore a lot of stuff
+		if (!r_helpers.isEmpty(rtable.macro)) {
+			// iterate over the tables and get results
+			rtable.macro.forEach((t) => {
+				const table = this.getTableByKey(t);
+				if (r_helpers.isEmpty(table)) { return; }
+				this.getTableResult(table);
+				result.push({ table: t, result: table.niceString() });
+			});
+			rtable.result = result;
+			return result;
+		}
+		
 		// we look in the start table for what to roll if the start wasn't explicitly set in the call
 		let sequence = (start === '') ? rtable.sequence : start;
 		
