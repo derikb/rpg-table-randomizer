@@ -365,7 +365,7 @@ In process attempt to validate data to make sure it is formatted right and conta
 * @param {Boolean} [simple=false] if true only output the first result label
 * @returns {String} the results
 
-Write out the results as a string draws from the optional print property.
+Write out the results as a string, draws from the optional _print_ property.
 
 Probably better off writing your own template to process the _results_ array.
 
