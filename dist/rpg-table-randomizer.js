@@ -4454,6 +4454,7 @@ var RandomTable = function RandomTable(config) {
   * @property {String|Array} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
   * @property {Array} [table] default table. array of strings or objects. removed after initialization.
   * @property {Object} [tables] a property for each subtables. if table property is not set then the first propery of this Object is used to start rolling
+  * @property {Array} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
   * @property {Object} [print] objects to describe what parts of a (sub)table should be displayed in the results
   * @property {Object} [print.default] how to display the default table's results
   * @property {Object} [print.default.hide_table] set to 1 will not show the table name
@@ -4470,6 +4471,7 @@ var RandomTable = function RandomTable(config) {
 	this.tags = [];
 	this.sequence = ''; // where to start rolling and if other tables should always be rolled on
 	this.tables = {};
+	this.macro = [];
 	this.result = [];
 	/**
   * Run on first construction
@@ -4507,9 +4509,9 @@ var RandomTable = function RandomTable(config) {
 			error.general += 'Title cannot be blank. ';
 		}
 
-		if (typeof properties.tables === 'string' || r_helpers.isEmpty(properties.tables)) {
-			error.fields.push({ field: 'title', message: 'Table cannot be empty' });
-			error.general += 'Table cannot be empty. ';
+		if (r_helpers.isEmpty(properties.tables) && r_helpers.isEmpty(properties.macro)) {
+			error.fields.push({ field: 'tables', message: 'Both Tables and Macro cannot be empty' });
+			error.general += 'Both Tables and Macro cannot be empty. ';
 		}
 
 		if (!r_helpers.isEmpty(error.fields) || !r_helpers.isEmpty(error.general)) {
@@ -4821,6 +4823,22 @@ var Randomizer = function Randomizer() {
 		if (typeof start === 'undefined') {
 			start = '';
 		}
+
+		// if macro is set then we ignore a lot of stuff
+		if (!r_helpers.isEmpty(rtable.macro)) {
+			// iterate over the tables and get results
+			rtable.macro.forEach(function (t) {
+				var table = _this.getTableByKey(t);
+				if (r_helpers.isEmpty(table)) {
+					return;
+				}
+				_this.getTableResult(table);
+				result.push({ table: t, result: table.niceString() });
+			});
+			rtable.result = result;
+			return result;
+		}
+
 		// we look in the start table for what to roll if the start wasn't explicitly set in the call
 		var sequence = start === '' ? rtable.sequence : start;
 
@@ -5085,7 +5103,7 @@ var Randomizer = function Randomizer() {
 
 		for (var i = 1; i <= multiplier; i++) {
 			_this4.getTableResult(t, subtable);
-			string += t.niceString(true) + ', ';
+			string += t.niceString() + ', ';
 		}
 		string = string.trim();
 		string = string.replace(/,$/, '');
