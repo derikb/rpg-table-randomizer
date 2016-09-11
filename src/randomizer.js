@@ -310,7 +310,6 @@ const Randomizer = function () {
 	 * @returns {String} The value with the token(s) replaced by the operation or else just the token (in case it was a mistake or at least to make the error clearer)
 	 */
 	this.convertToken = function (token, curtable) {
-		console.log(token);
 		const parts = token.replace('{{', '').replace('}}', '').split(':');
 		if (parts.length === 0) { return token; }
 		
@@ -331,7 +330,7 @@ const Randomizer = function () {
 		if (typeof curtable === 'undefined') { curtable = ''; }
 		const regexp = new RegExp('({{2}.+?}{2})', 'g');
 		const newstring = string.replace(regexp, (token) => {
-			return convertToken.call(this, token, curtable);
+			return this.convertToken(token, curtable);
 		});
 		return newstring;
 	};

@@ -44,8 +44,8 @@ module.exports = function npc_gen (randomizer) {
 				if (schema_fields[f].source && schema_fields[f].source !== '') {
 					// parse source into something randomizer can use...
 					if (schema_fields[f].type === 'array') {
-						let ct = (schema_fields[f].count) ? schema_fields[f].count : 1; //???
-						for (let i=0; i < ct; i++) {
+						const ct = (schema_fields[f].count) ? schema_fields[f].count : 1; // ???
+						for (let i = 0; i < ct; i++) {
 							this.fields[f].push(randomizer.convertToken(schema_fields[f].source));
 						}
 					} else {
@@ -67,7 +67,7 @@ module.exports = function npc_gen (randomizer) {
 	 * function to make a new NPC constructor
 	 * constructor is added to NPC[schemaname]
 	 * @param {Object} schema NPC schema object to base on the constructor
-	 * @return {null} 
+	 * @return {null}
 	 */
 	const registerSchema = function (schema) {
 		if (!schema.name || schema.name === 'base') {
@@ -78,48 +78,48 @@ module.exports = function npc_gen (randomizer) {
 		Schemas[schema.name] = schema;
 		// add this schema to the NPC object so we can use it as a constructor
 		// this could overwrite is that ok?
-		const base = NPC[schema.name] = function () {
+		const Base = NPC[schema.name] = function () {
 			// in case we add something to NPC constructor that we need to call?
 			// NPC.base.call(this);
 		};
-		base.prototype = new NPC.base();
-		base.prototype.constructor = base;
-		base.prototype.schema = schema.name;
+		Base.prototype = new NPC.Base();
+		Base.prototype.constructor = Base;
+		Base.prototype.schema = schema.name;
 		
 		// initialize schema properties...
 		const fields = Object.keys(schema.fields);
 		fields.forEach((f) => {
 			let default_ = null;
 			switch (schema.fields[f].type) {
-	    		case 'string':
-	    		case 'text':
-	    			default_ = '';
-	    			break;
-	    		case 'array':
-	    			default_ = [];
-	    			break;
-	    		case 'number':
-	    		case 'modifier':
-	    			default_ = 0;
-	    			break;
-	    		case undefined:
-	    			// ?
-	    			break;
+				case 'string':
+				case 'text':
+					default_ = '';
+					break;
+				case 'array':
+					default_ = [];
+					break;
+				case 'number':
+				case 'modifier':
+					default_ = 0;
+					break;
+				case undefined:
+					// ?
+					break;
 			}
-			base.prototype.fields[f] = default_;
+			Base.prototype.fields[f] = default_;
 		});
 		
 		const helpers = Object.keys(schema.helpers);
 		helpers.forEach((h) => {
 			if (typeof schema.helpers[h] === 'function') {
-				base.prototype.helpers[h] = schema.helpers[h];
+				Base.prototype.helpers[h] = schema.helpers[h];
 			}
 		});
 	};
 	
-	// return the NPC object of constructors and the registerSchema function	
+	// return the NPC object of constructors and the registerSchema function
 	return {
 		NPC: NPC,
 		registerSchema: registerSchema
 	};
-}
+};
