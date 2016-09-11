@@ -315,6 +315,15 @@ const result = randomizer.selectFromTable(colortable, 'shade');
 */
 ```
 
+#### convertToken (string, curtable)
+
+- @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}} (This will also work without the enclosing braces.)
+- @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
+- @returns {String} The value with the token(s) replaced by the operation or else just the token (in case it was a mistake or at least to make the error clearer)
+
+Take a token and perform token replacement, returning the result as a string.
+
+
 #### findToken (string, curtable)
 
 - @param {String} string usually a result from a RandomTable

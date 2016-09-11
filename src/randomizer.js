@@ -306,9 +306,11 @@ const Randomizer = function () {
 	/**
 	 * Perform token replacement.  Only table and roll actions are accepted
 	 * @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}}
+	 * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
 	 * @returns {String} The value with the token(s) replaced by the operation or else just the token (in case it was a mistake or at least to make the error clearer)
 	 */
-	function convertToken (token, curtable) {
+	this.convertToken = function (token, curtable) {
+		console.log(token);
 		const parts = token.replace('{{', '').replace('}}', '').split(':');
 		if (parts.length === 0) { return token; }
 		
