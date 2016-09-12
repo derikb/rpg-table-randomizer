@@ -3,6 +3,7 @@
 const expect = require('chai').expect;
 
 const randomizer = require('../src/randomizer.js');
+const r_helpers = require('../src/r_helpers.js');
 //const random_table = require('../src/random_table.js');
 const name = require('../src/random_name.js');
 const namedata = require('../sample/names.json');
@@ -86,41 +87,26 @@ describe('random_name module', function () {
 	});
 	
 	describe('createName function', function () {
-		
-		it('should return a created name', function () {
-			const name = namer.createName('flemish', 'female', 'first');
-			expect(name).to.be.string;
-			expect(name).to.be.have.length.above(1);
-			expect(name).to.match(/^\S+$/);
+		const name_types = Object.keys(namedata.options);
+		name_types.forEach(function(type){
+			const fullname_regex = (r_helpers.isEmpty(namedata[type].surname)) ? /^\S+$/ : /^\S+\s(\S+\s)?\S+$/;
+			['male', 'female', 'random'].forEach(function(gender){
+				it('should create a '+type+' '+gender+' full name', function () {
+					const name = namer.createName(type, gender);
+					expect(name).to.be.string;
+					expect(name).to.be.have.length.above(1);
+					expect(name).to.match(fullname_regex);
+				});
+				
+				it('should create a '+type+' '+gender+' first name', function () {
+					const name = namer.createName(type, gender, 'first');
+					expect(name).to.be.string;
+					expect(name).to.be.have.length.above(1);
+					expect(name).to.match(/^\S+$/);
+				});
+			});			
 		});
 		
-		it('should return a created name', function () {
-			const name = namer.createName('flemish', 'female');
-			expect(name).to.be.string;
-			expect(name).to.be.have.length.above(1);
-			expect(name).to.match(/^\S+\s(\S+\s)?\S+$/);
-		});
-		
-		it('should return a created name', function () {
-			const name = namer.createName('flemish');
-			expect(name).to.be.string;
-			expect(name).to.be.have.length.above(1);
-			expect(name).to.match(/^\S+\s(\S+\s)?\S+$/);
-		});
-		
-		it('should return a created name', function () {
-			const name = namer.createName();
-			expect(name).to.be.string;
-			expect(name).to.be.have.length.above(1);
-			expect(name).to.match(/^\S+\s(\S+\s)?\S+$/);
-		});
-		
-		it('should return a created native american esque name with no last name', function () {
-			const name = namer.createName('native american');
-			expect(name).to.be.string;
-			expect(name).to.be.have.length.above(1);
-			expect(name).to.match(/^\S+$/);
-		});	
 	});
 	
 	describe('capitalizeName function', function () {

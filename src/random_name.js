@@ -152,18 +152,14 @@ const RandomName = function (randomizer, namedata) {
 			});
 		}
 		
-		if (style !== 'first') {
+		if (style !== 'first' && !r_helpers.isEmpty(this.namedata[name_type]['surname'])) {
 			const skey = name_type + '_last';
 			if (!this.markov.memory[skey]) {
 				// console.log('learn surname '+skey);
-				if (this.namedata[name_type]['surname']) {
-					const namelist = this.namedata[name_type]['surname'];
-					namelist.forEach((v) => {
-						this.markov.learn(skey, v);
-					});
-				} else {
-					this.markov.memory[skey] = {};
-				}
+				const namelist = this.namedata[name_type]['surname'];
+				namelist.forEach((v) => {
+					this.markov.learn(skey, v);
+				});
 			}
 			lastname = this.markov.generate(skey);
 		}
@@ -258,16 +254,10 @@ const RandomName = function (randomizer, namedata) {
 		if (typeof token_parts[3] === 'undefined' || token_parts[3] !== 'first') {
 			token_parts[3] = '';
 		}
-		if (typeof token_parts[2] === 'undefined') {
-			string = n.createName(token_parts[1], 'random');
-		} else if (token_parts[2] === 'male') {
-			string = n.createName(token_parts[1], 'male', token_parts[3]);
-		} else if (token_parts[2] === 'female') {
-			string = n.createName(token_parts[1], 'female', token_parts[3]);
-		} else if (token_parts[2] === 'random') {
-			string = n.createName(token_parts[1], 'random', token_parts[3]);
+		if (typeof token_parts[2] === 'undefined' || token_parts[2] === '') {
+			token_parts[2] = 'random';
 		}
-		
+		string = n.createName(token_parts[1], token_parts[2], token_parts[3]);
 		return string;
 	});
 };
