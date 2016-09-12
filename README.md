@@ -537,7 +537,7 @@ Just returns a surname from one of the lists.
 
 * @param {String} _[name_type=random]_ what list/process to use
 * @param {String} _[gender=random]_ male or female or both
-* @param {Boolean} _[surname=false]_ include a surname or not
+* @param {String} _[style]_ first=first name only, else full name
 * @returns {String} a name
 
 Uses a Markov chain to generate a name in the style of the given name type/list.
