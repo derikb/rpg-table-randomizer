@@ -10,7 +10,7 @@
     "browserify:min": "./node_modules/.bin/browserify src/index.js --s rpg-table-randomizer -o dist/rpg-table-randomizer.min.js -t [ babelify --presets [ es2015 ] ] -d -p [minifyify --map dist/rpg-table-randomizer.js.map --output dist/rpg-table-randomizer.js.map]",
     "browserify:noname": "./node_modules/.bin/browserify src/index_noname.js --s rpg-table-randomizer -o dist/rpg-table-randomizer_noname.js -t [ babelify --presets [ es2015 ] ]",
     "browserify:noname_min": "./node_modules/.bin/browserify src/index_noname.js --s rpg-table-randomizer -o dist/rpg-table-randomizer_noname.min.js -t [ babelify --presets [ es2015 ] ] -d -p [minifyify --map dist/rpg-table-randomizer_noname.js.map --output dist/rpg-table-randomizer_noname.js.map]",
-    "test": "mocha test/test_random_table.js test/test_randomizer.js test/test_name.js test/test_normalizer.js test/test_r_helpers.js test/test_npc.js"
+    "test": "mocha test/ --recursive"
   },
   "repository": {
     "type": "git",
