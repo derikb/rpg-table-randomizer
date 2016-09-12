@@ -327,6 +327,7 @@ const Randomizer = function () {
 	 * @returns {String} String with tokens replaced (if applicable)
 	 */
 	this.findToken = function (string, curtable) {
+		if (r_helpers.isEmpty(string)) { return ''; }
 		if (typeof curtable === 'undefined') { curtable = ''; }
 		const regexp = new RegExp('({{2}.+?}{2})', 'g');
 		const newstring = string.replace(regexp, (token) => {
