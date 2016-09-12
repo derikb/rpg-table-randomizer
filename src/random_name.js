@@ -252,7 +252,6 @@ const RandomName = function (randomizer, namedata) {
 	 * Register the name token with the randomizer
 	 */
 	this.randomizer.registerTokenType('name', (token_parts, full_token, curtable) => {
-		console.log('name token');
 		let string = '';
 		const n = this;
 		if (typeof token_parts[1] === 'undefined' || token_parts[1] === '' || token_parts[1] === 'random') {
