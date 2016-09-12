@@ -2,11 +2,15 @@
 
 const expect = require('chai').expect;
 
-const randomizer = require('../src/randomizer.js');
-const random_table = require('../src/random_table.js');
-const table_normalizer = require('../src/table_normalizer.js');
+const rpg_table_randomizer = require('../src/index.js');
+const randomizer = rpg_table_randomizer.randomizer;
+const npc_generator = rpg_table_randomizer.npc_generator;
+const random_name = rpg_table_randomizer.random_name;
+const RandomTable = rpg_table_randomizer.RandomTable;
+const TableNormalizer = rpg_table_randomizer.TableNormalizer;
+const r_helpers = rpg_table_randomizer.r_helpers;
 
-describe('table_normalizer module', function () {
+describe('TableNormalizer module', function () {
 	
 	describe('Normalizing text', function () {
 		
@@ -14,7 +18,7 @@ describe('table_normalizer module', function () {
 			const text = `Red
 			Orange
 			Yellow`;
-			const normalizer = new table_normalizer(text);
+			const normalizer = new TableNormalizer(text);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('text');
 			expect(normalizer.normalized_data).to.be.an.array;
@@ -28,7 +32,7 @@ describe('table_normalizer module', function () {
 			const text = `1##Red
 			2##Orange
 			3##Yellow`;
-			const normalizer = new table_normalizer(text);
+			const normalizer = new TableNormalizer(text);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('text');
 			expect(normalizer.normalized_data).to.be.an.array;
@@ -42,7 +46,7 @@ describe('table_normalizer module', function () {
 			const text = `1. Red
 			2-3. Orange
 			4-6. Yellow`;
-			const normalizer = new table_normalizer(text);
+			const normalizer = new TableNormalizer(text);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('text');
 			expect(normalizer.normalized_data).to.be.an.array;
@@ -56,7 +60,7 @@ describe('table_normalizer module', function () {
 			const text = `1-2: Red
 			3: Orange
 			4-6: Yellow`;
-			const normalizer = new table_normalizer(text);
+			const normalizer = new TableNormalizer(text);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('text');
 			expect(normalizer.normalized_data).to.be.an.array;
@@ -70,7 +74,7 @@ describe('table_normalizer module', function () {
 			const text = `1-2, Red
 			3	Orange
 			4-6 Yellow`
-			const normalizer = new table_normalizer(text);
+			const normalizer = new TableNormalizer(text);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('text');
 			expect(normalizer.normalized_data).to.be.an.array;
@@ -84,7 +88,7 @@ describe('table_normalizer module', function () {
 			const text = `1-2. Red##direction
 			3: Orange##ordinal
 			4-6 Yellow##season`
-			const normalizer = new table_normalizer(text);
+			const normalizer = new TableNormalizer(text);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('text');
 			expect(normalizer.normalized_data).to.be.an.array;
@@ -99,7 +103,7 @@ describe('table_normalizer module', function () {
 			const text = `- Red
 			- Orange
 			- Yellow`;
-			const normalizer = new table_normalizer(text);
+			const normalizer = new TableNormalizer(text);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('text');
 			expect(normalizer.normalized_data).to.be.an.array;
@@ -119,7 +123,7 @@ describe('table_normalizer module', function () {
 			<li>Orange</li>
 			<li>Yellow</li>
 			</ul>`;
-			const normalizer = new table_normalizer(html);
+			const normalizer = new TableNormalizer(html);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('html');
 			expect(normalizer.normalized_data).to.be.an.array;
@@ -133,7 +137,7 @@ describe('table_normalizer module', function () {
 			const html = `<p> Red</p>
 			<p>Orange </p>
 			<p>Yellow</p>`;
-			const normalizer = new table_normalizer(html);
+			const normalizer = new TableNormalizer(html);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('html');
 			expect(normalizer.normalized_data).to.be.an.array;
@@ -147,7 +151,7 @@ describe('table_normalizer module', function () {
 			const html = `<p> Red<br/>
 			Orange<br/>
 			Yellow</p>`;
-			const normalizer = new table_normalizer(html);
+			const normalizer = new TableNormalizer(html);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('html');
 			expect(normalizer.normalized_data).to.be.an.array;
@@ -161,7 +165,7 @@ describe('table_normalizer module', function () {
 			const html = `<ul><li>1-2. Red##direction</li>
 			<li>3: Orange##ordinal</li>
 			<li>4-6 Yellow##season</li>`
-			const normalizer = new table_normalizer(html);
+			const normalizer = new TableNormalizer(html);
 			normalizer.normalizeData();
 			expect(normalizer.data_type).to.equal('html');
 			expect(normalizer.normalized_data).to.be.an.array;

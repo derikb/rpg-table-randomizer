@@ -28,10 +28,6 @@ randomizer.setTableKeyLookup(function(key){
 	return tables[key] ? tables[key] : null;
 });
 
-const name = require('../src/random_name.js');
-const namedata = require('../sample/names.json');
-const namer = new name(randomizer, namedata);
-
 describe('npc_generator module', function() {
 
 	describe('registerSchema', function () {

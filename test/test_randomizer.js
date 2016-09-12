@@ -2,8 +2,14 @@
 
 const expect = require('chai').expect;
 
-const randomizer = require('../src/randomizer.js');
-const RandomTable = require('../src/random_table.js');
+const rpg_table_randomizer = require('../src/index.js');
+const randomizer = rpg_table_randomizer.randomizer;
+const npc_generator = rpg_table_randomizer.npc_generator;
+const random_name = rpg_table_randomizer.random_name;
+const RandomTable = rpg_table_randomizer.RandomTable;
+const TableNormalizer = rpg_table_randomizer.TableNormalizer;
+const r_helpers = rpg_table_randomizer.r_helpers;
+
 const test_tables = require('./test.json');
 const mission_tables = require('../sample/colonial_mission.json');
 
