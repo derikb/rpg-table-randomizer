@@ -118,17 +118,17 @@ const RandomName = function (randomizer, namedata) {
 	 * Create a name using Markov chains
 	 * @param {String} [name_type=random] what list/process to use
 	 * @param {String} [gender=random] male or female or both
-	 * @param {Boolean} [surname=false] include a surname or not
+	 * @param {String} style first=first name only, else full name
 	 * @returns {String} a name
 	 */
-	this.createName = function (name_type, gender, surname) {
+	this.createName = function (name_type, gender, style) {
 		if (typeof name_type === 'undefined' || name_type === '' || name_type === 'random') {
 			// randomize a type...
 			name_type = this.randomizer.rollRandom(Object.keys(this.namedata.options));
 		}
-		if (typeof surname === 'undefined') { surname = false; }
+		if (typeof style === 'undefined') { style = ''; }
 		if (!this.namedata[name_type]) { return ''; }
-		if (typeof gender === 'undefined') { gender = ''; }
+		if (typeof gender === 'undefined' || (gender !== 'male' && gender !== 'female')) { gender = ''; }
 		
 		const mkey = `${name_type}_${gender}`;
 		let lastname = '';
@@ -152,7 +152,7 @@ const RandomName = function (randomizer, namedata) {
 			});
 		}
 		
-		if (surname) {
+		if (style !== 'first') {
 			const skey = name_type + '_last';
 			if (!this.markov.memory[skey]) {
 				// console.log('learn surname '+skey);
@@ -165,14 +165,11 @@ const RandomName = function (randomizer, namedata) {
 					this.markov.memory[skey] = {};
 				}
 			}
-			lastname = this.capitalizeName(this.markov.generate(skey));
+			lastname = this.markov.generate(skey);
 		}
 		
-		thename = this.capitalizeName(this.markov.generate(mkey));
-		if (lastname !== '') {
-			thename += ` ${lastname}`;
-		}
-		return thename;
+		thename = `${this.markov.generate(mkey)} ${lastname}`;
+		return this.capitalizeName(thename.trim());
 	};
 	/**
 	 * Capitalize names, account for multiword lastnames like "Van Hausen"
@@ -180,10 +177,11 @@ const RandomName = function (randomizer, namedata) {
 	 * @return {String} name capitalized
 	 */
 	this.capitalizeName = function (name) {
+		const leave_lower = ['of', 'the', 'from', 'de', 'le', 'la'];
 		// need to find spaces in name and capitalize letter after space
 		const parts = name.split(' ');
 		const upper_parts = parts.map((w) => {
-			return `${r_helpers.capitalize(w)}`;
+			return (leave_lower.indexOf(w) >= 0) ? w : `${r_helpers.capitalize(w)}`;
 		});
 		return upper_parts.join(' ');
 	};
@@ -261,13 +259,13 @@ const RandomName = function (randomizer, namedata) {
 			token_parts[3] = '';
 		}
 		if (typeof token_parts[2] === 'undefined') {
-			string = n.selectName(token_parts[1], 'random');
+			string = n.createName(token_parts[1], 'random');
 		} else if (token_parts[2] === 'male') {
-			string = n.selectName(token_parts[1], 'male', token_parts[3]);
+			string = n.createName(token_parts[1], 'male', token_parts[3]);
 		} else if (token_parts[2] === 'female') {
-			string = n.selectName(token_parts[1], 'female', token_parts[3]);
+			string = n.createName(token_parts[1], 'female', token_parts[3]);
 		} else if (token_parts[2] === 'random') {
-			string = n.selectName(token_parts[1], 'random', token_parts[3]);
+			string = n.createName(token_parts[1], 'random', token_parts[3]);
 		}
 		
 		return string;
