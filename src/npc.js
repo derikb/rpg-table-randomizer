@@ -72,15 +72,14 @@ module.exports = function npc_gen (randomizer) {
 	 * @param {Object} fields data for the fields
 	 */
 	NPC.Base.prototype.set = function (fields) {
-		if (typeof fields !== 'objects') { return; }
+		if (typeof fields !== 'object') { return; }
 		const props = Object.keys(fields);
 		props.forEach((p) => {
 			if (this.fields[p]) {
-				this.fields[p] = fields[p]; 
+				this.fields[p] = fields[p];
 			}
 		});
 	};
-	
 	
 	/**
 	 * Object store for registered schemas
