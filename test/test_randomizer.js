@@ -196,7 +196,5 @@ describe('Randomizer module', function (){
 		});
 		
 	});
-
-	
-	
+		
 });
