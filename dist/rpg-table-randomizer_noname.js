@@ -6,16 +6,187 @@ var random_table = require('./random_table.js');
 var table_normalizer = require('./table_normalizer.js');
 var RandomName = require('./random_name.js');
 var r_helpers = require('./r_helpers.js');
+var npc_gen = require('./npc.js')(randomizer);
 
 module.exports = {
 	randomizer: randomizer,
 	RandomTable: random_table,
 	TableNormalizer: table_normalizer,
 	random_name: new RandomName(randomizer, { options: {} }),
-	r_helpers: r_helpers
+	r_helpers: r_helpers,
+	npc_generator: npc_gen
 };
 
-},{"./r_helpers.js":2,"./random_name.js":3,"./random_table.js":4,"./randomizer.js":5,"./table_normalizer.js":6}],2:[function(require,module,exports){
+},{"./npc.js":2,"./r_helpers.js":3,"./random_name.js":4,"./random_table.js":5,"./randomizer.js":6,"./table_normalizer.js":7}],2:[function(require,module,exports){
+'use strict';
+
+/**
+ * npc_gen: pass in the randomizer so we can return an object that can use the shared randomizer instance
+ * @return {Object} npc functions
+ */
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+module.exports = function npc_gen(randomizer) {
+	/**
+  * Object to store NPC constructors.
+  * each constructor (except the base one) is based on a schema
+  */
+	var NPC = {};
+	/**
+  * The base prototype for NPC constructors. From this schemas are used to make differing constructions
+  */
+	NPC.Base = function () {};
+	/**
+  * Just a unique identifier that can be used for storage/retrieval
+  */
+	NPC.Base.prototype.id = 0;
+	/**
+  * Name of the schema used for the NPC
+  */
+	NPC.Base.prototype.schema = '';
+	/**
+  * The NPC's fields as set by the schema
+  */
+	NPC.Base.prototype.fields = [];
+	/**
+  * Schema assigned helper functions
+  */
+	NPC.Base.prototype.helpers = {};
+	/**
+  * set defaults on the fields
+  * usually this would involve calling random tables
+  */
+	NPC.Base.prototype.initialize = function () {
+		var _this = this;
+
+		var schema_fields = Schemas[this.schema].fields;
+		var fields = Object.keys(this.fields);
+		fields.forEach(function (f) {
+			var sch = schema_fields.find(function (v) {
+				return v.key === f;
+			});
+			if (sch) {
+				if (sch.default) {
+					_this.fields[f] = sch.default;
+					return;
+				}
+				if (sch.source && sch.source !== '') {
+					// parse source into something randomizer can use...
+					var src_temp = void 0;
+					if (sch.type === 'function') {
+						var func = new Function(sch.source);
+						src_temp = func.call(_this);
+					} else {
+						src_temp = sch.source;
+					}
+					// console.log(src_temp);
+					if (sch.type === 'array') {
+						var ct = sch.count ? sch.count : 1; // ???
+						for (var i = 0; i < ct; i++) {
+							_this.fields[f].push(randomizer.convertToken(src_temp));
+						}
+					} else {
+						_this.fields[f] = randomizer.convertToken(src_temp);
+					}
+				}
+			}
+		});
+	};
+	/**
+  * Take an empty object and set the fields
+  * @todo should we account for id and schema too?
+  * @param {Object} fields data for the fields
+  */
+	NPC.Base.prototype.set = function (fields) {
+		var _this2 = this;
+
+		if ((typeof fields === 'undefined' ? 'undefined' : _typeof(fields)) !== 'object') {
+			return;
+		}
+		var props = Object.keys(fields);
+		props.forEach(function (p) {
+			if (_this2.fields[p]) {
+				_this2.fields[p] = fields[p];
+			}
+		});
+	};
+
+	/**
+  * Object store for registered schemas
+  */
+	var Schemas = {};
+
+	/**
+  * function to make a new NPC constructor
+  * constructor is added to NPC[schema.key]
+  * @param {Object} schema NPC schema object to base on the constructor
+  * @return {null}
+  */
+	var registerSchema = function registerSchema(schema) {
+		if (!schema.key || schema.key === 'base' || !Array.isArray(schema.fields)) {
+			return null;
+			// throw exception?
+		}
+		// store it for later reference
+		Schemas[schema.key] = schema;
+		// add this schema to the NPC object so we can use it as a constructor
+		// this could overwrite is that ok?
+		var Base = NPC[schema.key] = function () {
+			// in case we add something to NPC constructor that we need to call?
+			// NPC.Base.call(this);
+		};
+		Base.prototype = new NPC.Base();
+		Base.prototype.constructor = Base;
+		Base.prototype.schema = schema.key;
+		Base.prototype.fields = [];
+		Base.prototype.helpers = {};
+
+		// initialize schema properties...
+		schema.fields.forEach(function (f) {
+			var default_ = null;
+			switch (f.type) {
+				case 'string':
+				case 'text':
+					default_ = '';
+					break;
+				case 'array':
+					default_ = [];
+					break;
+				case 'number':
+				case 'modifier':
+					default_ = 0;
+					break;
+				case undefined:
+					// ?
+					break;
+			}
+			Base.prototype.fields[f.key] = default_;
+		});
+
+		if (!schema.helpers || _typeof(schema.helpers) !== 'object') {
+			return;
+		}
+		var helpers = Object.keys(schema.helpers);
+		helpers.forEach(function (h) {
+			// if (typeof schema.helpers[h] === 'function') {
+			//	Base.prototype.helpers[h] = schema.helpers[h];
+			// }
+			// create a function from the array
+			Base.prototype.helpers[h] = new (Function.prototype.bind.apply(Function, [null].concat(_toConsumableArray(schema.helpers[h]))))();
+		});
+	};
+
+	// return the NPC object of constructors and the registerSchema function
+	return {
+		NPC: NPC,
+		registerSchema: registerSchema
+	};
+};
+
+},{}],3:[function(require,module,exports){
 'use strict';
 
 /**
@@ -66,7 +237,7 @@ var isUndefined = function isUndefined(obj) {
  * @return {String} string with first letter capitalized
  */
 var capitalize = function capitalize(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+  return isEmpty(string) ? string : string.charAt(0).toUpperCase() + string.slice(1);
 };
 
 module.exports = {
@@ -77,7 +248,7 @@ module.exports = {
   capitalize: capitalize
 };
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 'use strict';
 
 var r_helpers = require('./r_helpers.js');
@@ -165,14 +336,14 @@ var RandomName = function RandomName(randomizer, namedata) {
 			case 'dutch':
 			case 'turkish':
 			default:
-				name = r_helpers.capitalize(this.randomizer.rollRandom(this.namedata[name_type][gender]));
+				name = this.randomizer.rollRandom(this.namedata[name_type][gender]);
 				if (typeof this.namedata[name_type]['surname'] !== 'undefined' && style !== 'first') {
-					name += r_helpers.capitalize(' ' + this.randomizer.rollRandom(this.namedata[name_type]['surname']));
+					name += ' ' + this.randomizer.rollRandom(this.namedata[name_type]['surname']);
 				}
 				name = this.randomizer.findToken(name).trim();
 				break;
 		}
-		return name;
+		return this.capitalizeName(name);
 	};
 	/**
   * Select a sur/last name only from one of the lists
@@ -194,33 +365,33 @@ var RandomName = function RandomName(randomizer, namedata) {
 			case 'dutch':
 			case 'turkish':
 			default:
-				name = r_helpers.capitalize(this.randomizer.rollRandom(this.namedata[name_type]['surname']));
+				name = this.randomizer.rollRandom(this.namedata[name_type]['surname']);
 				name = this.randomizer.findToken(name);
 				break;
 		}
-		return name;
+		return this.capitalizeName(name);
 	};
 	/**
   * Create a name using Markov chains
   * @param {String} [name_type=random] what list/process to use
   * @param {String} [gender=random] male or female or both
-  * @param {Boolean} [surname=false] include a surname or not
+  * @param {String} style first=first name only, else full name
   * @returns {String} a name
   */
-	this.createName = function (name_type, gender, surname) {
+	this.createName = function (name_type, gender, style) {
 		var _this = this;
 
 		if (typeof name_type === 'undefined' || name_type === '' || name_type === 'random') {
 			// randomize a type...
 			name_type = this.randomizer.rollRandom(Object.keys(this.namedata.options));
 		}
-		if (typeof surname === 'undefined') {
-			surname = false;
+		if (typeof style === 'undefined') {
+			style = '';
 		}
 		if (!this.namedata[name_type]) {
 			return '';
 		}
-		if (typeof gender === 'undefined') {
+		if (typeof gender === 'undefined' || gender !== 'male' && gender !== 'female') {
 			gender = '';
 		}
 
@@ -246,29 +417,22 @@ var RandomName = function RandomName(randomizer, namedata) {
 			});
 		}
 
-		if (surname) {
+		if (style !== 'first' && !r_helpers.isEmpty(this.namedata[name_type]['surname'])) {
 			(function () {
 				var skey = name_type + '_last';
 				if (!_this.markov.memory[skey]) {
 					// console.log('learn surname '+skey);
-					if (_this.namedata[name_type]['surname']) {
-						var _namelist = _this.namedata[name_type]['surname'];
-						_namelist.forEach(function (v) {
-							_this.markov.learn(skey, v);
-						});
-					} else {
-						_this.markov.memory[skey] = {};
-					}
+					var _namelist = _this.namedata[name_type]['surname'];
+					_namelist.forEach(function (v) {
+						_this.markov.learn(skey, v);
+					});
 				}
-				lastname = _this.capitalizeName(_this.markov.generate(skey));
+				lastname = _this.markov.generate(skey);
 			})();
 		}
 
-		thename = this.capitalizeName(this.markov.generate(mkey));
-		if (lastname !== '') {
-			thename += ' ' + lastname;
-		}
-		return thename;
+		thename = this.markov.generate(mkey) + ' ' + lastname;
+		return this.capitalizeName(thename.trim());
 	};
 	/**
   * Capitalize names, account for multiword lastnames like "Van Hausen"
@@ -276,10 +440,11 @@ var RandomName = function RandomName(randomizer, namedata) {
   * @return {String} name capitalized
   */
 	this.capitalizeName = function (name) {
+		var leave_lower = ['of', 'the', 'from', 'de', 'le', 'la'];
 		// need to find spaces in name and capitalize letter after space
 		var parts = name.split(' ');
 		var upper_parts = parts.map(function (w) {
-			return '' + r_helpers.capitalize(w);
+			return leave_lower.indexOf(w) >= 0 ? w : '' + r_helpers.capitalize(w);
 		});
 		return upper_parts.join(' ');
 	};
@@ -297,8 +462,7 @@ var RandomName = function RandomName(randomizer, namedata) {
 				name += this.randomizer.getWeightedRandom(['', ' ', '-'], [3, 2, 2]);
 			}
 		}
-		name = r_helpers.capitalize(name.toLowerCase());
-		name += ' ' + this.randomizer.rollRandom(this.namedata.holmesian_title);
+		name = name.toLowerCase() + ' ' + this.randomizer.rollRandom(this.namedata.holmesian_title);
 
 		name = this.randomizer.findToken(name);
 
@@ -349,7 +513,6 @@ var RandomName = function RandomName(randomizer, namedata) {
   * Register the name token with the randomizer
   */
 	this.randomizer.registerTokenType('name', function (token_parts, full_token, curtable) {
-		console.log('name token');
 		var string = '';
 		var n = _this2;
 		if (typeof token_parts[1] === 'undefined' || token_parts[1] === '' || token_parts[1] === 'random') {
@@ -358,16 +521,10 @@ var RandomName = function RandomName(randomizer, namedata) {
 		if (typeof token_parts[3] === 'undefined' || token_parts[3] !== 'first') {
 			token_parts[3] = '';
 		}
-		if (typeof token_parts[2] === 'undefined') {
-			string = n.selectSurname(token_parts[1]);
-		} else if (token_parts[2] === 'male') {
-			string = n.selectName(token_parts[1], 'male', token_parts[3]);
-		} else if (token_parts[2] === 'female') {
-			string = n.selectName(token_parts[1], 'female', token_parts[3]);
-		} else if (token_parts[2] === 'random') {
-			string = n.selectName(token_parts[1], 'random', token_parts[3]);
+		if (typeof token_parts[2] === 'undefined' || token_parts[2] === '') {
+			token_parts[2] = 'random';
 		}
-
+		string = n.createName(token_parts[1], token_parts[2], token_parts[3]);
 		return string;
 	});
 };
@@ -479,7 +636,7 @@ var Markov = function Markov(config) {
 
 module.exports = RandomName;
 
-},{"./r_helpers.js":2}],4:[function(require,module,exports){
+},{"./r_helpers.js":3}],5:[function(require,module,exports){
 'use strict';
 
 var r_helpers = require('./r_helpers.js');
@@ -708,7 +865,7 @@ var RandomTable = function RandomTable(config) {
 
 module.exports = RandomTable;
 
-},{"./r_helpers.js":2}],5:[function(require,module,exports){
+},{"./r_helpers.js":3}],6:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -1027,9 +1184,10 @@ var Randomizer = function Randomizer() {
 	/**
   * Perform token replacement.  Only table and roll actions are accepted
   * @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}}
+  * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
   * @returns {String} The value with the token(s) replaced by the operation or else just the token (in case it was a mistake or at least to make the error clearer)
   */
-	function convertToken(token, curtable) {
+	this.convertToken = function (token, curtable) {
 		var parts = token.replace('{{', '').replace('}}', '').split(':');
 		if (parts.length === 0) {
 			return token;
@@ -1051,12 +1209,15 @@ var Randomizer = function Randomizer() {
 	this.findToken = function (string, curtable) {
 		var _this3 = this;
 
+		if (r_helpers.isEmpty(string)) {
+			return '';
+		}
 		if (typeof curtable === 'undefined') {
 			curtable = '';
 		}
 		var regexp = new RegExp('({{2}.+?}{2})', 'g');
 		var newstring = string.replace(regexp, function (token) {
-			return convertToken.call(_this3, token, curtable);
+			return _this3.convertToken(token, curtable);
 		});
 		return newstring;
 	};
@@ -1160,7 +1321,7 @@ var Randomizer = function Randomizer() {
 
 module.exports = new Randomizer();
 
-},{"./r_helpers.js":2}],6:[function(require,module,exports){
+},{"./r_helpers.js":3}],7:[function(require,module,exports){
 'use strict';
 
 var r_helpers = require('./r_helpers');
@@ -1351,5 +1512,5 @@ var TableNormalizer = function TableNormalizer(data) {
 
 module.exports = TableNormalizer;
 
-},{"./r_helpers":2}]},{},[1])(1)
+},{"./r_helpers":3}]},{},[1])(1)
 });
