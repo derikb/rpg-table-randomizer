@@ -86,7 +86,7 @@ describe('selectSurname function', function(){
 describe('createName function', function () {
 	
 	it('should return a created name', function () {
-		const name = namer.createName('flemish', 'female', false);
+		const name = namer.createName('flemish', 'female', 'first');
 		expect(name).to.be.string;
 		expect(name).to.be.have.length.above(1);
 		expect(name).to.match(/^\S+$/);
@@ -96,23 +96,29 @@ describe('createName function', function () {
 		const name = namer.createName('flemish', 'female');
 		expect(name).to.be.string;
 		expect(name).to.be.have.length.above(1);
-		expect(name).to.match(/^\S+$/);
+		expect(name).to.match(/^\S+\s(\S+\s)?\S+$/);
 	});
 	
 	it('should return a created name', function () {
 		const name = namer.createName('flemish');
 		expect(name).to.be.string;
 		expect(name).to.be.have.length.above(1);
-		expect(name).to.match(/^\S+$/);
+		expect(name).to.match(/^\S+\s(\S+\s)?\S+$/);
 	});
 	
 	it('should return a created name', function () {
 		const name = namer.createName();
 		expect(name).to.be.string;
 		expect(name).to.be.have.length.above(1);
-		expect(name).to.match(/^\S+$/);
+		expect(name).to.match(/^\S+\s(\S+\s)?\S+$/);
 	});
 	
+	it('should return a created native american esque name with no last name', function () {
+		const name = namer.createName('native american');
+		expect(name).to.be.string;
+		expect(name).to.be.have.length.above(1);
+		expect(name).to.match(/^\S+$/);
+	});	
 });
 
 describe('capitalizeName function', function () {
@@ -124,8 +130,12 @@ describe('capitalizeName function', function () {
 		expect(namer.capitalizeName('dido barclay')).to.equal('Dido Barclay');
 	});
 	
-	it('should return a capitalized triple word name', function () {
-		expect(namer.capitalizeName('dido de vroom')).to.equal('Dido De Vroom');
+	it('should return a capitalized triple word name with de uncapitalized', function () {
+		expect(namer.capitalizeName('dido de vroom')).to.equal('Dido de Vroom');
+	});
+	
+	it('should return a name without "of the" capitalized', function () {
+		expect(namer.capitalizeName('rolf of the north')).to.equal('Rolf of the North');
 	});
 });
 
