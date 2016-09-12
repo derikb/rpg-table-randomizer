@@ -1,12 +1,16 @@
 'use strict';
 
 const expect = require('chai').expect;
-const randomizer = require('../src/randomizer.js');
 
-const rpgnpc = require('../src/npc.js')(randomizer);
+const rpg_table_randomizer = require('../src/index.js');
+const randomizer = rpg_table_randomizer.randomizer;
+const npc_generator = rpg_table_randomizer.npc_generator;
+const random_name = rpg_table_randomizer.random_name;
+const RandomTable = rpg_table_randomizer.RandomTable;
+const TableNormalizer = rpg_table_randomizer.TableNormalizer;
+const r_helpers = rpg_table_randomizer.r_helpers;
+
 const schemas = require('../sample/schemas.js');
-
-const RandomTable = require('../src/random_table.js');
 const test_tables = require('./test.json');
 const mission_tables = require('../sample/colonial_mission.json');
 
@@ -16,7 +20,6 @@ test_tables.forEach((t) => {
 	tables[t.key] = new RandomTable(t);
 });
 
-console.log('hjello');
 
 randomizer.setTableKeyLookup(function(key){
 	return tables[key] ? tables[key] : null;
@@ -26,19 +29,18 @@ const name = require('../src/random_name.js');
 const namedata = require('../sample/names.json');
 const namer = new name(randomizer, namedata);
 
-
 describe('registerSchema', function () {
 	it('should create a new npc constructor for the schema', function () {
-		rpgnpc.registerSchema(schemas.colonial);
-		expect(rpgnpc.NPC.colonial).to.be.a('function');
+		npc_generator.registerSchema(schemas.colonial);
+		expect(npc_generator.NPC.colonial).to.be.a('function');
 	});
 });
 
 describe('colonial npc constructor', function () {
-	rpgnpc.registerSchema(schemas.colonial);
+	npc_generator.registerSchema(schemas.colonial);
 	
-	console.log(rpgnpc.NPC);
-	const n = new rpgnpc.NPC.colonial();
+	console.log(npc_generator.NPC);
+	const n = new npc_generator.NPC.colonial();
 	
 	it('should construct a colonial npc object', function () {
 		expect(n).to.be.a('object');
@@ -51,6 +53,9 @@ describe('colonial npc constructor', function () {
 	it('should roll some random values for fields', function () {
 		n.initialize();
 		console.log(n.fields);
-		// expect()
+		expect(n.fields.con).to.be.a('number');
+		expect(n.fields.con).to.be.within(3, 18);
+		expect(n.fields.hp).to.be.a('number');
+		expect(n.fields.goals).to.be.a('string');
 	});
 });

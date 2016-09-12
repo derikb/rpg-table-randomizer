@@ -1,28 +1,30 @@
 /**
  * Sample schemas
  */
- 
- module.exports = schemas = {};
- 
- schemas.colonial = {
- 	title: 'Colonial Campaign NPC',
- 	name: 'colonial',
+
+module.exports = schemas = {};
+
+schemas.colonial = {
+	title: 'Colonial Campaign NPC',
+	name: 'colonial',
 	author: 'Derik A Badman',
-	fields: {
-		name: { type: 'string', source: 'name:flemish:random' },
-		occupation: { type: 'string', source: 'table:colonial_occupations' },
-		appearance: { type: 'array', source: 'table:colonial_appearance', count: 2 },
-		personality: { type: 'array', source: 'table:colonial_personality', count: 2 },
-		goals: { type: 'string', source: 'table:colonial_goals' },
-		reaction: { type: 'number', source: 'roll:2d6' },
-		notes: { type: 'text' },
-		group: { type: 'string' },
-		con: { type: 'number', source: 'roll:3d6' }
-	},
+	fields: [
+		{ key: 'name', type: 'string', source: 'name:flemish:random' },
+		{ key: 'occupation', type: 'string', source: 'table:colonial_occupations' },
+		{ key: 'appearance', type: 'array', source: 'table:colonial_appearance', count: 2 },
+		{ key: 'personality', type: 'array', source: 'table:colonial_personality', count: 2 },
+		{ key: 'goals', type: 'string', source: 'table:colonial_goals' },
+		{ key: 'reaction', type: 'number', source: 'roll:2d6' },
+		{ key: 'notes', type: 'text' },
+		{ key: 'group', type: 'string' },
+		{ key: 'con', type: 'number', source: 'roll:3d6' },
+		{ key: 'level', type: 'number', source: 'roll:1d3' },
+		{ key: 'hp', type: 'number', source: function() { return `roll:${this.fields.level}d6${this.helpers.attribute_mod(this.fields.con)}`; } }
+	],
 	helpers: {
 		attribute_mod: function(attr) {
-			return Math.floor( (attr - 10) / 2 );
+			const abs = Math.floor((attr - 10) / 2);
+			return (abs === 0) ? '' : (abs > 0) ? `+${abs}` : abs;
 		}
 	}
- };
- 
+};
