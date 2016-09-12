@@ -45,7 +45,7 @@ const isUndefined = function (obj) {
  * @return {String} string with first letter capitalized
  */
 const capitalize = function (string) {
-	return string.charAt(0).toUpperCase() + string.slice(1);
+	return isEmpty(string) ? string : string.charAt(0).toUpperCase() + string.slice(1);
 };
 
 module.exports = {
