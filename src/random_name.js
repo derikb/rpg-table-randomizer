@@ -79,14 +79,14 @@ const RandomName = function (randomizer, namedata) {
 			case 'dutch':
 			case 'turkish':
 			default:
-				name = r_helpers.capitalize(this.randomizer.rollRandom(this.namedata[name_type][gender]));
+				name = this.randomizer.rollRandom(this.namedata[name_type][gender]);
 				if (typeof this.namedata[name_type]['surname'] !== 'undefined' && style !== 'first') {
-					name += r_helpers.capitalize(' ' + this.randomizer.rollRandom(this.namedata[name_type]['surname']));
+					name += ' ' + this.randomizer.rollRandom(this.namedata[name_type]['surname']);
 				}
 				name = this.randomizer.findToken(name).trim();
 				break;
 		}
-		return name;
+		return this.capitalizeName(name);
 	};
 	/**
 	 * Select a sur/last name only from one of the lists
@@ -108,11 +108,11 @@ const RandomName = function (randomizer, namedata) {
 			case 'dutch':
 			case 'turkish':
 			default:
-				name = r_helpers.capitalize(this.randomizer.rollRandom(this.namedata[name_type]['surname']));
+				name = this.randomizer.rollRandom(this.namedata[name_type]['surname']);
 				name = this.randomizer.findToken(name);
 				break;
 		}
-		return name;
+		return this.capitalizeName(name);
 	};
 	/**
 	 * Create a name using Markov chains
@@ -201,8 +201,7 @@ const RandomName = function (randomizer, namedata) {
 				name += this.randomizer.getWeightedRandom(['', ' ', '-'], [3, 2, 2]);
 			}
 		}
-		name = r_helpers.capitalize(name.toLowerCase());
-		name += ' ' + this.randomizer.rollRandom(this.namedata.holmesian_title);
+		name = name.toLowerCase() + ' ' + this.randomizer.rollRandom(this.namedata.holmesian_title);
 		
 		name = this.randomizer.findToken(name);
 		
@@ -263,7 +262,7 @@ const RandomName = function (randomizer, namedata) {
 			token_parts[3] = '';
 		}
 		if (typeof token_parts[2] === 'undefined') {
-			string = n.selectSurname(token_parts[1]);
+			string = n.selectName(token_parts[1], 'random');
 		} else if (token_parts[2] === 'male') {
 			string = n.selectName(token_parts[1], 'male', token_parts[3]);
 		} else if (token_parts[2] === 'female') {
