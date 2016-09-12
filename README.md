@@ -28,10 +28,10 @@ This is model and logic only there is no ui and only the most limited of view da
 A simple example setting up a very basic unweighted table (with no subtables), then "rolling" on it, and also generating a dice roll and two random names:
 
 ```
-const rpg-table-randomizer = require('rpg-table-randomizer');
-const randomizer = rpg-table-randomizer.randomizer;
-const RandomTable = rpg-table-randomizer.RandomTable;
-const random_name = rpg-table-randomizer.random_name
+const rpg_table_randomizer = require('rpg-table-randomizer');
+const randomizer = rpg_table_randomizer.randomizer;
+const RandomTable = rpg_table_randomizer.RandomTable;
+const random_name = rpg_table_randomizer.random_name
 
 const table_config = {
 	key: 'colors',
