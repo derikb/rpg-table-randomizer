@@ -5,12 +5,14 @@ const random_table = require('./random_table.js');
 const table_normalizer = require('./table_normalizer.js');
 const RandomName = require('./random_name.js');
 const r_helpers = require('./r_helpers.js');
+const npc_gen = require('./npc.js')(randomizer);
 
 module.exports = {
 	randomizer: randomizer,
 	RandomTable: random_table,
 	TableNormalizer: table_normalizer,
 	random_name: new RandomName(randomizer, { options: {} }),
-	r_helpers: r_helpers
+	r_helpers: r_helpers,
+	npc_generator: npc_gen
 };
 

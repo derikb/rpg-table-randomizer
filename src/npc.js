@@ -46,7 +46,13 @@ module.exports = function npc_gen (randomizer) {
 				}
 				if (sch.source && sch.source !== '') {
 					// parse source into something randomizer can use...
-					const src_temp = (typeof sch.source === 'function') ? sch.source.call(this) : sch.source;
+					let src_temp;
+					if (sch.type === 'function') {
+						const func = new Function(sch.source);
+						src_temp = func.call(this);
+					} else {
+						src_temp = sch.source;
+					}
 					// console.log(src_temp);
 					if (sch.type === 'array') {
 						const ct = (sch.count) ? sch.count : 1; // ???
@@ -59,9 +65,22 @@ module.exports = function npc_gen (randomizer) {
 				}
 			}
 		});
-		
-		return 'initted';
 	};
+	/**
+	 * Take an empty object and set the fields
+	 * @todo should we account for id and schema too?
+	 * @param {Object} fields data for the fields
+	 */
+	NPC.Base.prototype.set = function (fields) {
+		if (typeof fields !== 'objects') { return; }
+		const props = Object.keys(fields);
+		props.forEach((p) => {
+			if (this.fields[p]) {
+				this.fields[p] = fields[p]; 
+			}
+		});
+	};
+	
 	
 	/**
 	 * Object store for registered schemas
@@ -70,26 +89,26 @@ module.exports = function npc_gen (randomizer) {
 	
 	/**
 	 * function to make a new NPC constructor
-	 * constructor is added to NPC[schemaname]
+	 * constructor is added to NPC[schema.key]
 	 * @param {Object} schema NPC schema object to base on the constructor
 	 * @return {null}
 	 */
 	const registerSchema = function (schema) {
-		if (!schema.name || schema.name === 'base') {
+		if (!schema.key || schema.key === 'base') {
 			return null;
 			// throw exception?
 		}
 		// store it for later reference
-		Schemas[schema.name] = schema;
+		Schemas[schema.key] = schema;
 		// add this schema to the NPC object so we can use it as a constructor
 		// this could overwrite is that ok?
-		const Base = NPC[schema.name] = function () {
+		const Base = NPC[schema.key] = function () {
 			// in case we add something to NPC constructor that we need to call?
 			// NPC.Base.call(this);
 		};
 		Base.prototype = new NPC.Base();
 		Base.prototype.constructor = Base;
-		Base.prototype.schema = schema.name;
+		Base.prototype.schema = schema.key;
 		
 		// initialize schema properties...
 		schema.fields.forEach((f) => {
@@ -115,9 +134,11 @@ module.exports = function npc_gen (randomizer) {
 		
 		const helpers = Object.keys(schema.helpers);
 		helpers.forEach((h) => {
-			if (typeof schema.helpers[h] === 'function') {
-				Base.prototype.helpers[h] = schema.helpers[h];
-			}
+			// if (typeof schema.helpers[h] === 'function') {
+			//	Base.prototype.helpers[h] = schema.helpers[h];
+			// }
+			// create a function from the array
+			Base.prototype.helpers[h] = new Function(...schema.helpers[h]);
 		});
 	};
 	

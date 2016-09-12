@@ -8,6 +8,7 @@
   1. [randomizer](#randomizer)
   1. [RandomTable](#randomtable)
   1. [TableNormalizer](#tablenormalizer)
+  1. [npc_generator](#npc_generator)
   1. [random_name](#random_name)
   1. [r_helpers](#r_helpers)
 1. [Tests](#tests)
@@ -437,6 +438,46 @@ Returns the type of data set via the constructor or setData()
 * @return {Array|Object} normalized data for use in a RandomTable object
 
 Tries to normalize the data for RandomTable usage... Probably the thing that will need the most tweaking over time.
+
+
+### npc_generator
+
+An object containing functions for the creation of Non-player characters based on custom schemas.
+
+#### registerSchema (schema)
+
+* @param {Object} schema NPC schema object to base on the constructor
+
+This function takes the passed in `schema` (see [npcschema.md](npcschema.md) for the schema format) and makes a new constructor on the `npc_generator.NPC` object under the property `schema.key`.
+
+#### NPC
+
+An object whose properties are constructors for generating NPC objects.
+
+##### NPC.Base
+
+The prototype for all NPC objects/constructors. By itself does very little, but by updating its `prototype` you can add functionality to all NPC objects.
+
+```
+const lotfp = {
+	key: 'lotfp',
+	title: 'Lamentations of the Flame Princess NPC',
+	fields: [
+		{ key: 'personality', type: 'array', source: 'table:personality_traits', count: 2 },
+		{ key: 'goals', type: 'string', source: 'table:npc_goals' },
+		{ key: 'reaction', type: 'number', source: 'roll:2d6' },
+		{ key: 'notes', type: 'text' },
+		{ key: 'con', type: 'number', source: 'roll:3d6' },
+		{ key: 'level', type: 'number', source: 'roll:1d3' },
+	]
+};
+
+npc_generator.registerSchema(lotfp);
+
+const npc = new NPC.lotfp(); // a new NPC object using the lotfp schema
+npc.initialize(); // npc now has default values randomly set for its fields
+```
+
 
 
 ### random_name

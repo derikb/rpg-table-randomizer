@@ -5,8 +5,8 @@
 module.exports = schemas = {};
 
 schemas.colonial = {
+	key: 'colonial',
 	title: 'Colonial Campaign NPC',
-	name: 'colonial',
 	author: 'Derik A Badman',
 	fields: [
 		{ key: 'name', type: 'string', source: 'name:flemish:random' },
@@ -19,12 +19,12 @@ schemas.colonial = {
 		{ key: 'group', type: 'string' },
 		{ key: 'con', type: 'number', source: 'roll:3d6' },
 		{ key: 'level', type: 'number', source: 'roll:1d3' },
-		{ key: 'hp', type: 'number', source: function() { return `roll:${this.fields.level}d6${this.helpers.attribute_mod(this.fields.con)}`; } }
+		{ key: 'hp', type: 'function', source: 'return `roll:${this.fields.level}d6${this.helpers.attribute_mod(this.fields.con)}`;' }
 	],
 	helpers: {
-		attribute_mod: function(attr) {
-			const abs = Math.floor((attr - 10) / 2);
-			return (abs === 0) ? '' : (abs > 0) ? `+${abs}` : abs;
-		}
+		attribute_mod: [
+			'attr',
+			"const abs = Math.floor((attr - 10) / 2); return (abs === 0) ? '' : (abs > 0) ? `+${abs}` : abs;"
+		]
 	}
 };
