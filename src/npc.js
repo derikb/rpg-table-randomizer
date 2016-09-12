@@ -25,7 +25,7 @@ module.exports = function npc_gen (randomizer) {
 	/**
 	 * The NPC's fields as set by the schema
 	 */
-	NPC.Base.prototype.fields = {};
+	NPC.Base.prototype.fields = [];
 	/**
 	 * Schema assigned helper functions
 	 */
@@ -94,7 +94,7 @@ module.exports = function npc_gen (randomizer) {
 	 * @return {null}
 	 */
 	const registerSchema = function (schema) {
-		if (!schema.key || schema.key === 'base') {
+		if (!schema.key || schema.key === 'base' || !Array.isArray(schema.fields)) {
 			return null;
 			// throw exception?
 		}
@@ -109,6 +109,8 @@ module.exports = function npc_gen (randomizer) {
 		Base.prototype = new NPC.Base();
 		Base.prototype.constructor = Base;
 		Base.prototype.schema = schema.key;
+		Base.prototype.fields = [];
+		Base.prototype.helpers = {};
 		
 		// initialize schema properties...
 		schema.fields.forEach((f) => {
@@ -132,6 +134,7 @@ module.exports = function npc_gen (randomizer) {
 			Base.prototype.fields[f.key] = default_;
 		});
 		
+		if (!schema.helpers || typeof schema.helpers !== 'object') { return; }
 		const helpers = Object.keys(schema.helpers);
 		helpers.forEach((h) => {
 			// if (typeof schema.helpers[h] === 'function') {
