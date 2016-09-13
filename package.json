@@ -1,16 +1,17 @@
 {
   "name": "rpg-table-randomizer",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Module for random tables for use in roleplaying games",
   "main": "src/index.js",
   "scripts": {
     "eslint": "./node_modules/.bin/eslint ",
     "eslint:src": "./node_modules/.bin/eslint src/",
-    "browserify": "./node_modules/.bin/browserify src/index.js --s rpg-table-randomizer -o dist/rpg-table-randomizer.js -t [ babelify --presets [ es2015 ] ]",
-    "browserify:min": "./node_modules/.bin/browserify src/index.js --s rpg-table-randomizer -o dist/rpg-table-randomizer.min.js -t [ babelify --presets [ es2015 ] ] -d -p [minifyify --map dist/rpg-table-randomizer.js.map --output dist/rpg-table-randomizer.js.map]",
-    "browserify:noname": "./node_modules/.bin/browserify src/index_noname.js --s rpg-table-randomizer -o dist/rpg-table-randomizer_noname.js -t [ babelify --presets [ es2015 ] ]",
-    "browserify:noname_min": "./node_modules/.bin/browserify src/index_noname.js --s rpg-table-randomizer -o dist/rpg-table-randomizer_noname.min.js -t [ babelify --presets [ es2015 ] ] -d -p [minifyify --map dist/rpg-table-randomizer_noname.js.map --output dist/rpg-table-randomizer_noname.js.map]",
-    "test": "mocha test/ --recursive"
+    "browserify": "./node_modules/.bin/browserify src/index.js --s rpg_table_randomizer -o dist/rpg-table-randomizer.js -t [ babelify --presets [ es2015 ] ]",
+    "browserify:min": "./node_modules/.bin/browserify src/index.js --s rpg_table_randomizer -o dist/rpg-table-randomizer.min.js -t [ babelify --presets [ es2015 ] ] -d -p [minifyify --map dist/rpg-table-randomizer.js.map --output dist/rpg-table-randomizer.js.map]",
+    "browserify:noname": "./node_modules/.bin/browserify src/index_noname.js --s rpg_table_randomizer -o dist/rpg-table-randomizer_noname.js -t [ babelify --presets [ es2015 ] ]",
+    "browserify:noname_min": "./node_modules/.bin/browserify src/index_noname.js --s rpg_table_randomizer -o dist/rpg-table-randomizer_noname.min.js -t [ babelify --presets [ es2015 ] ] -d -p [minifyify --map dist/rpg-table-randomizer_noname.js.map --output dist/rpg-table-randomizer_noname.js.map]",
+    "test": "mocha test/ --recursive",
+    "build": "npm run browserify && npm run browserify:min && npm run browserify:noname && npm run browserify:noname_min"
   },
   "repository": {
     "type": "git",

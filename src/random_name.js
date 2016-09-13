@@ -366,7 +366,7 @@ module.exports = function random_name (randomizer, namedata) {
 	/**
 	 * Stores the Markov object
 	 */
-	const markov = new MarkovGenerator({ order: 3 });;
+	let markov = new MarkovGenerator({ order: 3 });;
 	
 	
 	return {
