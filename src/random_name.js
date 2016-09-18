@@ -121,7 +121,7 @@ module.exports = function random_name (randomizer, namedata) {
 		}
 		if (typeof style === 'undefined') { style = ''; }
 		if (!namedata[name_type]) { return ''; }
-		if (typeof gender === 'undefined' || (gender !== 'male' && gender !== 'female')) { gender = ''; }
+		if (typeof gender === 'undefined' || (gender !== 'male' && gender !== 'female')) { gender = randomizer.rollRandom(['male', 'female']); }
 		
 		const mkey = `${name_type}_${gender}`;
 		let lastname = '';
