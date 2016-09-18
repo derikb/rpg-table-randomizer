@@ -536,7 +536,7 @@ Just returns a surname from one of the lists.
 #### createName (name_type, gender, surname)
 
 * @param {String} _[name_type=random]_ what list/process to use
-* @param {String} _[gender=random]_ male or female or both
+* @param {String} _[gender=random]_ male or female or randomly selected
 * @param {String} _[style]_ first=first name only, else full name
 * @returns {String} a name
 
