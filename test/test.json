@@ -328,14 +328,14 @@
 	      { "label": "Concern" }
 	    ],
 	    "name_place": [
-	    	"River",
-	    	"Valley",
-	    	"Mountain",
-	    	"River Valley",
-	    	"Bay",
-	    	"Sea",
-	    	"Lake",
-	    	"Castle"
+	    	{ "label": "River" },
+	    	{ "label": "Valley" },
+	    	{ "label": "Mountain" },
+	    	{ "label": "River Valley" },
+	    	{ "label": "Bay" },
+	    	{ "label": "Sea" },
+	    	{ "label": "Lake" },
+	    	{ "label": "Castle" }
 	    ],
 	    "industry": [
 	      { "label": "Land speculation" },

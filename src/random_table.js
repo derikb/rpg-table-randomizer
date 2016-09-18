@@ -25,6 +25,7 @@ const RandomTable = function (config) {
 	 * @property {Object} [print.default.hide_table] set to 1 will not show the table name
 	 * @property {Object} [print.default.hide_result] set to 1 will not show the result on that (sub)table
 	 * @property {Object} [print.default.hide_desc] set to 1 will not show any description for a result on that (sub)table
+	 * @property {Array} [dependencies] table keys that are needed to get full results from this table
 	 * @property {Array} [result] current result array of objects
 	 */
 	this.id = 0;
@@ -37,6 +38,7 @@ const RandomTable = function (config) {
 	this.sequence = ''; // where to start rolling and if other tables should always be rolled on
 	this.tables = {};
 	this.macro = [];
+	this.dependencies = null;
 	this.result = [];
 	/**
 	 * Run on first construction
@@ -202,6 +204,43 @@ const RandomTable = function (config) {
 			return v.table === table;
 		});
 		return (typeof obj !== 'undefined') ? obj : {};
+	};
+	/**
+	 * find the dependent tables to get full results for this table
+	 * @return {Array} table keys
+	 */
+	this.findDependencies = function () {
+		// check field first, if it's not null we'll trust it...?
+		if (this.dependencies !== null) {
+			return this.dependencies;
+		}
+		// iterate over the tables and look for table tokens
+		let dep = [];
+		const tokenRegExp = new RegExp('({{2}.+?}{2})', 'g');
+		const tnames = Object.keys(this.tables);
+		tnames.forEach((n) => {
+			// n is sub/table name
+			const table = this.tables[n];
+			table.forEach((r) => {
+				// r is object of table potential result
+				if (!r.label) { return; }
+				const tokens = r.label.match(tokenRegExp);
+				if (tokens !== null) {
+					tokens.forEach((token) => {
+						const parts = token.replace('{{', '').replace('}}', '').split(':');
+						if (parts.length > 1 && parts[0] === 'table' && parts[1] !== 'this') {
+							dep.push(parts[1]);
+						}
+					});
+				}
+			});
+		});
+		dep = dep.reduce((a, b) => {
+			if (a.indexOf(b) < 0) { a.push(b); }
+			return a;
+		}, []);
+		this.dependencies = dep;
+		return dep;
 	};
 	
 	/**

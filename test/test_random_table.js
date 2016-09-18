@@ -115,6 +115,22 @@ describe('RandomTable module', function () {
 			expect(output).to.not.match(/\n/);
 			expect(output).to.not.match(/\s{2}/);
 		});
-	});	
-
+	});
+	
+	describe('findDependencies method', function () {
+		it('should return an array of tables', function () {
+			let sample_data = test_tables.find((v) => { return v.key === 'colonial_encounters_town'; });
+			test_table = new RandomTable(sample_data);
+			expect(test_table.findDependencies()).to.have.members(['colonial_occupations', 'colonial_factions']);
+			expect(test_table.dependencies).to.have.members(['colonial_occupations', 'colonial_factions']);
+		});
+		
+		it('should return an array of tables', function () {
+			let sample_data = test_tables.find((v) => { return v.key === 'colonial_companies'; });
+			test_table = new RandomTable(sample_data);
+			expect(test_table.findDependencies()).to.be.empty;
+			expect(test_table.dependencies).to.be.empty;
+		});		
+	});
+	
 });

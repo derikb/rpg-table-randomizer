@@ -321,16 +321,21 @@ const Randomizer = function () {
 		}
 	};
 	/**
+	 * Define the regex to find tokens
+	 * Note: this is duplicated in RandomTable.findDependencies() so if updated, update it there too
+	 */
+	this.tokenRegExp = new RegExp('({{2}.+?}{2})', 'g');
+	/**
 	 * Look for tokens to perform replace action in convertToken
 	 * @param {String} string usually a result from a RandomTable
 	 * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
+	 * @param {Function} [callback] optional callback to be performed on tokens...
 	 * @returns {String} String with tokens replaced (if applicable)
 	 */
-	this.findToken = function (string, curtable) {
+	this.findToken = function (string, curtable, callback) {
 		if (r_helpers.isEmpty(string)) { return ''; }
 		if (typeof curtable === 'undefined') { curtable = ''; }
-		const regexp = new RegExp('({{2}.+?}{2})', 'g');
-		const newstring = string.replace(regexp, (token) => {
+		const newstring = string.replace(this.tokenRegExp, (token) => {
 			return this.convertToken(token, curtable);
 		});
 		return newstring;
