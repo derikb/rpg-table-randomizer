@@ -357,6 +357,7 @@ A constructor for generating random table objects that can be used by the random
 * @property {Object} [print.default.hide_table] set to 1 will not show the table name
 * @property {Object} [print.default.hide_result] set to 1 will not show the result on that (sub)table
 * @property {Object} [print.default.hide_desc] set to 1 will not show any description for a result on that (sub)table
+* @property {Array} [dependencies] table keys that are needed to get full results from this table
 * @property {Array} [result] current result array of objects (don't set this on constructor, but you can access it later)
 
 Constructs a new RandomTable object or instantiates and existing one from some data source.
@@ -408,6 +409,13 @@ Get an object result in case we only have the label and need other data from it.
 * @returns {Object} result element for specified table (or empty)
 
 Find the result element for a specific table/subtable. Only works if we have already generated a result.
+
+#### findDependencies
+
+* @returns {Array} array of table keys that the current table calls on (via tokens)
+
+This method returns an array of table keys that the current table refers to in `{{table:SOMETABLE}}` tokens. Can be useful for making sure you have all the tables necessary to return full results from the current table.
+
 
 ### TableNormalizer
 
