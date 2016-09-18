@@ -4622,6 +4622,7 @@ var RandomTable = function RandomTable(config) {
   * @property {Object} [print.default.hide_table] set to 1 will not show the table name
   * @property {Object} [print.default.hide_result] set to 1 will not show the result on that (sub)table
   * @property {Object} [print.default.hide_desc] set to 1 will not show any description for a result on that (sub)table
+  * @property {Array} [dependencies] table keys that are needed to get full results from this table
   * @property {Array} [result] current result array of objects
   */
 	this.id = 0;
@@ -4634,6 +4635,7 @@ var RandomTable = function RandomTable(config) {
 	this.sequence = ''; // where to start rolling and if other tables should always be rolled on
 	this.tables = {};
 	this.macro = [];
+	this.dependencies = null;
 	this.result = [];
 	/**
   * Run on first construction
@@ -4813,6 +4815,49 @@ var RandomTable = function RandomTable(config) {
 			return v.table === table;
 		});
 		return typeof obj !== 'undefined' ? obj : {};
+	};
+	/**
+  * find the dependent tables to get full results for this table
+  * @return {Array} table keys
+  */
+	this.findDependencies = function () {
+		var _this = this;
+
+		// check field first, if it's not null we'll trust it...?
+		if (this.dependencies !== null) {
+			return this.dependencies;
+		}
+		// iterate over the tables and look for table tokens
+		var dep = [];
+		var tokenRegExp = new RegExp('({{2}.+?}{2})', 'g');
+		var tnames = Object.keys(this.tables);
+		tnames.forEach(function (n) {
+			// n is sub/table name
+			var table = _this.tables[n];
+			table.forEach(function (r) {
+				// r is object of table potential result
+				if (!r.label) {
+					return;
+				}
+				var tokens = r.label.match(tokenRegExp);
+				if (tokens !== null) {
+					tokens.forEach(function (token) {
+						var parts = token.replace('{{', '').replace('}}', '').split(':');
+						if (parts.length > 1 && parts[0] === 'table' && parts[1] !== 'this') {
+							dep.push(parts[1]);
+						}
+					});
+				}
+			});
+		});
+		dep = dep.reduce(function (a, b) {
+			if (a.indexOf(b) < 0) {
+				a.push(b);
+			}
+			return a;
+		}, []);
+		this.dependencies = dep;
+		return dep;
 	};
 
 	/**
@@ -5159,12 +5204,18 @@ var Randomizer = function Randomizer() {
 		}
 	};
 	/**
+  * Define the regex to find tokens
+  * Note: this is duplicated in RandomTable.findDependencies() so if updated, update it there too
+  */
+	this.tokenRegExp = new RegExp('({{2}.+?}{2})', 'g');
+	/**
   * Look for tokens to perform replace action in convertToken
   * @param {String} string usually a result from a RandomTable
   * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
+  * @param {Function} [callback] optional callback to be performed on tokens...
   * @returns {String} String with tokens replaced (if applicable)
   */
-	this.findToken = function (string, curtable) {
+	this.findToken = function (string, curtable, callback) {
 		var _this3 = this;
 
 		if (r_helpers.isEmpty(string)) {
@@ -5173,8 +5224,7 @@ var Randomizer = function Randomizer() {
 		if (typeof curtable === 'undefined') {
 			curtable = '';
 		}
-		var regexp = new RegExp('({{2}.+?}{2})', 'g');
-		var newstring = string.replace(regexp, function (token) {
+		var newstring = string.replace(this.tokenRegExp, function (token) {
 			return _this3.convertToken(token, curtable);
 		});
 		return newstring;

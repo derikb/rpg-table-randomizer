@@ -1,6 +1,6 @@
 {
   "name": "rpg-table-randomizer",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Module for random tables for use in roleplaying games",
   "main": "src/index.js",
   "scripts": {
