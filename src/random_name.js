@@ -8,7 +8,7 @@ const r_helpers = require('./r_helpers.js');
  * @param {Object} namedata a lot of names divided by type. see /samples/names.json for formatting
  */
 module.exports = function random_name (randomizer, namedata) {
-	
+	// if necessary inititalize the namedata object
 	if (typeof namedata === 'undefined') {
 		const namedata = { options: {} };
 	}
@@ -73,7 +73,7 @@ module.exports = function random_name (randomizer, namedata) {
 			case 'turkish':
 			default:
 				name = randomizer.rollRandom(namedata[name_type][gender]);
-				if (typeof namedata[name_type]['surname'] !== 'undefined' && style !== 'first') {
+				if (style !== 'first' && typeof namedata[name_type]['surname'] !== 'undefined' && !r_helpers.isEmpty(namedata[name_type]['surname'])) {
 					name += ' ' + randomizer.rollRandom(namedata[name_type]['surname']);
 				}
 				name = randomizer.findToken(name).trim();
@@ -91,6 +91,9 @@ module.exports = function random_name (randomizer, namedata) {
 		if (typeof name_type === 'undefined' || name_type === '' || name_type === 'random') {
 			// randomize a type...
 			name_type = randomizer.rollRandom(Object.keys(namedata.options));
+		}
+		if (typeof namedata[name_type]['surname'] === 'undefined' || r_helpers.isEmpty(namedata[name_type]['surname'])) {
+			return '';
 		}
 		switch (name_type) {
 			case 'holmesian':
@@ -254,7 +257,6 @@ module.exports = function random_name (randomizer, namedata) {
 		return string;
 	});
 
-	
 	/**
 	 * Adapted from http://blog.javascriptroom.com/2013/01/21/markov-chains/
 	 */
@@ -330,7 +332,7 @@ module.exports = function random_name (randomizer, namedata) {
 		this.breakText = function (txt, cb) {
 			const parts = txt.split(this.separator);
 			const prev = this.genInitial();
-	 
+			
 			parts.forEach((v) => {
 				v = v.toLowerCase();
 				cb(prev, v);
@@ -366,8 +368,7 @@ module.exports = function random_name (randomizer, namedata) {
 	/**
 	 * Stores the Markov object
 	 */
-	let markov = new MarkovGenerator({ order: 3 });;
-	
+	let markov = new MarkovGenerator({ order: 3 });
 	
 	return {
 		generateList: generateList,
