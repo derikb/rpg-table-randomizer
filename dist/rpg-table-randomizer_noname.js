@@ -259,7 +259,7 @@ var r_helpers = require('./r_helpers.js');
  * @param {Object} namedata a lot of names divided by type. see /samples/names.json for formatting
  */
 module.exports = function random_name(randomizer, namedata) {
-
+	// if necessary inititalize the namedata object
 	if (typeof namedata === 'undefined') {
 		var _namedata = { options: {} };
 	}
@@ -328,7 +328,7 @@ module.exports = function random_name(randomizer, namedata) {
 			case 'turkish':
 			default:
 				name = randomizer.rollRandom(namedata[name_type][gender]);
-				if (typeof namedata[name_type]['surname'] !== 'undefined' && style !== 'first') {
+				if (style !== 'first' && typeof namedata[name_type]['surname'] !== 'undefined' && !r_helpers.isEmpty(namedata[name_type]['surname'])) {
 					name += ' ' + randomizer.rollRandom(namedata[name_type]['surname']);
 				}
 				name = randomizer.findToken(name).trim();
@@ -346,6 +346,9 @@ module.exports = function random_name(randomizer, namedata) {
 		if (typeof name_type === 'undefined' || name_type === '' || name_type === 'random') {
 			// randomize a type...
 			name_type = randomizer.rollRandom(Object.keys(namedata.options));
+		}
+		if (typeof namedata[name_type]['surname'] === 'undefined' || r_helpers.isEmpty(namedata[name_type]['surname'])) {
+			return '';
 		}
 		switch (name_type) {
 			case 'holmesian':
@@ -381,7 +384,7 @@ module.exports = function random_name(randomizer, namedata) {
 			return '';
 		}
 		if (typeof gender === 'undefined' || gender !== 'male' && gender !== 'female') {
-			gender = '';
+			gender = randomizer.rollRandom(['male', 'female']);
 		}
 
 		var mkey = name_type + '_' + gender;
@@ -625,7 +628,7 @@ module.exports = function random_name(randomizer, namedata) {
 	/**
   * Stores the Markov object
   */
-	var markov = new MarkovGenerator({ order: 3 });;
+	var markov = new MarkovGenerator({ order: 3 });
 
 	return {
 		generateList: generateList,
