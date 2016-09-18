@@ -52,7 +52,7 @@ describe('random_name module', function () {
 		it('should return a female first and surname from the list', function () {
 			const name = random_name.selectName('flemish', 'female');
 			expect(name).to.be.string;
-			expect(name).to.match(/^\S+\s(\S+\s)?\S+$/);
+			expect(name).to.match(/^\S+\s(\S+\s)*\S+$/);
 			let names = name.split(' ');
 			expect(names.shift()).to.be.oneOf(random_name.namedata.flemish.female);
 			expect(names.join(' ').toLowerCase()).to.be.oneOf(random_name.namedata.flemish.surname.map((w) => { return w.toLowerCase(); }));
@@ -68,7 +68,7 @@ describe('random_name module', function () {
 		it('should return a male first and surname from the list', function () {
 			const name = random_name.selectName('flemish', 'male');
 			expect(name).to.be.string;
-			expect(name).to.match(/^\S+\s(\S+\s)?\S+$/);
+			expect(name).to.match(/^\S+\s(\S+\s)*\S+$/);
 			let names = name.split(' ');
 			expect(names.shift()).to.be.oneOf(random_name.namedata.flemish.male);
 			expect(names.join(' ').toLowerCase()).to.be.oneOf(random_name.namedata.flemish.surname.map((w) => { return w.toLowerCase(); }));
@@ -81,7 +81,7 @@ describe('random_name module', function () {
 		it('should return a surname', function () {
 			const surname = random_name.selectSurname('flemish');
 			expect(surname).to.be.string;
-			expect(surname).to.match(/^(\S+\s)?\S+$/);
+			expect(surname).to.match(/^(\S+\s)*\S+$/);
 			expect(surname.toLowerCase()).to.be.oneOf(random_name.namedata.flemish.surname.map((w) => { return w.toLowerCase(); }));
 		});
 		
@@ -90,7 +90,7 @@ describe('random_name module', function () {
 	describe('createName function', function () {
 		const name_types = Object.keys(random_name.namedata.options);
 		name_types.forEach(function(type){
-			const fullname_regex = (r_helpers.isEmpty(random_name.namedata[type].surname)) ? /^\S+$/ : /^\S+\s(\S+\s)?\S+$/;
+			const fullname_regex = (r_helpers.isEmpty(random_name.namedata[type].surname)) ? /^\S+$/ : /^\S+\s(\S+\s)*\S+$/;
 			['male', 'female', 'random'].forEach(function(gender){
 				it('should create a '+type+' '+gender+' full name', function () {
 					const name = random_name.createName(type, gender);
