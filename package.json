@@ -1,6 +1,6 @@
 {
   "name": "rpg-table-randomizer",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Module for random tables for use in roleplaying games",
   "main": "src/index.js",
   "scripts": {
@@ -11,7 +11,8 @@
     "browserify:noname": "./node_modules/.bin/browserify src/index_noname.js --s rpg_table_randomizer -o dist/rpg-table-randomizer_noname.js -t [ babelify --presets [ es2015 ] ]",
     "browserify:noname_min": "./node_modules/.bin/browserify src/index_noname.js --s rpg_table_randomizer -o dist/rpg-table-randomizer_noname.min.js -t [ babelify --presets [ es2015 ] ] -d -p [minifyify --map dist/rpg-table-randomizer_noname.js.map --output dist/rpg-table-randomizer_noname.js.map]",
     "test": "mocha test/ --recursive",
-    "build": "npm run browserify && npm run browserify:min && npm run browserify:noname && npm run browserify:noname_min"
+    "build": "npm run browserify && npm run browserify:min && npm run browserify:noname && npm run browserify:noname_min",
+    "release": "standard-version -a"
   },
   "repository": {
     "type": "git",
@@ -34,14 +35,17 @@
   "devDependencies": {
     "babel-preset-es2015": "^6.14.0",
     "babelify": "^7.3.0",
-    "bower": "^1.7.9",
     "browserify": "^13.1.0",
-    "chai": "^3.5.0",
-    "eslint": "^3.4.0",
-    "eslint-config-standard": "^6.0.0",
-    "eslint-plugin-promise": "^2.0.1",
-    "eslint-plugin-standard": "^2.0.0",
-    "mocha": "^3.0.2"
+    "chai": "^4.2.0",
+    "cz-conventional-changelog": "^3.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "mocha": "^7.1.1",
+    "standard-version": "^7.1.0"
   },
   "dependencies": {}
 }

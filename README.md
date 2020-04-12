@@ -14,8 +14,8 @@
 1. [Tests](#tests)
 1. [Contributors](#contributors)
 1. [License](#license)
-  
-  
+
+
 
 ## Synopsis
 
@@ -100,11 +100,6 @@ There are two versions of the module packaged for browsers and each is also avai
 * `dist/rpg-table-randomizer.js` and `dist/rpg-table-randomizer.min.js` offers the full module
 * `dist/rpg-table-randomizer_noname.js` and `dist/rpg-table-randomizer_noname.min.js` offers the module without the random name data. This makes the file more than half as small, but if you want to use the random name generator you need to add name data using `random_name.registerNameType()`
 
-#### Bower
-
-```
-$ bower install rpg-table-randomizer --save
-```
 
 #### Manually
 
@@ -143,7 +138,7 @@ randomizer.roll('2d8'); // returns an integer between 2 and 16
 
 This is the primary way to generate results from the RandomTable objects.
 
-Takes a RandomTable object and returns an array of results. If RandomTable.sequence is set, multiple results may be returned. Optionally a specific subtable can be selected to select from. This is basically a wrapper for selectFromTable() that may, depending on the RandomTable's properties, concatenate multiple selectFromTable() results. 
+Takes a RandomTable object and returns an array of results. If RandomTable.sequence is set, multiple results may be returned. Optionally a specific subtable can be selected to select from. This is basically a wrapper for selectFromTable() that may, depending on the RandomTable's properties, concatenate multiple selectFromTable() results.
 
 ```
 const table_config = {
@@ -185,7 +180,7 @@ Use this to set-up a way to retrieve RandomTable objects from a source. Necessar
 const table_retrieve = function (key) {
 	// some method to find the table with the key of the key argument.
 	// and set it to the var table
-	return table;	
+	return table;
 };
 
 randomizer.setTableKeyLookup(table_retrieve);
@@ -207,7 +202,7 @@ Register a custom token type for use in tables.
 
 ```
 const footoken = function (token_parts, full_token, current_table) {
-	return token_parts[1] + ' with big red eyes';	
+	return token_parts[1] + ' with big red eyes';
 }
 
 randomizer.registerTokenType('foo', footoken);
@@ -285,7 +280,7 @@ randomizer.rollRandom(data); // returns one of the reactions
 - @returns {Array} array of object results { table: table that was rolled on, result: result string, desc: optional description string }
 
 In most cases it is not necessary to call this method directly, getTableResult() should be preferred.
- 
+
 This returns the result for a single table in the RandomTable object.
 
 ```
@@ -533,7 +528,7 @@ const name = random_name.selectName('flemish', 'female'); // Benedicta Ambroos
 const name2 = random_name.selectName('cornish', 'male'); // Carasek Godden
 
 ```
- 
+
 #### selectSurname (name_type)
 
 * @param {String} _[name_type=random]_ what list/process to use
