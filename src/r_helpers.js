@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Is it empty (stolen from Underscore)
  * @param {Object|String|?} obj some type of things
@@ -28,7 +26,7 @@ const isString = function (obj) {
  * @return {Boolean} is it an object?
  */
 const isObject = function (obj) {
-	var type = typeof obj;
+	const type = typeof obj;
 	return type === 'function' || type === 'object' && !!obj;
 };
 /**
@@ -48,10 +46,10 @@ const capitalize = function (string) {
 	return isEmpty(string) ? string : string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-module.exports = {
-	isEmpty: isEmpty,
-	isString: isString,
-	isObject: isObject,
-	isUndefined: isUndefined,
-	capitalize: capitalize
+export {
+	isEmpty,
+	isString,
+	isObject,
+	isUndefined,
+	capitalize
 };

@@ -11,7 +11,6 @@
 			]
 		}
 	},
-	},
 	{
 		"key": "color",
 		"title": "Colors",
@@ -31,7 +30,7 @@
 				"Orange",
 				"Violet"
 			]
-		}		
+		}
 	},
 	{
 		"key": "ordinal",

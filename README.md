@@ -5,11 +5,11 @@
 1. [Motivation](#motivation)
 1. [Installation](#installation)
 1. [API Reference](#api-reference)
-  1. [randomizer](#randomizer)
-  1. [RandomTable](#randomtable)
+  1. [Randomizer](#Randomizer)
+  1. [RandomTable](#RandomTable)
   1. [TableNormalizer](#tablenormalizer)
   1. [npc_generator](#npc_generator)
-  1. [random_name](#random_name)
+  1. [RandomName](#RandomName)
   1. [r_helpers](#r_helpers)
 1. [Tests](#tests)
 1. [Contributors](#contributors)
@@ -19,21 +19,31 @@
 
 ## Synopsis
 
-Module for randomization focused on tables used in roleplaying games.
+Modules for randomization focused on tables used in roleplaying games.
 
-This is model and logic only there is no ui and only the most limited of view data. No functions are provided for the organization or storage of table data. (I'm working on a webapp that will provide views, ui, and storage.)
+These are models and logic only, there is no ui and only the most limited of view data. No functions are provided for the organization or storage of table data.
 
 ## Code Example
 
 A simple example setting up a very basic unweighted table (with no subtables), then "rolling" on it, and also generating a dice roll and two random names:
 
 ```
-const rpg_table_randomizer = require('rpg-table-randomizer');
-const randomizer = rpg_table_randomizer.randomizer;
-const RandomTable = rpg_table_randomizer.RandomTable;
-const random_name = rpg_table_randomizer.random_name
+import Randomizer from '../src/randomizer.js';
+import RandomTable from '../src/random_table.js';
 
-const table_config = {
+// Object to hold tables.
+const testTables = {};
+
+// Instantiate a randomizer
+const randomizer = new Randomizer({});
+// Set a really basic table lookup
+// just looks for the key in the testTables Object.
+randomizer.setTableKeyLookup(function(key) {
+	return testTables[key] || null;
+});
+
+// Really basic random table
+const colortable = new RandomTable({
 	key: 'colors',
 	title: 'Random Color',
 	table: [
@@ -41,25 +51,38 @@ const table_config = {
 		'Orange',
 		'Yellow',
 	]
-};
+});
+// Add it to the tables object.
+testTables[colortable.key] = colortable;
 
-const colortable = new RandomTable(table_config);
+// Return random result from the colors table.
+console.log(randomizer.getTableResultByKey('colors'));
 
-let result = randomizer.getTableResult(colortable);
+// Random roll
+console.log(randomizer.roll('2d4+1'));
+```
 
-// result equals one of the colors
+Example using the name generator.
 
-let roll = randomizer.roll('2d4+1');
+```
+import Randomizer from '../src/randomizer.js';
+import RandomTable from '../src/random_table.js';
+import RandomName from '../src/random_name.js';
 
-// roll equals a number between 3 and 9
+// Instantiate randomizer
+const randomizer = new Randomizer({});
+// Set the randomizer in the random name module.
+RandomName.setRandomizer(randomizer);
 
-let my_old_character_name = random_name.selectName('dutch', 'male');
 
-// my_old_character_name equals a male name from the dutch name list
+// Add some name data
+const namedata = {}; // See samples/names.json for how this data should look.
+RandomName.setNameData(namedata);
 
-let my_new_character_name = random_name.createName('flemish', 'female');
-
-// my_new_character_name equals a female name based on flemish name syntax using Markov chain
+// List of 4 names of the Flemish type.
+console.log(RandomName.generateList(4, 'flemish'));
+// Get a single French name from the female name list.
+console.log(RandomName.createName('french', 'female'));
 
 ```
 
@@ -73,11 +96,9 @@ I also really like have a quick way to get a bunch of names.
 
 ## Installation
 
-This module was written for use in nodejs but uses browserify to create a module that can be used in browser. Babel is used to convert ES2015 features, but I haven't tested in most browsers.
-
 There are no module requirements for production environment.
 
-### Node
+You should be able to use it in any modern browser or server side via node.
 
 Install the module via npm:
 
@@ -85,34 +106,19 @@ Install the module via npm:
 $ npm install --save rpg-table-randomizer
 ```
 
-Require it where you want to use it:
-
-```
-const rpgrandomizer = require('rpg-table-randomizer');
-
-```
-
-### Browser
-
-This will theoretically work.
-
-There are two versions of the module packaged for browsers and each is also available in minified form:
-* `dist/rpg-table-randomizer.js` and `dist/rpg-table-randomizer.min.js` offers the full module
-* `dist/rpg-table-randomizer_noname.js` and `dist/rpg-table-randomizer_noname.min.js` offers the module without the random name data. This makes the file more than half as small, but if you want to use the random name generator you need to add name data using `random_name.registerNameType()`
-
-
-#### Manually
-
-Download the latest release from github. Load the `dist/rpg-table-randomizer.min.js` file in your html. For debugging purposes there is the source map file or the unminified version, all in the `dist/` directory.
-
+Or download from git and just use in your project.
 
 ## API Reference
 
 The module exposes a few objects and constructors.
 
-### randomizer
+**This is under construction as I refactor.**
 
-This object is used for generating random results from tables. It can also provide random dice rolls.
+### Randomizer
+
+Exported from the randomizer.js file.
+
+A class used for generating random results from tables. It can also provide random dice rolls.
 
 #### roll (string)
 
@@ -273,6 +279,13 @@ randomizer.rollRandom(data); // returns one of the reactions
 
 ```
 
+#### getTableResultByKey(tableKey, table)
+
+* @param {String} tableKey RandomTable key to lookup table by.
+* @param {String} table Specific subtable to rull on, else default.
+
+Gets a result from a table based on the table key.
+
 #### selectFromTable (rtable, table)
 
 - @param {Object} rtable the RandomTable object
@@ -333,9 +346,9 @@ Takes a result value, finds, and replaces any tokens in it.
 
 ### RandomTable
 
-A constructor for generating random table objects that can be used by the randomizer. A great variety of options are available.
+A class for random table objects that can be used by the randomizer. A great variety of options are available.
 
-#### RandomTable (config)
+#### constructor (config)
 
 * @property {String} id id for the table, primary key for database if used
 * @property {String} key identifier for the table, used in table token lookups
@@ -414,30 +427,13 @@ This method returns an array of table keys that the current table refers to in `
 
 ### TableNormalizer
 
-A constructor for parsing different types of content and formatting them for use in the RandomTable's tables property.
+Exported from table_normalizer.js
 
 This is still in progress to a certain extent as I try to figure out easy ways for people to make RandomTable data from existing formats (like html, text lists, etc.).
 
-#### TableNormalizer (data)
+#### normalizeData (data)
 
 * @param {String|Object|Array} _data_ data to normalize
-
-Constructor for the normalizer.
-
-#### setData (data)
-
-* @param {String|Object|Array} _data_ data to normalize
-
-An alternate way to set the data to normalize.
-
-#### checkType ()
-
-* @return {String} data_type
-
-Returns the type of data set via the constructor or setData()
-
-#### normalizeData ()
-
 * @return {Array|Object} normalized data for use in a RandomTable object
 
 Tries to normalize the data for RandomTable usage... Probably the thing that will need the most tweaking over time.
@@ -483,9 +479,21 @@ npc.initialize(); // npc now has default values randomly set for its fields
 
 
 
-### random_name
+### RandomName
 
-An object that can generate names of all sorts both from lists of names and via Markov chains.
+Functions export from random_name.js
+
+Methods that can generate names of all sorts both from lists of names and via Markov chains.
+
+### setNameData (data)
+
+@param {Object} data a lot of names divided by type. see /samples/names.json for formatting
+
+You need to set this is you want to generate/randomize names.
+
+### setRandomizer (Randomizer)
+
+@param {Randomizer} Instantiation of the Randomizer class.
 
 #### generateList (number, name_type, create)
 
@@ -553,25 +561,6 @@ const name2 = random_name.createName('japanese', 'male'); // Hinobu
 
 ```
 
-#### capitalizeName (name)
-
-* @param {String} _name_ a name
-* @return {String} name capitalized
-
-This just capitalizes the first letter of any word in the given name. Used internally when creating names.
-
-#### holmesname ()
-
-* @returns {String} name
-
-Returns a name adapted from the <a href="http://zenopusarchives.blogspot.com/2013/07/random-names-one-sheet.html">Zenopus Archives' Holmesian Name Generator</a>.
-
-#### demonname ()
-
-* @returns {String} name
-
-Returns a demon name adapted from Jeff Rients, based on Goetia, as implemented here: <a href="http://www.random-generator.com/index.php?title=Goetic_Demon_Names">Goetic Demon Names</a>.
-
 #### registerNameType (name_type, data, label)
 
 * @param {String} name_type the shortname for the type
@@ -608,6 +597,15 @@ random_name.registerNameType('caveman', new_names, 'Cave-Man');
 
 random_name.selectName('caveman', 'female'); // Shelee Tnk
 
+```
+
+#### nameTokenCallback
+
+This function can be use in a Randomizer to setup the "name" token.
+
+```
+const randomizer = new Randomizer();
+randomizer.registerTokenType('name', RandomName.nameTokenCallback);
 ```
 
 ### r_helpers

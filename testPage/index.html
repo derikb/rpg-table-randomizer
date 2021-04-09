@@ -1,0 +1,51 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+
+        <script type="module">
+            import Randomizer from '../src/randomizer.js';
+            import RandomTable from '../src/random_table.js';
+            import normalizeData from '../src/table_normalizer.js';
+            import RandomName from '../src/random_name.js';
+
+            const testTables = {};
+
+            fetch('../sample/names.json')
+                .then(response => response.json())
+                .then((obj) => {
+                    RandomName.setNameData(obj);
+                    console.log(RandomName.generateList(4, 'flemish'));
+                    console.log(RandomName.createName('french', 'female'));
+                });
+
+
+
+            const randomizer = new Randomizer({});
+            RandomName.setRandomizer(randomizer);
+            //console.log(randomizer.roll('2d6+1'));
+
+
+            randomizer.setTableKeyLookup(function(key) {
+                return testTables[key] || null;
+            });
+
+            randomizer.registerTokenType('name', RandomName.nameTokenCallback);
+
+            fetch('../sample/general.json')
+                .then(response => response.json())
+                .then((array) => {
+                    array.forEach((obj) => {
+                        const table = new RandomTable(obj);
+                        testTables[table.key] = table;
+                    });
+
+
+                    console.log(randomizer.getTableResultByKey('ordinal'));
+                    console.log(randomizer.getTableResultByKey('colonial_companies'));
+                });
+
+        </script>
+    </body>
+</html>
