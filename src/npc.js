@@ -1,203 +1,95 @@
-import randomizer from './randomizer.js';
+import Randomizer from './randomizer.js';
+import { NPCSchema } from './npc_schema.js';
+import { isEmpty } from './r_helpers.js';
 
 /**
  * Object store for registered schemas
  */
 const Schemas = {};
 
-
-class NPC {
-	constructor() {
-		this.id = 0;
-		this.schema = '';
-		this.fields = {};
-		this.helpers = {};
-	}
-
-	setFields(fields = {}) {
-		if (typeof fields !== 'object') {
-			return;
-		}
-		const props = Object.keys(fields);
-		props.forEach((p) => {
-			if (this.fields[p]) {
-				this.fields[p] = fields[p];
-			}
-		});
-	};
-
-	initialize() {
-		const schema_fields = this.schema.fields || {};
-		const fields = Object.keys(this.fields);
-		fields.forEach((f) => {
-			const sch = schema_fields.find((v) => { return v.key === f; });
-			if (sch) {
-				if (sch.default) {
-					this.fields[f] = sch.default;
-					return;
-				}
-				if (sch.source && sch.source !== '') {
-					// parse source into something randomizer can use...
-					let src_temp;
-					if (sch.type === 'function') {
-						const func = new Function(sch.source);
-						src_temp = func.call(this);
-					} else {
-						src_temp = sch.source;
-					}
-					// console.log(src_temp);
-					if (sch.type === 'array') {
-						const ct = (sch.count) ? sch.count : 1; // ???
-						for (let i = 0; i < ct; i++) {
-							this.fields[f].push(randomizer.convertToken(src_temp));
-						}
-					} else {
-						this.fields[f] = randomizer.convertToken(src_temp);
-					}
-				}
-			}
-		});
-	}
-}
-
 /**
- * @return {Object} npc functions
+ * Class for NPCs.
+ * @param {String} id Some kind of indentifier.
+ * @param {String} schema Key for a NPCSchema used for this NPC.
+ * @param {Object} fields Field values indexed by NPCSchemaField key.
  */
-function npc_gen () {
-	/**
-	 * Object to store NPC constructors.
-	 * each constructor (except the base one) is based on a schema
-	 */
-	const NPC = {};
-	/**
-	 * The base prototype for NPC constructors. From this schemas are used to make differing constructions
-	 */
-	NPC.Base = function () { };
-	/**
-	 * Just a unique identifier that can be used for storage/retrieval
-	 */
-	NPC.Base.prototype.id = 0;
-	/**
-	 * Name of the schema used for the NPC
-	 */
-	NPC.Base.prototype.schema = '';
-	/**
-	 * The NPC's fields as set by the schema
-	 */
-	NPC.Base.prototype.fields = [];
-	/**
-	 * Schema assigned helper functions
-	 */
-	NPC.Base.prototype.helpers = {};
-	/**
-	 * set defaults on the fields
-	 * usually this would involve calling random tables
-	 */
-	NPC.Base.prototype.initialize = function () {
-		const schema_fields = Schemas[this.schema].fields;
-		const fields = Object.keys(this.fields);
-		fields.forEach((f) => {
-			const sch = schema_fields.find((v) => { return v.key === f; });
-			if (sch) {
-				if (sch.default) {
-					this.fields[f] = sch.default;
-					return;
-				}
-				if (sch.source && sch.source !== '') {
-					// parse source into something randomizer can use...
-					let src_temp;
-					if (sch.type === 'function') {
-						const func = new Function(sch.source);
-						src_temp = func.call(this);
-					} else {
-						src_temp = sch.source;
-					}
-					// console.log(src_temp);
-					if (sch.type === 'array') {
-						const ct = (sch.count) ? sch.count : 1; // ???
-						for (let i = 0; i < ct; i++) {
-							this.fields[f].push(randomizer.convertToken(src_temp));
-						}
-					} else {
-						this.fields[f] = randomizer.convertToken(src_temp);
-					}
-				}
-			}
-		});
-	};
+class NPC {
+	constructor({
+		id = '',
+		schema = '',
+		fields = {}
+	}) {
+		this.id = id;
+		this.schema = schema;
+		this.fields = fields;
+	}
 }
 
 /**
- * Function to make a new NPC constructor
- * constructor is added to NPC[schema.key]
- * @param {Object} schema NPC schema object to base on the constructor
- * @return {null}
+ * Add new schema to store.
+ * @param {NPCSchema} schema
  */
 const registerSchema = function (schema) {
-	if (!schema.key || schema.key === 'base' || !Array.isArray(schema.fields)) {
-		return null;
-		// throw exception?
+	if (!schema.key || schema.key === 'base') {
+		throw Error('Invalid schema');
 	}
 	// store it for later reference
 	Schemas[schema.key] = schema;
-	// add this schema to the NPC object so we can use it as a constructor
-	// this could overwrite is that ok?
-	const Base = NPC[schema.key] = function () {
-		// in case we add something to NPC constructor that we need to call?
-		// NPC.Base.call(this);
-	};
-	Base.prototype = new NPC.Base();
-	Base.prototype.constructor = Base;
-	Base.prototype.schema = schema.key;
-	Base.prototype.fields = [];
-	Base.prototype.helpers = {};
-
-	// initialize schema properties...
-	schema.fields.forEach((f) => {
-		let default_ = null;
-		switch (f.type) {
-			case 'string':
-			case 'text':
-				default_ = '';
-				break;
-			case 'array':
-				default_ = [];
-				break;
-			case 'number':
-			case 'modifier':
-				default_ = 0;
-				break;
-			case undefined:
-				// ?
-				break;
-		}
-		Base.prototype.fields[f.key] = default_;
-	});
-
-	if (!schema.helpers || typeof schema.helpers !== 'object') { return; }
-	const helpers = Object.keys(schema.helpers);
-	helpers.forEach((h) => {
-		// if (typeof schema.helpers[h] === 'function') {
-		//	Base.prototype.helpers[h] = schema.helpers[h];
-		// }
-		// create a function from the array
-		Base.prototype.helpers[h] = new Function(...schema.helpers[h]);
-	});
 };
 
-const getClassForSchema = function(schema) {
-	return class extends NPC {
-		constructor({
+/**
+ * Get schema by key.
+ * @param {String} key Schema key.
+ * @returns {NPCSchema|null}
+ */
+const getSchemaByKey = function(key) {
+	return Schemas[key] || null;
+};
 
-		}) {
-			this.schema = schema;
+/**
+ * Create a new NPC from a Schema.
+ * @param {String} schemaKey Key for an NPCSchema
+ * @param {Randomizer} randomizer
+ * @returns NPC
+ */
+const initializeNewNPC = function(schemaKey, randomizer) {
+	const schema = getSchemaByKey(schemaKey);
+	if (!schema) {
+		throw Error('Schema not found.');
+	}
+	if (!randomizer instanceof Randomizer) {
+		throw Error('Invalid randomizer');
+	}
+
+	const npc = new NPC({});
+	npc.schema = schemaKey;
+	schema.fields.forEach((field) => {
+		const key = field.key;
+		if (!isEmpty(field.starting_value)) {
+			npc.fields[key] = field.starting_value;
+			return;
 		}
-	};
+		if (!isEmpty(field.source)) {
+			if (field.type === 'array') {
+				npc.fields[key] = [];
+				const ct = (field.count) ? field.count : 1;
+				for (let i = 0; i < ct; i++) {
+					npc.fields[key].push(randomizer.convertToken(field.source));
+				}
+			} else {
+				npc.fields[key] = randomizer.convertToken(field.source);
+			}
+			return;
+		}
+		npc.fields[key] = field.defaultEmpty;
+	});
+	return npc;
 };
 
 
 export default {
 	NPC,
 	registerSchema,
-	getClassForSchema
+	getSchemaByKey,
+	initializeNewNPC
 };

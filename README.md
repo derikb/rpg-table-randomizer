@@ -439,42 +439,76 @@ This is still in progress to a certain extent as I try to figure out easy ways f
 Tries to normalize the data for RandomTable usage... Probably the thing that will need the most tweaking over time.
 
 
+### NPCSchema
+
+Exported from npc_schema.js
+
+Classes for npc schemas.
+
+#### NPCSchema
+
+* @param {String} key Identifying key
+* @param {String} name Name of field.
+* @param {NPCSchemaField[]|obj[]} fields Data fields will be converted to NPCSchemaField if necessary)
+
+#### NPCSchemaField
+
+* @param {String} key Identifying key
+* @param {String} type Type of data in field. Valid: string, text, array, number, modifier
+* @param {String} source Source of data for Randomizer in the form of a token (see Randomizer, ex: "name:french", "table:color", etc.)
+* @param {Number} count Number of entries for array types.
+* @param {Array|String|Number} starting_value An optional starting value.
+
+
 ### npc_generator
 
+Exported from npc.js
 An object containing functions for the creation of Non-player characters based on custom schemas.
 
-#### registerSchema (schema)
+#### registerSchema (NPCSchema)
 
-* @param {Object} schema NPC schema object to base on the constructor
+* @param {NPCSchema} schema NPC schema instance
 
-This function takes the passed in `schema` (see [npcschema.md](npcschema.md) for the schema format) and makes a new constructor on the `npc_generator.NPC` object under the property `schema.key`.
+This function takes the passed in `NPCSchema` (see [npcschema.md](npcschema.md) and adds it by key to the available schemas.
+
+#### getSchemaByKey (key)
+
+* @param {String} key Schema key.
+* @returns {NPCSchema|null}
+
+#### initializeNewNPC (schemaKey, Randomizer)
+
+* @param {String} schemaKey Key for an NPCSchema
+* @param {Randomizer} randomizer
+* @returns NPC
 
 #### NPC
 
-An object whose properties are constructors for generating NPC objects.
+An NPC class.
 
-##### NPC.Base
+* @param {String} id Some kind of indentifier.
+* @param {String} schema Key for a NPCSchema used for this NPC.
+* @param {Object} fields Field values indexed by NPCSchemaField key.
 
-The prototype for all NPC objects/constructors. By itself does very little, but by updating its `prototype` you can add functionality to all NPC objects.
+
+Sample of making an NPC.
 
 ```
-const lotfp = {
-	key: 'lotfp',
-	title: 'Lamentations of the Flame Princess NPC',
+const ddSchema = new NPCSchema({
+	key: 'dd',
+	title: 'Basic D&D NPC',
 	fields: [
 		{ key: 'personality', type: 'array', source: 'table:personality_traits', count: 2 },
 		{ key: 'goals', type: 'string', source: 'table:npc_goals' },
 		{ key: 'reaction', type: 'number', source: 'roll:2d6' },
 		{ key: 'notes', type: 'text' },
-		{ key: 'con', type: 'number', source: 'roll:3d6' },
-		{ key: 'level', type: 'number', source: 'roll:1d3' },
+		{ key: 'con', type: 'number', source: 'roll:3d6' }
 	]
 };
 
-npc_generator.registerSchema(lotfp);
+npc_generator.registerSchema(ddSchema);
 
-const npc = new NPC.lotfp(); // a new NPC object using the lotfp schema
-npc.initialize(); // npc now has default values randomly set for its fields
+const npc = npc_generator.initializeNewNPC('dd', randomizer); // a new NPC object using the dd schema, with its fields set to random values.
 ```
 
 

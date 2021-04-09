@@ -255,7 +255,7 @@ class Randomizer {
 		if (!table) {
 			return [{ table: 'Error', result: 'No table found to roll on.', desc: '' }];
 		}
-		// console.log(table);
+
 		let o = []; // output for sequence of rolls/selections
 		const t = rtable.tables[table]; // the table/subtable
 		const result = this.rollRandom(t); // the random string from the table (either the object property, a string value from an array, or the value property from a selected object)
@@ -338,7 +338,10 @@ class Randomizer {
 	 * @returns {String} The value with the token(s) replaced by the operation or else just the token (in case it was a mistake or at least to make the error clearer)
 	 */
 	convertToken(token, curtable) {
-		const parts = token.replace('{{', '').replace('}}', '').split(':');
+		let parts = token.replace('{{', '').replace('}}', '').split(':');
+		parts = parts.map((el) => {
+			return el.trim();
+		});
 		if (parts.length === 0) {
 			return token;
 		}
@@ -415,7 +418,6 @@ class Randomizer {
 	 */
 	defaultTableToken(token_parts, full_token, curtable) {
 		let string = '';
-		// console.log(token_parts);
 		if (isUndefined(token_parts[1])) {
 			return full_token;
 		}
@@ -430,12 +432,9 @@ class Randomizer {
 		let t = null;
 		if (token_parts[1] === 'this') {
 			// reroll on same table
-			// console.log('this..'+curtable);
 			t = this.getTableByKey(curtable);
-			// console.log(t);
 		} else {
 			t = this.getTableByKey(token_parts[1]);
-			// console.log(t);
 		}
 		if (t === null || typeof t !== 'object') {
 			return full_token;
