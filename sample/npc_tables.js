@@ -1,4 +1,4 @@
-[
+export default [
 {
 	"key": "onthenpc_appearance",
 	"title": "Short Appearance Traits",
@@ -949,4 +949,4 @@
 		{ "label": "Woodcutter", "description": "" }
 	]
 }
-]
+];

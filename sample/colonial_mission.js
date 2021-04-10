@@ -1,4 +1,4 @@
-[
+export default [
 	{
 		"key": "mission_generator",
 		"title": "Colonial campaign mission generator",
@@ -73,7 +73,7 @@
 	    ]
 	  }
 	},
-	
+
 	{
 	  "key": "mission_place",
 	  "title": "Mission Places",
@@ -151,7 +151,7 @@
 	    ]
 	  }
 	},
-	
+
 	{
 	  "key": "mission_thing",
 	  "title": "Mission Things",
@@ -201,7 +201,7 @@
 	    ]
 	  }
 	},
-	
+
 	{
 	  "key": "mission_person",
 	  "title": "Mission Person",
@@ -253,7 +253,7 @@
 	    ]
 	  }
 	},
-	
+
 	{
 	  "key": "mission_patron",
 	  "title": "Mission Patrons",
@@ -291,7 +291,7 @@
 	    ]
 	  }
 	},
-	
+
 	{
 	  "key": "mission_antagonist",
 	  "title": "Mission Antagonist",
@@ -313,7 +313,7 @@
 	    ]
 	  }
 	},
-	
+
 	{
 	  "key": "mission_complication",
 	  "title": "Mission Complications",
@@ -343,7 +343,7 @@
 	    ]
 	  }
 	},
-	
+
 	{
 	  "key": "mission_reward",
 	  "title": "Mission Rewards",
@@ -368,4 +368,4 @@
 	    ]
 	  }
 	}
-]
+];

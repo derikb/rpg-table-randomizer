@@ -11,9 +11,8 @@
   1. [npc_generator](#npc_generator)
   1. [RandomName](#RandomName)
   1. [r_helpers](#r_helpers)
-1. [Tests](#tests)
-1. [Contributors](#contributors)
-1. [License](#license)
+2. [Contributors](#contributors)
+3. [License](#license)
 
 
 
@@ -68,16 +67,15 @@ Example using the name generator.
 import Randomizer from '../src/randomizer.js';
 import RandomTable from '../src/random_table.js';
 import RandomName from '../src/random_name.js';
+import names from '../sample/names.js';
 
 // Instantiate randomizer
 const randomizer = new Randomizer({});
 // Set the randomizer in the random name module.
 RandomName.setRandomizer(randomizer);
 
-
 // Add some name data
-const namedata = {}; // See samples/names.json for how this data should look.
-RandomName.setNameData(namedata);
+RandomName.setNameData(names);
 
 // List of 4 names of the Flemish type.
 console.log(RandomName.generateList(4, 'flemish'));
@@ -107,6 +105,13 @@ $ npm install --save rpg-table-randomizer
 ```
 
 Or download from git and just use in your project.
+
+The `src/index.js` will export a basic randomizer with name generation setup. Otherwise you'd probably want to figure out what parts you need and then run it through a js bundler.
+
+
+## Sample Data
+
+The `sample` directory includes a few example data sources. A simple way to handle data is to create objects and then export them as a module. That way the data could also be bundled up with your js code. For more complicated or dynamic data you'd want to load it from a server or some other storage.
 
 ## API Reference
 
@@ -370,7 +375,7 @@ A class for random table objects that can be used by the randomizer. A great var
 
 Constructs a new RandomTable object or instantiates and existing one from some data source.
 
-For formatting the tables property see the [tableformat.md](tableformat.md) document.
+For formatting the tables property see the [tableformat.md](/docs/tableformat.md) document.
 
 #### validate (attributes)
 
@@ -469,7 +474,7 @@ An object containing functions for the creation of Non-player characters based o
 
 * @param {NPCSchema} schema NPC schema instance
 
-This function takes the passed in `NPCSchema` (see [npcschema.md](npcschema.md) and adds it by key to the available schemas.
+This function takes the passed in `NPCSchema` and adds it by key to the available schemas memory store.
 
 #### getSchemaByKey (key)
 
@@ -653,10 +658,6 @@ I'm not going to document these now, but the methods are:
 - isUndefined
 - capitalize
 
-
-## Tests
-
-Tests are written for mocha/chai using the BDD expect style. They are all found in /test and be run with `npm test`
 
 ## Contributors
 
