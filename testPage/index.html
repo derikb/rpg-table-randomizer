@@ -1,0 +1,57 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+
+        <script type="module">
+            import Randomizer from '../src/randomizer.js';
+            import RandomTable from '../src/random_table.js';
+            import normalizeData from '../src/table_normalizer.js';
+            import RandomName from '../src/random_name.js';
+            import { NPCSchema } from '../src/npc_schema.js';
+            import npcGenerator from '../src/npc.js';
+            import names from '../sample/names.js';
+            import generalTables from '../sample/general.js';
+            import colonialTables from '../sample/colonial.js';
+            import colonialMission from '../sample/colonial_mission.js';
+            import npcTables from '../sample/npc_tables.js';
+            import { simple as simpleSchemaData } from '../sample/schemas.js';
+
+            const tableObjs = generalTables.concat(colonialTables, colonialMission, npcTables);
+
+            const testTables = {};
+            tableObjs.forEach((obj) => {
+                const table = new RandomTable(obj);
+                testTables[table.key] = table;
+            });
+
+            const randomizer = new Randomizer({});
+            RandomName.setRandomizer(randomizer);
+            RandomName.setNameData(names);
+
+            randomizer.setTableKeyLookup(function(key) {
+                return testTables[key] || null;
+            });
+
+            randomizer.registerTokenType('name', RandomName.nameTokenCallback);
+
+            console.log(randomizer.roll('2d6+1'));
+            console.log(RandomName.generateList(4, 'flemish'));
+            console.log(RandomName.createName('french', 'female'));
+            console.log(randomizer.getTableResultByKey('ordinal'));
+            console.log(randomizer.getTableResultByKey('colonial_companies'));
+            console.log(
+                randomizer.getTableResultByKey('mission_generator')
+            );
+
+            const simpleSchema = new NPCSchema(simpleSchemaData);
+
+            npcGenerator.registerSchema(simpleSchema);
+
+            console.log(
+                npcGenerator.initializeNewNPC('simple', randomizer)
+            );
+        </script>
+    </body>
+</html>

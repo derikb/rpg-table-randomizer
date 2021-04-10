@@ -97,7 +97,7 @@ tables: {
 	giant_types: [
 		'Cloud',
 		'Hill',
-		'Stone'	
+		'Stone'
 	]
 }
 ```
@@ -111,7 +111,7 @@ The `subtable` property in a result can have a number of properties that effect 
 * @property {Number} _weight_ a numeric value to weight the result in comparison with the other results
 * @property {String} _subtable_ the name of another subtable in the RandomTable object that should be rolled on when this result is retrieved
 * @property {String} _description_ an elaboration on the label that can be used when outputting/displaying results
-* @property {Boolean} _print_ should this result be included in various result outputs (good for use with the subtable property where you only want the result on the subtable to be displayed/output) 
+* @property {Boolean} _print_ should this result be included in various result outputs (good for use with the subtable property where you only want the result on the subtable to be displayed/output)
 
 Here's an example using these various properties. The default table is rolled on first (it is weighted so in this case humanoids are most common). The result of the default table decides what subtable should be rolled on next. Some of the subtables then have further subtables to be rolled on (so the "human" subtable will often cause a roll on the "actions_human" subtable).
 
@@ -134,7 +134,7 @@ Here's an example using these various properties. The default table is rolled on
 		{ label: "Rocks from above", "weight": 1 }
 	},
 	"lair": {
-		{ label: "Village", "weight": 1 },   
+		{ label: "Village", "weight": 1 },
 		{ label: "Campsite", "weight": 2 },
 		{ label: "Ruins", "weight": 1 },
 		{ label: "Cave", "weight": 1 },

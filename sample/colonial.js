@@ -1,4 +1,4 @@
-[
+export default [
 	{
 	"key": "colonial_personality",
   "title": "Personality Traits (Colonial)",
@@ -88,7 +88,7 @@
   }
 },
 {
-	"key": "colonial_goals"
+	"key": "colonial_goals",
   "title": "NPC Goals (Colonial)",
   "author": "Derik Badman",
   "tags": [
@@ -499,14 +499,14 @@
       { "label": "Hawk/Eagle", "subtable": "actions_animal" },
       { "label": "Livestock (Goat, pig, sheep)", "subtable": "actions_animal" }
     ],
-	"monsters": {
+	"monsters": [
 		{ "label": "???", "subtable": "actions_animal" },
 		{ "label": "Demon, Disguised", "weight": 1 },
 		{ "label": "Undead" },
 		{ "label": "[Something flying overhead]" },
 		{ "label": "[Other: Something large or dangerous]" }
-	},
-	"other": {
+  ],
+	"other": [
 		{ "label": "Barricade (trees)", "weight": 2 },
 	 	{ "label": "Barricade (wagons)", "weight": 2 },
 	 	{ "label": "Tripwire", "weight": 2 },
@@ -524,8 +524,8 @@
 		{ "label": "Fallen Tree", "weight": 1 },
 		{ "label": "Statue", "weight": 1 },
 		{ "label": "Grave(s)", "weight": 1 },
-	},
-	"weather": {
+  ],
+	"weather": [
 	 	{ "label": "Light Fog/mist", "weight": 2 },
 	 	{ "label": "Heavy Fog/mist", "weight": 2 },
 	 	{ "label": "Light precipitation", "weight": 2 },
@@ -537,7 +537,7 @@
 	 	{ "label": "Sun shower", "weight": 2 },
 	 	{ "label": "Bright Sun", "weight": 2 },
 	 	{ "label": "Major Weather event", "description": "Hurricane, tornado, blizzard, flood, etc." }
- 	},
+  ],
  	"hexdressing": [
       {  "label": "Tree fallen across the road" },
       {  "label": "Dead horse" },
@@ -562,7 +562,7 @@
       {  "label": "A stone road marker of ancient origin" },
       {  "label": "Brook that must be forded" },
       {  "label": "Large trees overhand the road obscuring the sky" }
-    ] 	
+    ]
   }
 },
 
@@ -640,7 +640,7 @@
       { "label": "Snakes", "subtable": "actions_animal" },
       { "label": "Livestock (Goat, pig, sheep)", "subtable": "actions_animal" }
     ],
-	"monsters": {
+	"monsters": [
 		{ "label": "???", "subtable": "actions_animal" },
 		{ "label": "Lizard Men", "subtable": "actions_men" },
 		{ "label": "Kobold", "subtable": "actions_men" },
@@ -648,8 +648,8 @@
 		{ "label": "Undead" },
 		{ "label": "[Something flying overhead]" },
 		{ "label": "[Other: Something large or dangerous]" }
-	},
-	"other": {
+  ],
+	"other": [
 	 	{ "label": "Tripwire", "weight": 2 },
 	 	{ "label": "Net trap", "weight": 1 },
 	 	{ "label": "Pit trap", "weight": 1 },
@@ -671,8 +671,8 @@
 		{ "label": "Magic Pool", "weight": 1 },
 		{ "label": "Tree lair", "weight": 2 },
 		{ "label": "Nest (ground)", "weight": 2 },
-	},
-	"weather": {
+  ],
+	"weather": [
 	 	{ "label": "Light Fog/mist", "weight": 2 },
 	 	{ "label": "Heavy Fog/mist", "weight": 2 },
 	 	{ "label": "Light precipitation", "weight": 2 },
@@ -684,7 +684,7 @@
 	 	{ "label": "Sun shower", "weight": 2 },
 	 	{ "label": "Bright Sun", "weight": 2 },
 	 	{ "label": "Major Weather event", "description": "Hurricane, tornado, blizzard, flood, etc." }
- 	},
+  ],
  	"hexdressing": [
       { "label": "Clearing" },
       { "label": "Brook" },
@@ -797,12 +797,12 @@
       { "label": "Frog", "subtable": "actions_animal" },
       { "label": "{{table:colonial_encounters_forest:animals}} drinking" }
     ],
-	"monsters": {
-		{ "label": "???": { "subtable": "actions_animal" },
-		{ "label": "[Something flying overhead]": {},
-		{ "label": "[Other: Something large or dangerous]": {}
-	},
-	"other": {
+	"monsters": [
+		{ "label": "???", "subtable": "actions_animal" },
+		{ "label": "[Something flying overhead]" },
+		{ "label": "[Other: Something large or dangerous]" }
+  ],
+	"other": [
 	 	{ "label": "Campsite", "weight": 3 },
 		{ "label": "Village", "weight": 1 },
 		{ "label": "Homestead", "weight": 1 },
@@ -814,8 +814,8 @@
 		{ "label": "Magic Pool", "weight": 1 },
 		{ "label": "Rapids", "weight": 2 },
 		{ "label": "Nest", "weight": 2 },
-	},
-	"weather": {
+  ],
+	"weather": [
 	 	{ "label": "Light Fog/mist", "weight": 2 },
 	 	{ "label": "Heavy Fog/mist", "weight": 2 },
 	 	{ "label": "Light precipitation", "weight": 2 },
@@ -827,9 +827,9 @@
 	 	{ "label": "Sun shower", "weight": 2 },
 	 	{ "label": "Bright Sun", "weight": 2 },
 	 	{ "label": "Major Weather event", "description": "Hurricane, tornado, blizzard, flood, etc." }
- 	}
+  ]
   }
-};
+},
 
 {
 	"key": "colonial_encounters_swamp",
@@ -909,7 +909,7 @@
       { "label": "Leeches", "subtable": "actions_animal" },
       { "label": "Insect swarm", "subtable": "actions_animal" }
     ],
-	"monsters": {
+	"monsters": [
 		{ "label": "Tentacled Octopus Monster", "weight": 1 },
 		{ "label": "Will-o-wisp","weight": 1 },
 		{ "label": "Lizardmen/Snakemen", "weight": 1 },
@@ -918,8 +918,8 @@
 		{ "label": "Carnivorous Plant", "weight": 1 },
 		{ "label": "Zombies (drowners)" },
 		{ "label": "[Other: Something large or dangerous]" }
-	},
-	"other": {
+  ],
+	"other": [
 		{ "label": "Weather event", "weight": 1, "subtable": "weather" },
 		{ "label": "Fire", "weight": 1 },
 		{ "label": "Whirlpool", "weight": 1 },
@@ -940,14 +940,14 @@
  		{ "label": "Rocks from above", "weight": 1 },
 	 	{ "label": "Altar/shrine", "weight": 3 },
 		{ "label": "Campsite", "weight": 3 },
-		{ "label": "Village", "weight": 1 },	
+		{ "label": "Village", "weight": 1 },
 		{ "label": "Stream" },
 		{ "label": "Fallen Tree", "weight": 1 },
 		{ "label": "Tree lair", "weight": 2 },
 		{ "label": "Nest (ground)", "weight": 2 },
 		{ "label": "Nest (water)", "weight": 2 },
-	},
-	"weather": {
+  ],
+	"weather": [
 	 	{ "label": "Light Fog/mist", "weight": 2 },
 	 	{ "label": "Heavy Fog/mist", "weight": 2 },
 	 	{ "label": "Light precipitation", "weight": 2 },
@@ -959,7 +959,7 @@
 	 	{ "label": "Sun shower", "weight": 2 },
 	 	{ "label": "Bright Sun", "weight": 2 },
 	 	{ "label": "Major Weather event", "description": "Hurricane, tornado, blizzard, flood, etc." }
- 	}
+  ]
   }
 },
 
@@ -1215,3 +1215,4 @@
     ]
   }
 }
+];

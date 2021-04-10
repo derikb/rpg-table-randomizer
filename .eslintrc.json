@@ -3,13 +3,16 @@
         "node": true,
         "es6": true
     },
-    "extends": "standard",
+    "extends": [
+		"standard",
+		"plugin:import/errors",
+		"plugin:import/warnings"
+	],
     "parserOptions": {
         "sourceType": "module"
     },
     "plugins": [
-        "standard",
-        "promise"
+        "standard"
     ],
     "rules": {
 	    "quotes": [

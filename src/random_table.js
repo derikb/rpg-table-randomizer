@@ -1,12 +1,10 @@
-'use strict';
-
-const r_helpers = require('./r_helpers.js');
+import { isEmpty, isString, capitalize, isUndefined } from './r_helpers.js';
 
 /**
  * RandomTable: Model for tables used by Randomizer
  * @param {Object} config the tables non-default attributes
  */
-const RandomTable = function (config) {
+class RandomTable {
 	/**
 	 * The primary attributes of this table
 	 * @property {String} id id for the table, primary key for database if used
@@ -28,64 +26,65 @@ const RandomTable = function (config) {
 	 * @property {Array} [dependencies] table keys that are needed to get full results from this table
 	 * @property {Array} [result] current result array of objects
 	 */
-	this.id = 0;
-	this.key = '';
-	this.title = '';
-	this.author = '';
-	this.description = '';
-	this.source = '';
-	this.tags = [];
-	this.sequence = ''; // where to start rolling and if other tables should always be rolled on
-	this.tables = {};
-	this.macro = [];
-	this.dependencies = null;
-	this.result = [];
-	/**
-	 * Run on first construction
-	 * @param {Object} config data passed from the constructor
-	 */
-	const initialize = function (config) {
-		for (const prop in config) {
-			if (config.hasOwnProperty(prop)) {
-				this[prop] = config[prop];
-			}
-		}
-		// make sure this.tables.default is set instead of this.table
+	constructor({
+		id = 0,
+		key = null,
+		title = '',
+		author = '',
+		description = '',
+		source = '',
+		tags = [],
+		sequence = '', // where to start rolling and if other tables should always be rolled on
+		tables = {},
+		macro = [],
+		print = {},
+		dependencies = null,
+		result = [],
+		table = null
+	}) {
+		this.id = id;
+		this.key = key || this.id; // default to the id.
+		this.title = title;
+		this.author = author;
+		this.description = description;
+		this.source = source;
+		this.tags = tags;
+		this.sequence = sequence;
+		this.tables = tables;
+		this.macro = macro;
+		this.print = print;
+		this.dependencies = dependencies;
+		this.result = result;
+
+		// make sure this.tables.default is set instead of table
 		// maybe we dont need this
-		if (!r_helpers.isEmpty(this.table)) {
-			const tables = this.tables;
-			tables.default = this.table;
-			this.tables = tables;
-			delete this.table;
+		if (!isEmpty(table)) {
+			this.tables.default = table;
 		}
-		if (this.key === '') {
-			this.key = this.id;
-		}
-	};
+	}
 	/**
 	 * validate fields before saving
 	 * @param {Object} properties new attributes to save
 	 * @returns {Object} error information
 	 */
-	this.validate = function (properties) {
-		// console.log(attributes);
+	validate(properties) {
 		const error = { fields: [], general: '' };
-		
+
 		if (properties.title === '') {
 			error.fields.push({ field: 'title', message: 'Title cannot be blank' });
 			error.general += 'Title cannot be blank. ';
 		}
-		
-		if (r_helpers.isEmpty(properties.tables) && r_helpers.isEmpty(properties.macro)) {
+
+		if (isEmpty(properties.tables) && isEmpty(properties.macro)) {
 			error.fields.push({ field: 'tables', message: 'Both Tables and Macro cannot be empty' });
 			error.general += 'Both Tables and Macro cannot be empty. ';
 		}
-		
-		if (!r_helpers.isEmpty(error.fields) || !r_helpers.isEmpty(error.general)) {
+
+		if (!isEmpty(error.fields) || !isEmpty(error.general)) {
 			return error;
 		}
 		return true;
-	};
+	}
 	/**
 	 * Show the results as a string
 	 * @todo make this nicer/clearer #23
@@ -93,52 +92,55 @@ const RandomTable = function (config) {
 	 * @param {Boolean} [simple=false] if true only output the first result label
 	 * @returns {String} the results
 	 */
-	this.niceString = function (simple) {
-		if (typeof simple === 'undefined') {
-			simple = false;
-		}
+	niceString(simple = false) {
 		const r = this.result; // array
-		if (r_helpers.isString(r) || !Array.isArray(r) || r.length === 0) { return ''; }
-		
-		if (simple) { return r[0]['result']; } // @todo maybe use shift() instead, if editing this array won't be a problem. (else we could clone it...
-		
-		let o = '';
+		if (isString(r) || !Array.isArray(r) || r.length === 0) {
+			return '';
+		}
+
+		if (simple) {
+			return r[0]['result'];
+		} // @todo maybe use shift() instead, if editing this array won't be a problem. (else we could clone it...)
+
+		let output = '';
 		const print_opt = (this.print) ? this.print : {};
 		r.forEach((v) => {
 			if (print_opt[v.table]) {
 				if (!print_opt[v.table].hide_table || print_opt[v.table].hide_table === 0) {
-					o += `${r_helpers.capitalize(v.table)}: `;
+					output += `${capitalize(v.table)}: `;
 				}
 				if (!print_opt[v.table].hide_result || print_opt[v.table].hide_result === 0) {
-					o += `${r_helpers.capitalize(v.result)}\n`;
+					output += `${capitalize(v.result)}\n`;
 				}
 				if (!print_opt[v.table].hide_desc || print_opt[v.table].hide_desc === 0) {
-					if (v.desc !== '') { o += `${v.desc}\n`; }
+					if (v.desc !== '') {
+						output += `${v.desc}\n`;
+					}
 				}
 			} else {
 				if (v.table === 'default') {
-					o += `${r_helpers.capitalize(v.result)}\n`;
+					output += `${capitalize(v.result)}\n`;
 				} else {
-					o += `${r_helpers.capitalize(v.table)}: ${r_helpers.capitalize(v.result)}\n`;
+					output += `${capitalize(v.table)}: ${capitalize(v.result)}\n`;
 				}
-				if (v.desc !== '') { o += `${v.desc}\n`; }
+				if (v.desc !== '') {
+					output += `${v.desc}\n`;
+				}
 			}
 		});
-		o = o.trim(); // trim off final linebreak
-		return o;
-	};
+		return output.trim(); // trim off final linebreak
+	}
 	/**
 	 * outputs the json data for the table (import/export)
 	 * @param {Boolean} [editmode=false] if false empty properties will be stripped out
 	 * @returns {Object} table attributes
 	 */
-	this.outputObject = function (editmode) {
-		if (typeof editmode === 'undefined') { editmode = false; }
+	outputObject(editmode = false) {
 		// clone the data, this will strip out any functions too.
 		const att = JSON.parse(JSON.stringify(this));
 		const props = Object.keys(att);
 		props.forEach((k) => {
-			if (!editmode && r_helpers.isEmpty(att[k])) {
+			if (!editmode && isEmpty(att[k])) {
 				delete att[k];
 			}
 		});
@@ -150,35 +152,32 @@ const RandomTable = function (config) {
 		}
 		delete att.id;
 		return att;
-	};
+	}
 	/**
 	 * outputs the json data for the table (import/export)
 	 * @param {Boolean} [editmode=false] if false empty properties will be stripped out
 	 * @param {Boolean} [compress=false] if true JSON will not have indentation, etc.
 	 * @returns {String} table properties in JSON
 	 */
-	this.outputCode = function (editmode, compress) {
-		if (typeof editmode === 'undefined') { editmode = false; }
-		if (typeof compress === 'undefined') { compress = false; }
-		
+	outputCode(editmode = false, compress = false) {
 		const obj = this.outputObject(editmode);
-		
+
 		if (compress) {
 			return JSON.stringify(obj);
 		}
 		return JSON.stringify(obj, null, 2);
-	};
+	}
 	/**
 	 * Get an object result in case we only have the label and need other data from it
 	 * @param {String} label The item we are looking for
 	 * @param {String} [table=default] the table to search
 	 * @returns {Object} the object associated with the label or an empty one
 	 */
-	this.findObject = function (label, table) {
-		if (typeof table === 'undefined' || table === '') {
-			table = 'default';
-		}
+	findObject(label, table = 'default') {
 		const t = this.tables[table];
+		if (isEmpty(t)) {
+			return {};
+		}
 		if (t[label]) {
 			return t[label];
 		}
@@ -186,30 +185,27 @@ const RandomTable = function (config) {
 			const obj = t.find((v) => {
 				return v.label === label;
 			});
-			return (typeof obj !== 'undefined') ? obj : {};
+			return isUndefined(obj) ? {} : obj;
 		}
 		return {};
-	};
+	}
 	/**
 	  * find the result element for a specific table/subtable
 	  * only works if we have already generated a result
 	  * @param {String} table The table to look for
 	  * @returns {Object} result element for specified table (or empty)
 	  */
-	this.findResultElem = function (table) {
-		if (typeof table === 'undefined' || table === '') {
-			table = 'default';
-		}
+	findResultElem(table = 'default') {
 		const obj = this.result.find((v) => {
 			return v.table === table;
 		});
-		return (typeof obj !== 'undefined') ? obj : {};
-	};
+		return isUndefined(obj) ? {} : obj;
+	}
 	/**
 	 * find the dependent tables to get full results for this table
 	 * @return {Array} table keys
 	 */
-	this.findDependencies = function () {
+	findDependencies() {
 		// check field first, if it's not null we'll trust it...?
 		if (this.dependencies !== null) {
 			return this.dependencies;
@@ -241,12 +237,7 @@ const RandomTable = function (config) {
 		}, []);
 		this.dependencies = dep;
 		return dep;
-	};
-	
-	/**
-	 * Initialize the table, set the data, normalize, etc.
-	 */
-	initialize.call(this, config);
-};
+	}
+}
 
-module.exports = RandomTable;
+export default RandomTable;
