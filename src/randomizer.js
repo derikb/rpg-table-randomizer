@@ -403,7 +403,7 @@ class Randomizer {
 	 * @param {String} name Name of the token (used as first element).
 	 * @param {Function} process Function to return token replacement value function is passed the token_parts (token split by ":"),  original full_token, current table name
 	 */
-	registerTokenType = function (name, process) {
+	registerTokenType(name, process) {
 		this.token_types[name] = process;
 	}
 	/**
