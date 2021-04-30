@@ -24,6 +24,7 @@
             tableObjs.forEach((obj) => {
                 const table = new RandomTable(obj);
                 testTables[table.key] = table;
+                console.log(`Loaded table ${table}`);
             });
 
             const randomizer = new Randomizer({});

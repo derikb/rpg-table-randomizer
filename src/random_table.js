@@ -62,6 +62,9 @@ class RandomTable {
 			this.tables.default = table;
 		}
 	}
+	toString() {
+		return this.title;
+	}
 	/**
 	 * validate fields before saving
 	 * @param {Object} properties new attributes to save
