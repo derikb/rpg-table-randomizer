@@ -89,51 +89,6 @@ class RandomTable {
 		return true;
 	}
 	/**
-	 * Show the results as a string
-	 * @todo make this nicer/clearer #23
-	 * Alternate: write a template to use in the views?
-	 * @param {Boolean} [simple=false] if true only output the first result label
-	 * @returns {String} the results
-	 */
-	niceString(simple = false) {
-		const r = this.result; // array
-		if (isString(r) || !Array.isArray(r) || r.length === 0) {
-			return '';
-		}
-
-		if (simple) {
-			return r[0]['result'];
-		} // @todo maybe use shift() instead, if editing this array won't be a problem. (else we could clone it...)
-
-		let output = '';
-		const print_opt = (this.print) ? this.print : {};
-		r.forEach((v) => {
-			if (print_opt[v.table]) {
-				if (!print_opt[v.table].hide_table || print_opt[v.table].hide_table === 0) {
-					output += `${capitalize(v.table)}: `;
-				}
-				if (!print_opt[v.table].hide_result || print_opt[v.table].hide_result === 0) {
-					output += `${capitalize(v.result)}\n`;
-				}
-				if (!print_opt[v.table].hide_desc || print_opt[v.table].hide_desc === 0) {
-					if (v.desc !== '') {
-						output += `${v.desc}\n`;
-					}
-				}
-			} else {
-				if (v.table === 'default') {
-					output += `${capitalize(v.result)}\n`;
-				} else {
-					output += `${capitalize(v.table)}: ${capitalize(v.result)}\n`;
-				}
-				if (v.desc !== '') {
-					output += `${v.desc}\n`;
-				}
-			}
-		});
-		return output.trim(); // trim off final linebreak
-	}
-	/**
 	 * outputs the json data for the table (import/export)
 	 * @param {Boolean} [editmode=false] if false empty properties will be stripped out
 	 * @returns {Object} table attributes
@@ -191,18 +146,6 @@ class RandomTable {
 			return isUndefined(obj) ? {} : obj;
 		}
 		return {};
-	}
-	/**
-	  * find the result element for a specific table/subtable
-	  * only works if we have already generated a result
-	  * @param {String} table The table to look for
-	  * @returns {Object} result element for specified table (or empty)
-	  */
-	findResultElem(table = 'default') {
-		const obj = this.result.find((v) => {
-			return v.table === table;
-		});
-		return isUndefined(obj) ? {} : obj;
 	}
 	/**
 	 * find the dependent tables to get full results for this table

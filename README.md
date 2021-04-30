@@ -7,12 +7,14 @@
 1. [API Reference](#api-reference)
   1. [Randomizer](#Randomizer)
   1. [RandomTable](#RandomTable)
-  1. [TableNormalizer](#tablenormalizer)
-  1. [npc_generator](#npc_generator)
-  1. [RandomName](#RandomName)
-  1. [r_helpers](#r_helpers)
-2. [Contributors](#contributors)
-3. [License](#license)
+  1. [RandomTableResult](#RandomTableResult)
+  1. [RandomTableResultSet](#RandomTableResultSet)
+  2. [TableNormalizer](#tablenormalizer)
+  3. [npc_generator](#npc_generator)
+  4. [RandomName](#RandomName)
+  5. [r_helpers](#r_helpers)
+3. [Contributors](#contributors)
+4. [License](#license)
 
 
 
@@ -54,8 +56,10 @@ const colortable = new RandomTable({
 // Add it to the tables object.
 testTables[colortable.key] = colortable;
 
-// Return random result from the colors table.
-console.log(randomizer.getTableResultByKey('colors'));
+// Return random result set from the colors table.
+const colorResult = randomizer.getTableResultSetByKey('colors');
+console.log(colorResult); // full result set
+console.log(colorResult.niceString()); // In this case it would just be a color.
 
 // Random roll
 console.log(randomizer.roll('2d4+1'));
@@ -125,6 +129,8 @@ Exported from the randomizer.js file.
 
 A class used for generating random results from tables. It can also provide random dice rolls.
 
+
+
 #### roll (string)
 
 * @params {String} string a die roll notation
@@ -141,13 +147,29 @@ randomizer.roll('d4-1'); // returns an integer between 0 and 3
 randomizer.roll('2d8'); // returns an integer between 2 and 16
 ```
 
+#### getTableResultSetByKey (tableKey, table)
+
+- @param {String} _tableKey_ Key of RandomTable to use.
+- @param {String} _[table='']_ (sub)table to roll on
+- @return {RandomTableResultSet}
+
+This is one of two primary ways to generate results from the RandomTable objects (see also getResultSetForTable). This one takes a table key, looks up the table and then returns a result set.
+
+
+#### getResultSetForTable (rtable, table)
+
+- @param {RandomTable} _rtable_
+- @param {String} _[table='']_ (sub)table to roll on
+- @return {RandomTableResultSet}
+
+This is one of two primary ways to generate results from the RandomTable objects. This one accepts a RandomTable and then returns a result set.
+
+
 #### getTableResult (rtable, start)
 
-- @param {Object} _table_ a RandomTable object
+- @param {RandomTable} _table_
 - @param {String} _[start='']_ subtable to roll on
-- @return {Array} array of object results { table: table that was rolled on, result: result string, desc: optional description string }
-
-This is the primary way to generate results from the RandomTable objects.
+- @return {RandomTableResult[]}
 
 Takes a RandomTable object and returns an array of results. If RandomTable.sequence is set, multiple results may be returned. Optionally a specific subtable can be selected to select from. This is basically a wrapper for selectFromTable() that may, depending on the RandomTable's properties, concatenate multiple selectFromTable() results.
 
@@ -172,11 +194,7 @@ const colortable = new RandomTable(table_config);
 
 const result = randomizer.getTableResult(colortable);
 /*
- result will equal something like:
- [
- 	{ table: 'shade', result: 'Light' },
- 	{ table: 'color', result: 'Orange' }
- ]
+ The return will be a RandomTableResult from the default table and a RandomTableResult from the shade table.
 */
 ```
 
@@ -220,21 +238,6 @@ randomizer.registerTokenType('foo', footoken);
 
 // now a table could have a value like: "You see an {{foo:orange}}" and it would return "You see an orange with big red eyes"
 
-```
-
-#### random (min, max)
-
-- @param {Number} _min_ low end of range
-- @param {Number} _[max]_ high end of range
-- @return {Number} a random integer between min and max
-
-Returns a random integer between min and max params. If max is omitted, then it returns an integer between 0 and min.
-
-Example:
-
-```
-randomizer.random(1, 4); // an integer between 1 and 4
-randomizer.random(6); // an integer between 0 and 6
 ```
 
 #### getWeightedRandom (values, weights)
@@ -282,51 +285,6 @@ const data = [
 ];
 randomizer.rollRandom(data); // returns one of the reactions
 
-```
-
-#### getTableResultByKey(tableKey, table)
-
-* @param {String} tableKey RandomTable key to lookup table by.
-* @param {String} table Specific subtable to rull on, else default.
-
-Gets a result from a table based on the table key.
-
-#### selectFromTable (rtable, table)
-
-- @param {Object} rtable the RandomTable object
-- @param {String} table table to roll on
-- @returns {Array} array of object results { table: table that was rolled on, result: result string, desc: optional description string }
-
-In most cases it is not necessary to call this method directly, getTableResult() should be preferred.
-
-This returns the result for a single table in the RandomTable object.
-
-```
-const table_config = {
-	key: 'colors',
-	title: 'Random Color',
-	sequence: [ 'shade', 'default' ],
-	tables:
-		default: [
-			'Red',
-			'Orange',
-			'Yellow'
-		],
-		shade: [
-			'Light',
-			'Medium',
-			'Dark'
-		]
-};
-const colortable = new RandomTable(table_config);
-
-const result = randomizer.selectFromTable(colortable, 'shade');
-/*
- result will equal something like:
- [
- 	{ table: 'shade', result: 'Light' },
- ]
-*/
 ```
 
 #### convertToken (string, curtable)
@@ -384,15 +342,6 @@ For formatting the tables property see the [tableformat.md](/docs/tableformat.md
 
 In process attempt to validate data to make sure it is formatted right and contains the required properties...
 
-#### niceString ()
-
-* @param {Boolean} [simple=false] if true only output the first result label
-* @returns {String} the results
-
-Write out the results as a string, draws from the optional _print_ property.
-
-Probably better off writing your own template to process the _results_ array.
-
 #### outputObject (editmode)
 
 * @param {Boolean} [editmode=false] if false empty properties will be stripped out
@@ -416,18 +365,66 @@ Outputs the json data for the table (import/export).
 
 Get an object result in case we only have the label and need other data from it.
 
-#### findResultElem (table)
-
-* @param {String} table The table to look for
-* @returns {Object} result element for specified table (or empty)
-
-Find the result element for a specific table/subtable. Only works if we have already generated a result.
-
 #### findDependencies
 
 * @returns {Array} array of table keys that the current table calls on (via tokens)
 
 This method returns an array of table keys that the current table refers to in `{{table:SOMETABLE}}` tokens. Can be useful for making sure you have all the tables necessary to return full results from the current table.
+
+
+### RandomTableResult
+
+A class for a result from a table.
+
+When cast to string it will just output the result prop.
+
+#### constructor (config)
+
+* @property {String} table Subtable name (can be default or Error).
+* @property {String} result Individual result label.
+* @property {String} [desc] Extra description of result
+
+
+#### isDefault
+
+If it's the default (sub)table.
+
+#### isError
+
+If it's an error result.
+
+### RandomTableResultSet
+
+A class for a set of results from a table.
+
+Cast to a string will return niceString method.
+
+#### constructor (config)
+
+* @property {String} title Title of the RandomTable.
+* @property {RandomTableResult[]} results Individual table results.
+* @property {Object} printOptions This is the print prop of RandomTable
+
+#### addResult (data)
+
+* @param {RandomTableResult|Object} data Either a result or the data to create one.
+
+#### findResultByTable (table)
+
+* @param {String} [table=default] A subtable name.
+* @returns {RandomTableResult|null}
+
+This gets the result for a specific subtable.
+
+#### niceString ()
+
+* @param {Boolean} [simple=false] if true only output the first result label
+* @returns {String} the results
+
+Write out the results as a string, draws from printOptions property.
+
+Probably better off writing your own template to process the _results_ array.
+
 
 
 ### TableNormalizer
@@ -523,6 +520,8 @@ const npc = npc_generator.initializeNewNPC('dd', randomizer); // a new NPC objec
 Functions export from random_name.js
 
 Methods that can generate names of all sorts both from lists of names and via Markov chains.
+
+@todo I should handle non-binary names somehow shouldn't I.
 
 ### setNameData (data)
 

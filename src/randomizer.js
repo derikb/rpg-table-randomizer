@@ -1,6 +1,6 @@
 import { isEmpty, isString, isObject, isUndefined } from './r_helpers.js';
 import RandomTable from './random_table.js';
-
+import { RandomTableResult, RandomTableResultSet } from './table_result.js';
 
 /**
  * Define the regex to find tokens
@@ -101,6 +101,29 @@ class Randomizer {
 		});
 	}
 	/**
+	 * Return an error result
+	 * @param {String} error Error message
+	 * @returns {RandomTableResult}
+	 */
+	_getErrorResult(error = '') {
+		return new RandomTableResult({
+			table: 'Error',
+			result: error
+		});
+	}
+	/**
+	 * Return a result set with an error.
+	 * @param {String} error Error message
+	 * @returns {RandomTableResultSet}
+	 */
+	_getErrorResultSet(error = '') {
+		return new RandomTableResultSet({
+			results: [
+				this._getErrorResult(error)
+			]
+		});
+	}
+	/**
 	 * Random value selection
 	 * @param {Array} values an array of strings from which to choose
 	 * @param {Array} weights a matching array of integers to weight the values (i.e. values and weights are in the same order)
@@ -159,25 +182,26 @@ class Randomizer {
 	 * Generate a result from a RandomTable object
 	 * @param {Object} rtable the RandomTable
 	 * @param {String} [start=''] subtable to roll on
-	 * @return {Array} array of object results { table: table that was rolled on, result: result string, desc: optional description string }
+	 * @return {RandomTableResult[]}
 	 */
 	getTableResult(rtable, start = '') {
 		if (!isObject(rtable)) {
-			return [{ table: 'Error', result: 'No table found to roll on.', desc: '' }];
+			return [
+				this._getErrorResult('No table found to roll on.')
+			];
 		}
-		let result = [];
+		let results = [];
 
 		// if macro is set then we ignore a lot of stuff
 		if (!isEmpty(rtable.macro)) {
 			// iterate over the tables and get results
+			// Danger, we could theoretically hit an infinite loop, couldn't we?
 			rtable.macro.forEach((t) => {
-				const table = this.getTableByKey(t);
-				if (isEmpty(table)) { return; }
-				this.getTableResult(table);
-				result.push({ table: t, result: table.niceString() });
+				const set = this.getTableResultSetByKey(t);
+				const result = new RandomTableResult({ table: t, result: set.niceString() });
+				results.push(result);
 			});
-			rtable.result = result;
-			return result;
+			return results;
 		}
 
 		// we look in the start table for what to roll if the start wasn't explicitly set in the call
@@ -192,52 +216,76 @@ class Randomizer {
 			// if no start attribute
 			// try for "default" table
 			if (typeof rtable.tables['default'] !== 'undefined') {
-				result = this.selectFromTable(rtable, 'default');
+				results = this._selectFromTable(rtable, 'default');
 			} else {
 				// select first item from tables
 				const tables = Object.keys(rtable.tables);
-				result = this.selectFromTable(rtable, tables[0]);
+				results = this._selectFromTable(rtable, tables[0]);
 			}
 		} else if (typeof sequence === 'string') {
-			result = this.selectFromTable(rtable, sequence);
+			results = this._selectFromTable(rtable, sequence);
 		} else {
 			sequence.forEach((seq) => {
-				let r = '';
+				let r = [];
 				if (isString(seq)) {
-					r = this.selectFromTable(rtable, seq);
-					result = result.concat(r);
+					r = this._selectFromTable(rtable, seq);
+					results = results.concat(r);
 					return;
 				}
 				// its an object
 				const table = (seq.table) ? seq.table : '';
-				if (table === '') {
+				if (!table) {
 					return;
 				}
 				const times = (typeof seq.times === 'number') ? seq.times : 1;
 				for (let i = 1; i <= times; i++) {
-					r = this.selectFromTable(table);
-					result = result.concat(r);
+					r = this._selectFromTable(table);
+					results = results.concat(r);
 				}
 			});
 		}
 
-		rtable.result = result;
-		return result;
+		return results;
 	}
+
+
 	/**
-	 * Select from table based on a table key.
+	 * Get result set from a table based on the key.
 	 * @param {String} tableKey
 	 * @param {String} table
+	 * @returns {RandomTableResultSet}
 	 */
-	getTableResultByKey(tableKey, table = '') {
+	getTableResultSetByKey(tableKey, table = '') {
 		if (!tableKey) {
-			return [{ table: 'Error', result: 'No table key.', desc: '' }];
+			return this._getErrorResultSet('No table key.');
 		}
 		const rtable = this.getTableByKey(tableKey);
 		if (isEmpty(rtable) || !(rtable instanceof RandomTable)) {
-			return [{ table: 'Error', result: 'No table found to for that key.', desc: '' }];
+			return this._getErrorResultSet(`No table found to key: ${tableKey}`);
 		}
-		return this.getTableResult(rtable, table);
+		const results = this.getTableResult(rtable, table);
+		return new RandomTableResultSet({
+			title: rtable.title,
+			results: results,
+			printOptions: rtable.print
+		});
+	}
+	/**
+	 * Get result set from a table based on the key.
+	 * @param {RandomTable} rtable Main table object.
+	 * @param {String} [table] Subtable
+	 * @returns {RandomTableResultSet}
+	 */
+	getResultSetForTable(rtable, table = '') {
+		if (!(rtable instanceof RandomTable)) {
+			return this._getErrorResultSet(`Invalid table data.`);
+		}
+		const results = this.getTableResult(rtable, table);
+		return new RandomTableResultSet({
+			title: rtable.title,
+			results: results,
+			printOptions: rtable.print
+		});
 	}
 	/**
 	 * Get a result from a table/subtable in a RandomTable object
@@ -246,31 +294,30 @@ class Randomizer {
 	 * @todo we'll have to fix for this with a node version... make track the tables rolled on hierarchically, so a parent table doesn't call itself...?
 	 * @param {Object} rtable the RandomTable object
 	 * @param {String} table table to roll on
-	 * @returns {Array} array of object results { table: table that was rolled on, result: result string, desc: optional description string }
+	 * @returns {RandomTableResult[]}
 	 */
-	selectFromTable(rtable, table = '') {
-		if (!isObject(rtable)) {
-			return [{ table: 'Error', result: 'No table found to roll on.', desc: '' }];
-		}
-		if (!table) {
-			return [{ table: 'Error', result: 'No table found to roll on.', desc: '' }];
+	_selectFromTable(rtable, table) {
+		if (!(rtable instanceof RandomTable)) {
+			return [this._getErrorResult('Invalid table.')];
 		}
 
 		let o = []; // output for sequence of rolls/selections
 		const t = rtable.tables[table]; // the table/subtable
+		if (!t) {
+			return [this._getErrorResult('Invalid table name.')];
+		}
 		const result = this.rollRandom(t); // the random string from the table (either the object property, a string value from an array, or the value property from a selected object)
 		let r = ''; // the string result from the table
 		let result_print = true; // are we going to show this result
 
 		if (isUndefined(t[result])) {
 			// table is an array
-			// r = _.findWhere(t, { label: result });
 			r = t.find((v) => {
 				return v.label === result;
 			});
 			if (isUndefined(r)) {
 				// it's just an array of strings so we can stop here
-				o.push({ table: table, result: result, desc: '' });
+				o.push(new RandomTableResult({ table: table, result: result }));
 				return o;
 			}
 			result_print = (isUndefined(r['print'])) ? true : r['print'];
@@ -286,26 +333,33 @@ class Randomizer {
 			const desc = (isString(r['description'])) ? r['description'] : '';
 			// replace any tokens
 			const t_result = this.findToken(result, rtable.key);
-			o.push({ table: table, result: t_result, desc: desc });
+			o.push(new RandomTableResult({ table: table, result: t_result, desc: desc }));
 		}
 
 		// are there subtables to roll on?
 		const subtable = r.subtable;
-		let r2 = ''; // subtable results
-		if (isUndefined('undefined')) {
+		if (isUndefined(subtable)) {
 			// no subtables
 			return o;
-		} else if (isString(subtable)) {
+		}
+
+		let r2 = ''; // subtable results
+		if (isString(subtable)) {
 			// subtables is a string reference to a table so we run this function again
-			r2 = this.selectFromTable(rtable, subtable);
-			o = o.concat(r2);
-		} else if (Array.isArray(subtable)) {
+			r2 = this._selectFromTable(rtable, subtable);
+			return o.concat(r2);
+		}
+
+		if (Array.isArray(subtable)) {
 			// subtables is an array, assume reference to other tables, roll on each in turn
 			subtable.forEach((v) => {
-				r2 = this.selectFromTable(rtable, v);
+				r2 = this._selectFromTable(rtable, v);
 				o = o.concat(r2);
 			});
-		} else if (isObject(subtable)) {
+			return o;
+		}
+
+		if (isObject(subtable)) {
 			// subtable is object assume embedded table(s)
 			// loop over keys
 			const k = Object.keys(subtable);
@@ -313,7 +367,6 @@ class Randomizer {
 				let result = this.rollRandom(subtable[kx]);
 				let desc = '';
 				if (isUndefined(subtable[kx][result])) {
-					// r2 = _.findWhere(subtable[kx], { label: result });
 					r2 = subtable[kx].find((v) => {
 						return v.label === result;
 					});
@@ -325,10 +378,11 @@ class Randomizer {
 				}
 				result = this.findToken(result, rtable.key);
 
-				o.push({ table: kx, result: result, desc: desc });
+				o.push(new RandomTableResult({ table: kx, result: result, desc: desc }));
 			});
+			return o;
 		}
-
+		// Shouldn't ever reach here...
 		return o;
 	}
 	/**
@@ -447,8 +501,8 @@ class Randomizer {
 		const subtable = (isUndefined(token_parts[2])) ? '' : token_parts[2];
 
 		for (var i = 1; i <= multiplier; i++) {
-			this.getTableResult(t, subtable);
-			string += t.niceString() + ', ';
+			const set = this.getResultSetForTable(t, subtable);
+			string += set.niceString() + ', ';
 		}
 		string = string.trim();
 		string = string.replace(/,$/, '');

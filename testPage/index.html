@@ -3,7 +3,7 @@
 
     </head>
     <body>
-
+        <p>Demo output...</p>
         <script type="module">
             import Randomizer from '../src/randomizer.js';
             import RandomTable from '../src/random_table.js';
@@ -18,13 +18,20 @@
             import npcTables from '../sample/npc_tables.js';
             import { simple as simpleSchemaData } from '../sample/schemas.js';
 
+
+            const printToScreen = function(any) {
+                const p = document.createElement('p');
+                p.innerText = JSON.stringify(any);
+                document.body.appendChild(p);
+            }
+
             const tableObjs = generalTables.concat(colonialTables, colonialMission, npcTables);
 
             const testTables = {};
             tableObjs.forEach((obj) => {
                 const table = new RandomTable(obj);
                 testTables[table.key] = table;
-                console.log(`Loaded table ${table}`);
+                printToScreen(`Loaded table ${table}`);
             });
 
             const randomizer = new Randomizer({});
@@ -37,20 +44,24 @@
 
             randomizer.registerTokenType('name', RandomName.nameTokenCallback);
 
-            console.log(randomizer.roll('2d6+1'));
-            console.log(RandomName.generateList(4, 'flemish'));
-            console.log(RandomName.createName('french', 'female'));
-            console.log(randomizer.getTableResultByKey('ordinal'));
-            console.log(randomizer.getTableResultByKey('colonial_companies'));
-            console.log(
-                randomizer.getTableResultByKey('mission_generator')
-            );
+           printToScreen(randomizer.roll('2d6+1'));
+           printToScreen(RandomName.generateList(4, 'flemish'));
+           printToScreen(RandomName.createName('french', 'female'));
+            const ordResult = randomizer.getTableResultSetByKey('ordinal');
+           printToScreen(ordResult);
+           printToScreen(ordResult.niceString());
+            const companyResult = randomizer.getTableResultSetByKey('colonial_companies');
+           printToScreen(companyResult);
+           printToScreen(companyResult.niceString());
+            const missionResult = randomizer.getTableResultSetByKey('mission_generator');
+           printToScreen(missionResult);
+           printToScreen(missionResult.niceString());
 
             const simpleSchema = new NPCSchema(simpleSchemaData);
 
             npcGenerator.registerSchema(simpleSchema);
 
-            console.log(
+           printToScreen(
                 npcGenerator.initializeNewNPC('simple', randomizer)
             );
         </script>
