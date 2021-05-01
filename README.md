@@ -334,15 +334,17 @@ A class for random table objects that can be used by the randomizer. A great var
 #### constructor (config)
 
 * @property {String} id id for the table, primary key for database if used
-* @property {String} key identifier for the table, used in table token lookups
-* @property {String} title title of the table
+* @property {String} key identifier for the table
+* @property {String} [title] title of the table
 * @property {String} [author] author of the table
 * @property {String} [description] description of the table
-* @property {String} [source] source of the table (as in the citation)
-* @property {Array} [tags] subject tags
-* @property {String|Array} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
-* @property {Array} [table] default table. array of strings or objects. removed after initialization and put in tables.default
-* @property {Object} [tables] a property for each subtables. if sequence property is not set then the first property of this Object is used to start rolling
+* @property {String} [source] source of the table
+* @property {String[]} [tags] subject tags
+* @property {String[]} [sequence] tables to roll on as default.
+* @property {String[]|Object[]} [table] default table. array of strings or objects. removed after initialization.
+* @property {Object} [tables] a property for each subtables.
+* @property {RandomTableEntries[]} tables[subtablename] Entries for subtables.
+* @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
 * @property {Map[DisplayOptions]} [display_opt] Display options for the subtables.
 * @property @deprecated {Object} [print] Backwards compatible. Key => Object data for display options.
 * @property {Array} [dependencies] table keys that are needed to get full results from this table

@@ -78,7 +78,7 @@ class RandomTable {
 	 * @property {String} [description] description of the table
 	 * @property {String} [source] source of the table
 	 * @property {String[]} [tags] subject tags
-	 * @property {String|String[]|Object[]} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
+	 * @property {String[]} [sequence] tables to roll on as default.
 	 * @property {String[]|Object[]} [table] default table. array of strings or objects. removed after initialization.
 	 * @property {Object} [tables] a property for each subtables.
 	 * @property {RandomTableEntries[]} tables[subtablename] Entries for subtables.
@@ -97,7 +97,7 @@ class RandomTable {
 		description = '',
 		source = '',
 		tags = [],
-		sequence = '',
+		sequence = [],
 		tables = {},
 		macro = [],
 		print = {},

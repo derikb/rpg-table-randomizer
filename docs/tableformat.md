@@ -6,23 +6,21 @@ _If you want the easiest way, just read this first section on "Simple Table Crea
 
 These are properties on the RandomTable object. Most are optional.
 
-* @property {String} [id] id for the table, primary key for database if used
-* @property {String} key identifier for the table, used in table token lookups
-* @property {String} title title of the table
+* @property {String} id id for the table, primary key for database if used
+* @property {String} key identifier for the table
+* @property {String} [title] title of the table
 * @property {String} [author] author of the table
 * @property {String} [description] description of the table
-* @property {String} [source] source of the table (as in the citation)
-* @property {Array} [tags] subject tags
-* @property {String|Array} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
-* @property {Array} [table] default table. array of strings or objects. removed after initialization and put in tables.default
-* @property {Object} [tables] a property for each subtables. if sequence property is not set then the first property of this Object is used to start rolling
-* @property {Array} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
-* @property {Object} [print] objects to describe what parts of a (sub)table should be displayed in the results
-* @property {Object} [print.default] how to display the default table's results
-* @property {Object} [print.default.hide_table] set to 1 will not show the table name
-* @property {Object} [print.default.hide_result] set to 1 will not show the result on that (sub)table
-* @property {Object} [print.default.hide_desc] set to 1 will not show any description for a result on that (sub)table
-* @property {Array} [result] current result array of objects (don't set this on constructor, but you can access it later)
+* @property {String} [source] source of the table
+* @property {String[]} [tags] subject tags
+* @property {String[]} [sequence] tables to roll on as default.
+* @property {String[]|Object[]} [table] default table. array of strings or objects. removed after initialization.
+* @property {Object} [tables] a property for each subtables.
+* @property {RandomTableEntries[]} tables[subtablename] Entries for subtables.
+* @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
+* @property {Map[DisplayOptions]} [display_opt] Display options for the subtables.
+* @property @deprecated {Object} [print] Backwards compatible. Key => Object data for display options.
+* @property {Array} [dependencies] table keys that are needed to get full results from this table
 
 At the most basic level `key`, `title`, and either `table` or `tables.default` need to be set for the RandomTable to be effective. If `table` is set its data will be moved to `tables.default` on initialization.
 

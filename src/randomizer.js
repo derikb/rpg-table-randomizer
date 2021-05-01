@@ -204,14 +204,14 @@ class Randomizer {
 		}
 
 		// we look in the start table for what to roll if the start wasn't explicitly set in the call
-		let sequence = (!start) ? rtable.sequence : start;
+		let sequence = (!start) ? rtable.sequence : [start];
 
-		if (sequence === 'rollall') {
+		if (sequence[0] === 'rollall') {
 			// roll all the tables in order
 			sequence = rtable.subtableNames;
 		}
 
-		if (sequence === '') {
+		if (sequence.length === 0) {
 			// if no start attribute
 			// try for "default" table
 			if (typeof rtable.tables['default'] !== 'undefined') {
@@ -221,28 +221,13 @@ class Randomizer {
 				const tables = rtable.subtableNames;
 				results = this._selectFromTable(rtable, tables[0]);
 			}
-		} else if (typeof sequence === 'string') {
-			results = this._selectFromTable(rtable, sequence);
-		} else {
-			sequence.forEach((seq) => {
-				let r = [];
-				if (isString(seq)) {
-					r = this._selectFromTable(rtable, seq);
-					results = results.concat(r);
-					return;
-				}
-				// its an object
-				const table = (seq.table) ? seq.table : '';
-				if (!table) {
-					return;
-				}
-				const times = (typeof seq.times === 'number') ? seq.times : 1;
-				for (let i = 1; i <= times; i++) {
-					r = this._selectFromTable(table);
-					results = results.concat(r);
-				}
-			});
+			return results;
 		}
+
+		sequence.forEach((seq) => {
+			const r = this._selectFromTable(rtable, seq);
+			results = results.concat(r);
+		});
 
 		return results;
 	}
@@ -300,7 +285,7 @@ class Randomizer {
 			return [this._getErrorResult('Invalid table.')];
 		}
 
-		let o = []; // output for sequence of rolls/selections
+		let o = []; // Results
 		const entries = rtable.getSubtableEntries(table); // the table/subtable
 		if (entries.length === 0) {
 			return [this._getErrorResult('Invalid table name.')];
