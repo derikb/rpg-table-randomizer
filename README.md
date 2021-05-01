@@ -323,13 +323,9 @@ A class for random table objects that can be used by the randomizer. A great var
 * @property {String|Array} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
 * @property {Array} [table] default table. array of strings or objects. removed after initialization and put in tables.default
 * @property {Object} [tables] a property for each subtables. if sequence property is not set then the first property of this Object is used to start rolling
-* @property {Object} [print] objects to describe what parts of a (sub)table should be displayed in the results
-* @property {Object} [print.default] how to display the default table's results
-* @property {Object} [print.default.hide_table] set to 1 will not show the table name
-* @property {Object} [print.default.hide_result] set to 1 will not show the result on that (sub)table
-* @property {Object} [print.default.hide_desc] set to 1 will not show any description for a result on that (sub)table
+* @property {Map[DisplayOptions]} [display_opt] Display options for the subtables.
+* @property @deprecated {Object} [print] Backwards compatible. Key => Object data for display options.
 * @property {Array} [dependencies] table keys that are needed to get full results from this table
-* @property {Array} [result] current result array of objects (don't set this on constructor, but you can access it later)
 
 Constructs a new RandomTable object or instantiates and existing one from some data source.
 
@@ -372,6 +368,23 @@ Get an object result in case we only have the label and need other data from it.
 This method returns an array of table keys that the current table refers to in `{{table:SOMETABLE}}` tokens. Can be useful for making sure you have all the tables necessary to return full results from the current table.
 
 
+
+
+
+### DisplayOptions
+
+Display settings for subtables. Found in the Map RandomTable.display_opt or RandomTableResultSet.displayOptions
+
+#### constructor (config)
+
+* @property {String} table Subtable name.
+* @property {Boolean} hide_table Hide the subtable name.
+* @property {Boolean} hide_result Hide the result.
+* @property {Boolean} hide_desc Hide the description field.
+
+The three hide props will accept 0/1 in the constructor, but will convert to Boolean for the properties.
+
+
 ### RandomTableResult
 
 A class for a result from a table.
@@ -403,7 +416,7 @@ Cast to a string will return niceString method.
 
 * @property {String} title Title of the RandomTable.
 * @property {RandomTableResult[]} results Individual table results.
-* @property {Object} printOptions This is the print prop of RandomTable
+* @property {Map[DisplayOptions]} displayOptions This is the display_opt prop of RandomTable
 
 #### addResult (data)
 
@@ -421,7 +434,7 @@ This gets the result for a specific subtable.
 * @param {Boolean} [simple=false] if true only output the first result label
 * @returns {String} the results
 
-Write out the results as a string, draws from printOptions property.
+Write out the results as a string, draws from displayOptions property.
 
 Probably better off writing your own template to process the _results_ array.
 

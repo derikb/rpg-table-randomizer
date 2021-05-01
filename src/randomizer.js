@@ -1,6 +1,5 @@
 import { isEmpty, isString, isObject, isUndefined } from './r_helpers.js';
-import RandomTable from './random_table.js';
-import { RandomTableResult, RandomTableResultSet } from './table_result.js';
+import { RandomTable, RandomTableResult, RandomTableResultSet } from './random_table.js';
 
 /**
  * Define the regex to find tokens
@@ -267,7 +266,7 @@ class Randomizer {
 		return new RandomTableResultSet({
 			title: rtable.title,
 			results: results,
-			printOptions: rtable.print
+			displayOptions: rtable.display_opt
 		});
 	}
 	/**
@@ -284,7 +283,7 @@ class Randomizer {
 		return new RandomTableResultSet({
 			title: rtable.title,
 			results: results,
-			printOptions: rtable.print
+			displayOptions: rtable.display_opt
 		});
 	}
 	/**

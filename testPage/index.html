@@ -64,6 +64,12 @@
            printToScreen(
                 npcGenerator.initializeNewNPC('simple', randomizer)
             );
+
+            const swampEncounter = randomizer.getTableByKey('colonial_encounters_swamp');
+            printToScreen(swampEncounter);
+            const swampEncounterResult = randomizer.getTableResultSetByKey('colonial_encounters_swamp');
+            printToScreen(swampEncounterResult);
+           printToScreen(swampEncounterResult.niceString());
         </script>
     </body>
 </html>
