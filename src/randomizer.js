@@ -192,12 +192,12 @@ class Randomizer {
 		let results = [];
 
 		// if macro is set then we ignore a lot of stuff
-		if (!isEmpty(rtable.macro)) {
+		if (rtable.macro.length > 0) {
 			// iterate over the tables and get results
 			// Danger, we could theoretically hit an infinite loop, couldn't we?
-			rtable.macro.forEach((t) => {
-				const set = this.getTableResultSetByKey(t);
-				const result = new RandomTableResult({ table: t, result: set.niceString() });
+			rtable.macro.forEach((tableKey) => {
+				const set = this.getTableResultSetByKey(tableKey);
+				const result = new RandomTableResult({ table: tableKey, result: set.niceString() });
 				results.push(result);
 			});
 			return results;
@@ -292,7 +292,8 @@ class Randomizer {
 		}
 		const entry = this.rollRandomEntry(entries);
 
-		// if print is false we suppress the output from this table (good for top-level tables)
+		// if print is false we suppress the output from this table
+		// (good for top-level tables that have subtables prop set)
 		if (entry.print) {
 			// replace any tokens
 			const t_result = this.findToken(entry.label, rtable.key);
@@ -390,7 +391,7 @@ class Randomizer {
 	/**
 	 * Dice roll token.
 	 */
-	defaultRollToken(token_parts, full_token, curtable) {
+	defaultRollToken(token_parts, full_token = '', curtable = '') {
 		return this.roll(token_parts[1]);
 	}
 	/**

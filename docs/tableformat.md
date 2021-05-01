@@ -233,7 +233,7 @@ If you want to generate a result from across a number of tables, you can create 
 }
 ```
 
-In this case, passing this table to ```randomizer.getTableResult()``` will generate a result array on the able with one element for each of the "mission_*" tables listed in the `macro` property.
+In this case, passing this table to ```randomizer.getTableResult()``` will generate a result array with one element for each of the "mission_*" tables listed in the `macro` property.
 
 ```
 [
