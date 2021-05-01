@@ -1,5 +1,5 @@
 import { isEmpty, isString, isObject, isUndefined } from './r_helpers.js';
-import { RandomTable, RandomTableResult, RandomTableResultSet } from './random_table.js';
+import { RandomTable, RandomTableResult, RandomTableResultSet, RandomTableEntry } from './random_table.js';
 
 /**
  * Define the regex to find tokens
@@ -124,7 +124,7 @@ class Randomizer {
 	}
 	/**
 	 * Random value selection
-	 * @param {Array} values an array of strings from which to choose
+	 * @param {Array} values an array of objects from which to choose
 	 * @param {Array} weights a matching array of integers to weight the values (i.e. values and weights are in the same order)
 	 * @returns {String} the randomly selected Array element from values param
 	 */
@@ -141,40 +141,40 @@ class Randomizer {
 	}
 	/**
 	 * Random value selection, wrapper for getWeightedRandom that processes the data into values/weights arrays
-	 * @param {Object|Array} data An object or array of data
-	 * @returns {String} the randomly selected Object property name, Array element, or value of the "label" property
+	 * @param {String[]} data values
+	 * @returns {String|null} the randomly selected string
 	 */
-	rollRandom(data) {
+	rollRandomString(data) {
 		const values = [];
 		const weights = [];
 
-		if (Array.isArray(data)) {
-			data.forEach((v, k, l) => {
-				if (typeof v === 'object') {
-					if (typeof v.weight !== 'undefined') {
-						weights.push(v.weight);
-					} else {
-						weights.push(1);
-					}
-					values.push(v.label);
-				} else if (typeof v === 'string') {
-					// nothing
-					weights.push(1);
-					values.push(v);
-				}
-			});
-		} else if (isObject(data) && !isEmpty(data)) {
-			const props = Object.keys(data);
-			props.forEach((k) => {
-				const v = data[k];
-				if (typeof v.weight !== 'undefined') {
-					weights.push(v.weight);
-				} else {
-					weights.push(1);
-				}
-				values.push(k);
-			});
+		if (!Array.isArray(data)) {
+			return null;
 		}
+		data.forEach((entry) => {
+			weights.push(1);
+			values.push(entry);
+		});
+
+		return this.getWeightedRandom(values, weights);
+	}
+	/**
+	 * Random selection from TableEntries, wrapper for getWeightedRandom that processes the data into values/weights arrays
+	 * @param {RandomTableEntry[]} entries Table entries.
+	 * @returns {RandomTableEntry|null} the randomly selected entry
+	 */
+	rollRandomEntry(entries) {
+		const values = [];
+		const weights = [];
+
+		if (!Array.isArray(entries)) {
+			return null;
+		}
+		entries.forEach((entry, k, l) => {
+			weights.push(entry.weight);
+			values.push(entry);
+		});
+
 		return this.getWeightedRandom(values, weights);
 	}
 	/**
@@ -208,7 +208,7 @@ class Randomizer {
 
 		if (sequence === 'rollall') {
 			// roll all the tables in order
-			sequence = Object.keys(rtable.tables);
+			sequence = rtable.subtableNames;
 		}
 
 		if (sequence === '') {
@@ -218,7 +218,7 @@ class Randomizer {
 				results = this._selectFromTable(rtable, 'default');
 			} else {
 				// select first item from tables
-				const tables = Object.keys(rtable.tables);
+				const tables = rtable.subtableNames;
 				results = this._selectFromTable(rtable, tables[0]);
 			}
 		} else if (typeof sequence === 'string') {
@@ -301,87 +301,30 @@ class Randomizer {
 		}
 
 		let o = []; // output for sequence of rolls/selections
-		const t = rtable.tables[table]; // the table/subtable
-		if (!t) {
+		const entries = rtable.getSubtableEntries(table); // the table/subtable
+		if (entries.length === 0) {
 			return [this._getErrorResult('Invalid table name.')];
 		}
-		const result = this.rollRandom(t); // the random string from the table (either the object property, a string value from an array, or the value property from a selected object)
-		let r = ''; // the string result from the table
-		let result_print = true; // are we going to show this result
+		const entry = this.rollRandomEntry(entries);
 
-		if (isUndefined(t[result])) {
-			// table is an array
-			r = t.find((v) => {
-				return v.label === result;
-			});
-			if (isUndefined(r)) {
-				// it's just an array of strings so we can stop here
-				o.push(new RandomTableResult({ table: table, result: result }));
-				return o;
-			}
-			result_print = (isUndefined(r['print'])) ? true : r['print'];
-		} else {
-			r = t[result];
-			result_print = (isUndefined(t[result]['print'])) ? true : t[result]['print'];
-		}
-		// r is now the result object
-
-		// if print==false we suppress the output from this table (good for top-level tables)
-		if (result_print === true) {
-			// add the description if there is one
-			const desc = (isString(r['description'])) ? r['description'] : '';
+		// if print is false we suppress the output from this table (good for top-level tables)
+		if (entry.print) {
 			// replace any tokens
-			const t_result = this.findToken(result, rtable.key);
-			o.push(new RandomTableResult({ table: table, result: t_result, desc: desc }));
+			const t_result = this.findToken(entry.label, rtable.key);
+			o.push(new RandomTableResult({ table: table, result: t_result, desc: entry.description }));
 		}
 
 		// are there subtables to roll on?
-		const subtable = r.subtable;
-		if (isUndefined(subtable)) {
+		if (entry.subtable.length === 0) {
 			// no subtables
 			return o;
 		}
 
-		let r2 = ''; // subtable results
-		if (isString(subtable)) {
-			// subtables is a string reference to a table so we run this function again
-			r2 = this._selectFromTable(rtable, subtable);
-			return o.concat(r2);
-		}
-
-		if (Array.isArray(subtable)) {
-			// subtables is an array, assume reference to other tables, roll on each in turn
-			subtable.forEach((v) => {
-				r2 = this._selectFromTable(rtable, v);
-				o = o.concat(r2);
-			});
-			return o;
-		}
-
-		if (isObject(subtable)) {
-			// subtable is object assume embedded table(s)
-			// loop over keys
-			const k = Object.keys(subtable);
-			k.forEach((kx) => {
-				let result = this.rollRandom(subtable[kx]);
-				let desc = '';
-				if (isUndefined(subtable[kx][result])) {
-					r2 = subtable[kx].find((v) => {
-						return v.label === result;
-					});
-					if (isObject(r2)) {
-						desc = (isString(r2.description)) ? r2.description : '';
-					}
-				} else {
-					desc = (isString(subtable[kx][result]['description'])) ? subtable[kx][result]['description'] : '';
-				}
-				result = this.findToken(result, rtable.key);
-
-				o.push(new RandomTableResult({ table: kx, result: result, desc: desc }));
-			});
-			return o;
-		}
-		// Shouldn't ever reach here...
+		// Select from each subtable and add to results.
+		entry.subtable.forEach((subtableName) => {
+			const r2 = this._selectFromTable(rtable, subtableName);
+			o = o.concat(r2);
+		});
 		return o;
 	}
 	/**
@@ -408,16 +351,16 @@ class Randomizer {
 	}
 	/**
 	 * Look for tokens to perform replace action in convertToken
-	 * @param {String} string usually a result from a RandomTable
+	 * @param {String} entryLabel Usually a label from a RandomTableEntry
 	 * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
 	 * @param {Function} [callback] optional callback to be performed on tokens...
 	 * @returns {String} String with tokens replaced (if applicable)
 	 */
-	findToken(string, curtable = '', callback = null) {
-		if (isEmpty(string)) {
+	findToken(entryLabel, curtable = '', callback = null) {
+		if (isEmpty(entryLabel)) {
 			return '';
 		}
-		const newstring = string.replace(tokenRegExp, (token) => {
+		const newstring = entryLabel.replace(tokenRegExp, (token) => {
 			return this.convertToken(token, curtable);
 		});
 		return newstring;

@@ -1,4 +1,4 @@
-import { isEmpty, capitalize, isUndefined } from './r_helpers.js';
+import { isEmpty, capitalize, isUndefined, isString, isObject } from './r_helpers.js';
 
 
 /**
@@ -26,6 +26,44 @@ class DisplayOptions {
 	}
 }
 
+
+/**
+ * Class for entries in a random (sub)table.
+ * This normalizes the various options into a class that makes the other code simpler.
+ */
+class RandomTableEntry {
+	/**
+	 *
+	 * @property {String} label Basic string label. Only required field. Can include tokens.
+	 * @property {Boolean} [print=true] Should the result be included in the output.
+	 * @property {String} [description] Extra description for the label.
+	 * @property {String[]} [subtable] Other tables to roll on.
+	 * @proparty {Number} [weight=1] Number to weight entry relative to other entries.
+	 */
+	constructor({
+		label = '',
+		print = true,
+		description = '',
+		subtable = [],
+		weight = 1
+	}) {
+		this.label = label;
+		this.print = !(print === false || print == 0);
+		this.description = description;
+		this.weight = parseInt(weight, 10);
+		if (this.weight <= 0) {
+			this.weight = 1;
+		}
+		// Make sure it's an array of string.
+		if (isString(subtable)) {
+			this.subtable = [subtable];
+		} else if (Array.isArray(subtable)) {
+			this.subtable = subtable.map((el) => { return el.toString(); });
+		}
+
+	}
+}
+
 /**
  * RandomTable: Model for tables used by Randomizer
  * @param {Object} config the tables non-default attributes
@@ -42,11 +80,14 @@ class RandomTable {
 	 * @property {String[]} [tags] subject tags
 	 * @property {String|String[]|Object[]} [sequence] tables to roll on. if array it can be an array of strings (table names) or objects (two properties table: the table to roll on and times: the number of times to roll)
 	 * @property {String[]|Object[]} [table] default table. array of strings or objects. removed after initialization.
-	 * @property {Object} [tables] a property for each subtables. if table property is not set then the first propery of this Object is used to start rolling
+	 * @property {Object} [tables] a property for each subtables.
+	 * @property {RandomTableEntries[]} tables[subtablename] Entries for subtables.
 	 * @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
 	 * @property {Map[DisplayOptions]} [display_opt] Display options for the subtables.
 	 * @property @deprecated {Object} [print] Backwards compatible. Key => Object data for display options.
 	 * @property {Array} [dependencies] table keys that are needed to get full results from this table
+	 *
+	 * Note the Constructor args are not exactly the same as the properties. Some type changes are made to convert data.
 	 */
 	constructor({
 		id = 0,
@@ -56,7 +97,7 @@ class RandomTable {
 		description = '',
 		source = '',
 		tags = [],
-		sequence = '', // where to start rolling and if other tables should always be rolled on
+		sequence = '',
 		tables = {},
 		macro = [],
 		print = {},
@@ -72,9 +113,10 @@ class RandomTable {
 		this.source = source;
 		this.tags = tags;
 		this.sequence = sequence;
-		this.tables = tables;
 		this.macro = macro;
 		this.dependencies = dependencies;
+
+		this._normalizeTables(tables, table);
 
 		this.display_opt = new Map();
 		// Backwards compatible.
@@ -89,19 +131,67 @@ class RandomTable {
 		display_opt.forEach((data) => {
 			const key = data.table || '';
 			if (key) {
+				if (data instanceof DisplayOptions) {
+					this.display_opt.set(key, data);
+					return;
+				}
 				const opt = new DisplayOptions(data);
 				this.display_opt.set(key, opt);
 			}
 		});
-
-		// make sure this.tables.default is set instead of table
-		// maybe we dont need this
-		if (!isEmpty(table)) {
-			this.tables.default = table;
-		}
 	}
 	toString() {
 		return this.title;
+	}
+	/**
+	 * Make sure table entries are all RandomTableEntry objects.
+	 * @param {Array} data
+	 * @returns RandomTableEntry[]
+	 */
+	_normalizeTable(data) {
+		const entries = [];
+		data.forEach((d) => {
+			if (isEmpty(d)) {
+				return;
+			}
+			if (isString(d)) {
+				entries.push(new RandomTableEntry({
+					label: d
+				}));
+				return;
+			}
+			if (d instanceof RandomTableEntry) {
+				entries.push(d);
+				return;
+			}
+			entries.push(new RandomTableEntry(d));
+		});
+		return entries;
+	}
+	/**
+	 * Normalize the tables/table constructor data.
+	 * @param {Object} tables
+	 * @param {Array} table
+	 * @returns
+	 */
+	_normalizeTables(tables, table) {
+		if (isEmpty(tables) && isEmpty(table)) {
+			return;
+		}
+		this.tables = {};
+		if (isObject(tables)) {
+			const subtableNames = Object.keys(tables);
+			subtableNames.forEach((name) => {
+				const data = tables[name];
+				if (!Array.isArray(data)) {
+					return;
+				}
+				this.tables[name] = this._normalizeTable(data);
+			});
+		}
+		if (!isEmpty(table) && Array.isArray(table)) {
+			this.tables.default = this._normalizeTable(table);
+		}
 	}
 	/**
 	 * validate fields before saving
@@ -127,6 +217,21 @@ class RandomTable {
 		return true;
 	}
 	/**
+	 * All the subtable names.
+	 * @returns {String[]}
+	 */
+	get subtableNames() {
+		return Object.keys(this.tables);
+	}
+	/**
+	 * Get entries for a specific subtable.
+	 * @param {String} [name=default] Subtable name.
+	 * @returns {RandomTableEntry[]}
+	 */
+	getSubtableEntries(name = 'default') {
+		return this.tables[name] || [];
+	}
+	/**
 	 * outputs the json data for the table (import/export)
 	 * @param {Boolean} [editmode=false] if false empty properties will be stripped out
 	 * @returns {Object} table attributes
@@ -140,12 +245,6 @@ class RandomTable {
 				delete att[k];
 			}
 		});
-		// don't include results
-		if (att.result && editmode) {
-			att.result = [];
-		} else if (att.result) {
-			delete att.result;
-		}
 		delete att.id;
 		return att;
 	}
@@ -164,26 +263,23 @@ class RandomTable {
 		return JSON.stringify(obj, null, 2);
 	}
 	/**
-	 * Get an object result in case we only have the label and need other data from it
+	 * Get an entry in case we only have the label and need other data from it
 	 * @param {String} label The item we are looking for
 	 * @param {String} [table=default] the table to search
-	 * @returns {Object} the object associated with the label or an empty one
+	 * @returns {RandomTableEntry|null}
 	 */
-	findObject(label, table = 'default') {
+	findEntry(label, table = 'default') {
 		const t = this.tables[table];
 		if (isEmpty(t)) {
-			return {};
+			return null;
 		}
-		if (t[label]) {
-			return t[label];
+		const entry = t.find((e) => {
+			return e.label == label;
+		});
+		if (!entry) {
+			return null;
 		}
-		if (Array.isArray(t)) {
-			const obj = t.find((v) => {
-				return v.label === label;
-			});
-			return isUndefined(obj) ? {} : obj;
-		}
-		return {};
+		return entry;
 	}
 	/**
 	 * find the dependent tables to get full results for this table
@@ -201,10 +297,8 @@ class RandomTable {
 		tnames.forEach((n) => {
 			// n is sub/table name
 			const table = this.tables[n];
-			table.forEach((r) => {
-				// r is object of table potential result
-				if (!r.label) { return; }
-				const tokens = r.label.match(tokenRegExp);
+			table.forEach((result) => {
+				const tokens = result.label.match(tokenRegExp);
 				if (tokens !== null) {
 					tokens.forEach((token) => {
 						const parts = token.replace('{{', '').replace('}}', '').split(':');
@@ -396,6 +490,7 @@ class RandomTableResultSet {
 export default RandomTable;
 
 export {
+	RandomTableEntry,
 	RandomTable,
 	DisplayOptions,
 	RandomTableResult,

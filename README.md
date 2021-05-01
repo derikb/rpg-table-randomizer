@@ -7,14 +7,15 @@
 1. [API Reference](#api-reference)
   1. [Randomizer](#Randomizer)
   1. [RandomTable](#RandomTable)
-  1. [RandomTableResult](#RandomTableResult)
-  1. [RandomTableResultSet](#RandomTableResultSet)
-  2. [TableNormalizer](#tablenormalizer)
-  3. [npc_generator](#npc_generator)
-  4. [RandomName](#RandomName)
-  5. [r_helpers](#r_helpers)
-3. [Contributors](#contributors)
-4. [License](#license)
+  2. [RandomTableEntry](#RandomTableEntry)
+  3. [RandomTableResult](#RandomTableResult)
+  4. [RandomTableResultSet](#RandomTableResultSet)
+  5. [TableNormalizer](#tablenormalizer)
+  6. [npc_generator](#npc_generator)
+  7. [RandomName](#RandomName)
+  8. [r_helpers](#r_helpers)
+2. [Contributors](#contributors)
+3. [License](#license)
 
 
 
@@ -268,22 +269,41 @@ randomizer.getWeightedRandom(values, weights); // returns a reaction from the va
 
 ```
 
-#### rollRandom (data)
+#### rollRandomString (data)
 
-- @param {Array|Object} _data_ An object or array of data
-- @returns {String} the randomly selected Object property name, Array element, or value of the "label" property
+- @param {String[]} _data_ Array of string to select from.
+- @returns {String} the randomly selected string
 
-This is mostly used internally. Takes a structured object or array of data and returns one of the element's value randomly based on weight property (if it's there).
+Takes an array of strings and returns one of the element's value randomly.
 
 ```
 const data = [
-	{ label: "Hostile", weight: 1 },
-	{ label: "Unfriendly", weight: 9 },
-	{ label: "Indifferent", weight: 16 },
-	{ label: "Talkative", weight: 9 },
-	{ label: "Helpful", weight: 1 }
+	"Hostile",
+	"Unfriendly",
+	"Indifferent",
+	"Talkative",
+	"Helpful"
 ];
-randomizer.rollRandom(data); // returns one of the reactions
+randomizer.rollRandomString(data); // returns one of the reactions
+
+```
+
+#### rollRandomEntry (data)
+
+- @param {RandomTableEntry[]} _data_ An array of entries to choose from
+- @returns {RandomTableEntry}
+
+This is mostly used internally. Takes an array of entries and returns one of them randomly based on weight property.
+
+```
+const data = [
+	new RandomTableEntry({ label: "Hostile", weight: 1 }),
+	new RandomTableEntry({ label: "Unfriendly", weight: 9 }),
+	new RandomTableEntry({ label: "Indifferent", weight: 16 }),
+	new RandomTableEntry({ label: "Talkative", weight: 9 }),
+	new RandomTableEntry({ label: "Helpful", weight: 1 })
+];
+randomizer.rollRandom(data); // returns one of the reactions entries
 
 ```
 
@@ -296,9 +316,9 @@ randomizer.rollRandom(data); // returns one of the reactions
 Take a token and perform token replacement, returning the result as a string.
 
 
-#### findToken (string, curtable)
+#### findToken (entryLabel, curtable)
 
-- @param {String} string usually a result from a RandomTable
+- @param {String} entryLabel Usually a Label from a RandomTableEntry
 - @param {String} curtable name of the RandomTable the string is from (needed for "this" tokens)
 - @returns {String} String with tokens replaced (if applicable)
 
@@ -338,6 +358,18 @@ For formatting the tables property see the [tableformat.md](/docs/tableformat.md
 
 In process attempt to validate data to make sure it is formatted right and contains the required properties...
 
+#### subtableNames
+
+* @returns {String[]}
+
+Return all subtable names.
+
+#### getSubtableEntries (name)
+
+* @returns {RandomTableEntry[]}
+
+Return entries for a subtable
+
 #### outputObject (editmode)
 
 * @param {Boolean} [editmode=false] if false empty properties will be stripped out
@@ -353,13 +385,13 @@ Outputs the json data for the table (import/export).
 
 Outputs the json data for the table (import/export).
 
-#### findObject (label, table)
+#### findEntry (label, table)
 
 * @param {String} label The item we are looking for
 * @param {String} [table=default] the table to search
-* @returns {Object} the object associated with the label or an empty one
+* @returns {RandomTableEntry|null} Entry associated with the label or null.
 
-Get an object result in case we only have the label and need other data from it.
+Get an entry in case we only have the label and need other data from it.
 
 #### findDependencies
 
@@ -384,6 +416,19 @@ Display settings for subtables. Found in the Map RandomTable.display_opt or Rand
 
 The three hide props will accept 0/1 in the constructor, but will convert to Boolean for the properties.
 
+
+
+### RandomTableEntry
+
+Entries for a RandomTable's (sub)tables.
+
+#### constructor (config)
+
+* @property {String} label Basic string label. Only required field. Can include tokens.
+* @property {Boolean} [print=true] Should the result be included in the output.
+* @property {String} [description] Extra description for the label.
+* @property {String[]} [subtable] Other tables to roll on.
+* @proparty {Number} [weight=1] Number to weight entry relative to other entries.
 
 ### RandomTableResult
 

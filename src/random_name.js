@@ -61,11 +61,11 @@ const selectName = function (name_type = 'random', gender = 'random', style = ''
 
 	if (name_type === 'random') {
 		// randomize a type...
-		name_type = randomizer.rollRandom(Object.keys(namedata.options));
+		name_type = randomizer.rollRandomString(Object.keys(namedata.options));
 	}
 	if (gender === 'random') {
 		// randomize a gender...
-		gender = randomizer.rollRandom(['male', 'female']);
+		gender = randomizer.rollRandomString(['male', 'female']);
 	}
 	if (style !== 'first') {
 		style = '';
@@ -83,9 +83,9 @@ const selectName = function (name_type = 'random', gender = 'random', style = ''
 		case 'dutch':
 		case 'turkish':
 		default:
-			name = randomizer.rollRandom(namedata[name_type][gender]);
+			name = randomizer.rollRandomString(namedata[name_type][gender]);
 			if (style !== 'first' && typeof namedata[name_type]['surname'] !== 'undefined' && !isEmpty(namedata[name_type]['surname'])) {
-				name += ' ' + randomizer.rollRandom(namedata[name_type]['surname']);
+				name += ' ' + randomizer.rollRandomString(namedata[name_type]['surname']);
 			}
 			name = randomizer.findToken(name).trim();
 			break;
@@ -102,7 +102,7 @@ const selectSurname = function (name_type = 'random') {
 	let name = '';
 	if (name_type === 'random') {
 		// randomize a type...
-		name_type = randomizer.rollRandom(Object.keys(namedata.options));
+		name_type = randomizer.rollRandomString(Object.keys(namedata.options));
 	}
 	if (isEmpty(namedata[name_type]['surname'])) {
 		return '';
@@ -116,7 +116,7 @@ const selectSurname = function (name_type = 'random') {
 		case 'dutch':
 		case 'turkish':
 		default:
-			name = randomizer.rollRandom(namedata[name_type]['surname']);
+			name = randomizer.rollRandomString(namedata[name_type]['surname']);
 			name = randomizer.findToken(name);
 			break;
 	}
@@ -133,13 +133,13 @@ const selectSurname = function (name_type = 'random') {
 const createName = function (name_type = 'random', gender = 'random', style = '') {
 	if (name_type === 'random') {
 		// randomize a type...
-		name_type = randomizer.rollRandom(Object.keys(namedata.options));
+		name_type = randomizer.rollRandomString(Object.keys(namedata.options));
 	}
 	if (!namedata[name_type]) {
 		return '';
 	}
 	if (gender !== 'male' && gender !== 'female') {
-		gender = randomizer.rollRandom(['male', 'female']);
+		gender = randomizer.rollRandomString(['male', 'female']);
 	}
 
 	const mkey = `${name_type}_${gender}`;
@@ -199,12 +199,12 @@ const holmesname = function () {
 	const scount = randomizer.getWeightedRandom(namedata.holmesian_scount.values, namedata.holmesian_scount.weights);
 
 	for (let i = 1; i <= scount; i++) {
-		name += randomizer.rollRandom(namedata.holmesian_syllables); // array
+		name += randomizer.rollRandomString(namedata.holmesian_syllables); // array
 		if (i < scount) {
 			name += randomizer.getWeightedRandom(['', ' ', '-'], [3, 2, 2]);
 		}
 	}
-	name = name.toLowerCase() + ' ' + randomizer.rollRandom(namedata.holmesian_title);
+	name = name.toLowerCase() + ' ' + randomizer.rollRandomString(namedata.holmesian_title);
 
 	name = randomizer.findToken(name);
 
@@ -223,7 +223,7 @@ const demonname = function () {
 	let name = '';
 	const format = randomizer.getWeightedRandom([ ['first', 'last'], ['first', 'inner', 'last'], ['first', 'inner', 'inner', 'last'], ['first', 'inner', 'inner', 'inner', 'last'] ], [55, 35, 7, 3]);
 	for (let i = 0; i < format.length; i++) {
-		name += randomizer.rollRandom(namedata.demonic[format[i]]);
+		name += randomizer.rollRandomString(namedata.demonic[format[i]]);
 	}
 	return name;
 };

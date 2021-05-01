@@ -117,23 +117,23 @@ Here's an example using these various properties. The default table is rolled on
 
 ```
 "tables": {
-	"default": {
+	"default": [
 		{ label: "Trap/Trick", "subtable": "trap", "print": false, "weight": 1 },
 		{ label: "Building/Lair", "subtable": "lair","print": false, "weight": 2 },
 		{ label: "Animal/Monster", "subtable": "monster", "print": false, "weight": 3 },
 		{ label: "Human(oid)", "subtable": "human", "print": false, "weight": 6 },
 		{ label: "Natural", "subtable": "natural", "print": false, "weight": 2 },
 		{ label: "Special", "subtable": "special", "print": false, "weight": 1 }
-	},
-	"trap": {
+	],
+	"trap": [
 		{ label: "Spiderweb", "weight": 2 },
 		{ label: "Tripwire", "weight": 2 },
 		{ label: "Net trap", "weight": 3 },
 		{ label: "Pit trap", "weight": 3 },
 		{ label: "Snare", "weight": 3 },
 		{ label: "Rocks from above", "weight": 1 }
-	},
-	"lair": {
+	],
+	"lair": [
 		{ label: "Village", "weight": 1 },
 		{ label: "Campsite", "weight": 2 },
 		{ label: "Ruins", "weight": 1 },
@@ -143,8 +143,8 @@ Here's an example using these various properties. The default table is rolled on
 		{ label: "Nest (water)", "weight": 2 },
 		{ label: "Altar/shrine", "weight": 1 },
 		{ label: "Tower", "weight": 1 }
-	},
-	"monster": {
+	],
+	"monster": [
 		{ label: "Insect swarm", "weight": 2 },
 		{ label: "Frogs", "weight": 2 },
 		{ label: "Alligators", "weight": 2 },
@@ -156,8 +156,8 @@ Here's an example using these various properties. The default table is rolled on
 		{ label: "Crabs/Crayfish", "weight": 2 },
 		{ label: "Will-o-wisp", "weight": 1 },
 		{ label: "Lizardmen/Snakemen", "weight": 1 },
-	},
-	"human": {
+	],
+	"human": [
 		{ label: "Militia", "weight": 1, "subtable": "human_actions" },
 		{ label: "Local Tribespeople", "weight": 1, "subtable": "human_actions" },
 		{ label: "Druid", "weight": 1 },
@@ -166,8 +166,8 @@ Here's an example using these various properties. The default table is rolled on
 		{ label: "NPC adventuring party", "weight": 1, "subtable": "human_actions" },
 		{ label: "Mage", "weight": 1, "subtable": "human_actions" },
 		{ label: "Bandit/Convict", "weight": 1, "subtable": "human_actions" }
-	},
-	"natural": {
+	],
+	"natural": [
 		{ label: "Weather event", "weight": 1, "subtable": "weather_event" },
 		{ label: "Fire", "weight": 1 },
 		{ label: "Whirlpool", "weight": 1 },
@@ -175,16 +175,16 @@ Here's an example using these various properties. The default table is rolled on
 		{ label: "Quicksand", "weight": 1 },
 		{ label: "Heavy vines/brush", "weight": 1 },
 		{ label: "Large Dead Tree", "weight": 1 }
-	},
-	"special": {
+	],
+	"special": [
 		{ label: "Magic Clearing", "weight": 1 },
 		{ label: "Mushroom Circle", "weight": 1 },
 		{ label: "Magic Pool", "weight": 1 },
 		{ label: "Statue", "weight": 1 },
 		{ label: "Grave(s)", "weight": 1 },
 		{ label: "[Demon?]", "weight": 1 }
-	},
-	"human_actions": {
+	],
+	"human_actions": [
 		{ label: "Hunting", "weight": 2 },
 		{ label: "Foraging" },
 		{ label: "Lost" },
@@ -196,8 +196,8 @@ Here's an example using these various properties. The default table is rolled on
 		{ label: "Religious ceremony" },
 		{ label: "Dying" },
 		{ label: "Dead"  },
-	},
-	"weather_event": {
+	],
+	"weather_event": [
 		{ label: "Light Fog/mist", "weight": 2 },
 		{ label: "Heavy Fog/mist", "weight": 2 },
 		{ label: "Light precipitation", "weight": 2 },
@@ -209,7 +209,7 @@ Here's an example using these various properties. The default table is rolled on
 		{ label: "Sun shower" },
 		{ label: "Bright Sun" },
 		{ label: "Major Weather event", "description": "Hurricane, tornado, blizzard, flood, etc." }
-	}
+	]
 }
 ```
 
