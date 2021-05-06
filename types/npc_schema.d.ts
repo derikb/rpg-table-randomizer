@@ -20,13 +20,15 @@ export class NPCSchemaField {
     /**
      *
      * @param {String} key Identifying key
+     * @param {String} label Readable label for field.
      * @param {String} type Type of data in field. Valid: string, text, array, number, modifier
      * @param {String} source Source of data for Randomizer in the form of a token (see Randomizer, ex: "name:french", "table:color", etc.)
      * @param {Number} count Number of entries for array types.
      * @param {Array|String|Number} starting_value An optional starting value.
      */
-    constructor({ key, type, source, count, starting_value }: string);
+    constructor({ key, label, type, source, count, starting_value }: string);
     key: any;
+    label: any;
     type: any;
     source: any;
     count: any;

@@ -6,6 +6,7 @@ class NPCSchemaField {
     /**
      *
      * @param {String} key Identifying key
+     * @param {String} label Readable label for field.
      * @param {String} type Type of data in field. Valid: string, text, array, number, modifier
      * @param {String} source Source of data for Randomizer in the form of a token (see Randomizer, ex: "name:french", "table:color", etc.)
      * @param {Number} count Number of entries for array types.
@@ -13,12 +14,14 @@ class NPCSchemaField {
      */
     constructor({
         key = '',
+        label = '',
         type = 'string',
         source = '',
         count = 1,
         starting_value = null
     }) {
         this.key = key;
+        this.label = label;
         this.type = type;
         this.source = source;
         this.count = count;
