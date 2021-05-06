@@ -59,11 +59,11 @@ const generateList = function (number = 10, name_type = 'random', create = false
 const selectName = function (name_type = 'random', gender = 'random', style = '') {
 	let name = '';
 
-	if (name_type === 'random') {
+	if (name_type === 'random' || isEmpty(name_type)) {
 		// randomize a type...
 		name_type = randomizer.rollRandomString(Object.keys(namedata.options));
 	}
-	if (gender === 'random') {
+	if (gender === 'random' || isEmpty(gender)) {
 		// randomize a gender...
 		gender = randomizer.rollRandomString(['male', 'female']);
 	}
@@ -83,6 +83,10 @@ const selectName = function (name_type = 'random', gender = 'random', style = ''
 		case 'dutch':
 		case 'turkish':
 		default:
+			if (isEmpty(namedata[name_type])) {
+				// Or should an error be thrown?
+				return '';
+			}
 			name = randomizer.rollRandomString(namedata[name_type][gender]);
 			if (style !== 'first' && typeof namedata[name_type]['surname'] !== 'undefined' && !isEmpty(namedata[name_type]['surname'])) {
 				name += ' ' + randomizer.rollRandomString(namedata[name_type]['surname']);
@@ -131,7 +135,7 @@ const selectSurname = function (name_type = 'random') {
  * @returns {String} a name
  */
 const createName = function (name_type = 'random', gender = 'random', style = '') {
-	if (name_type === 'random') {
+	if (name_type === 'random' || isEmpty(name_type)) {
 		// randomize a type...
 		name_type = randomizer.rollRandomString(Object.keys(namedata.options));
 	}
@@ -268,8 +272,8 @@ const registerNameType = function (name_type, data = {}, label = '') {
  */
 const nameTokenCallback = function(token_parts, full_token = '', curtable = '') {
 	let string = '';
-	if (typeof token_parts[1] === 'undefined' || token_parts[1] === '' || token_parts[1] === 'random') {
-		token_parts[1] = '';
+	if (typeof token_parts[1] === 'undefined' || token_parts[1] === '') {
+		token_parts[1] = 'random';
 	}
 	if (typeof token_parts[3] === 'undefined' || token_parts[3] !== 'first') {
 		token_parts[3] = '';
