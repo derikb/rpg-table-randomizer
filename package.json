@@ -8,8 +8,10 @@
     "eslint:src": "./node_modules/.bin/eslint src/",
     "build": "",
     "release": "standard-version -a",
-    "serve": "http-server ./ -a localhost"
+    "serve": "http-server ./ -a localhost",
+    "compileTypes": "npx tsc"
   },
+  "types": "./types/*",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/derikb/rpg-table-randomizer.git"
