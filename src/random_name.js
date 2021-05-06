@@ -40,7 +40,7 @@ const generateList = function (number = 10, name_type = 'random', create = false
 
 	for (let i = 1; i <= number; i++) {
 		const gender = (i <= Math.ceil(number / 2)) ? 'male' : 'female';
-		if (create && name_type !== 'holmesian' && name_type !== 'demonic') {
+		if (create) {
 			names[gender].push(createName(name_type, gender, true));
 		} else {
 			names[gender].push(selectName(name_type, gender));
@@ -71,29 +71,15 @@ const selectName = function (name_type = 'random', gender = 'random', style = ''
 		style = '';
 	}
 
-	switch (name_type) {
-		case 'holmesian':
-			name = holmesname();
-			break;
-		case 'demonic':
-			name = demonname();
-			break;
-		case 'cornish':
-		case 'flemish':
-		case 'dutch':
-		case 'turkish':
-		default:
-			if (isEmpty(namedata[name_type])) {
-				// Or should an error be thrown?
-				return '';
-			}
-			name = randomizer.rollRandomString(namedata[name_type][gender]);
-			if (style !== 'first' && typeof namedata[name_type]['surname'] !== 'undefined' && !isEmpty(namedata[name_type]['surname'])) {
-				name += ' ' + randomizer.rollRandomString(namedata[name_type]['surname']);
-			}
-			name = randomizer.findToken(name).trim();
-			break;
+	if (isEmpty(namedata[name_type])) {
+		// Or should an error be thrown?
+		return '';
 	}
+	name = randomizer.rollRandomString(namedata[name_type][gender]);
+	if (style !== 'first' && typeof namedata[name_type]['surname'] !== 'undefined' && !isEmpty(namedata[name_type]['surname'])) {
+		name += ' ' + randomizer.rollRandomString(namedata[name_type]['surname']);
+	}
+	name = randomizer.findToken(name).trim();
 	return capitalizeName(name);
 };
 
@@ -111,19 +97,8 @@ const selectSurname = function (name_type = 'random') {
 	if (isEmpty(namedata[name_type]['surname'])) {
 		return '';
 	}
-	switch (name_type) {
-		case 'holmesian':
-			name = holmesname();
-			break;
-		case 'cornish':
-		case 'flemish':
-		case 'dutch':
-		case 'turkish':
-		default:
-			name = randomizer.rollRandomString(namedata[name_type]['surname']);
-			name = randomizer.findToken(name);
-			break;
-	}
+	name = randomizer.rollRandomString(namedata[name_type]['surname']);
+	name = randomizer.findToken(name);
 	return capitalizeName(name);
 };
 
@@ -192,44 +167,6 @@ const capitalizeName = function (name) {
 		return (leave_lower.indexOf(w) >= 0) ? w : `${capitalize(w)}`;
 	});
 	return upper_parts.join(' ');
-};
-
-/**
- * Generate a Holmes name
- * @returns {String} name
- */
-const holmesname = function () {
-	let name = '';
-	const scount = randomizer.getWeightedRandom(namedata.holmesian_scount.values, namedata.holmesian_scount.weights);
-
-	for (let i = 1; i <= scount; i++) {
-		name += randomizer.rollRandomString(namedata.holmesian_syllables); // array
-		if (i < scount) {
-			name += randomizer.getWeightedRandom(['', ' ', '-'], [3, 2, 2]);
-		}
-	}
-	name = name.toLowerCase() + ' ' + randomizer.rollRandomString(namedata.holmesian_title);
-
-	name = randomizer.findToken(name);
-
-	name = name.replace(/[\s\-]([a-z]{1})/g, (match) => {
-		return match.toUpperCase();
-	});
-	return name;
-};
-
-/**
- * Demonic name
- * Taken from Jeff Rients, based on Goetia, as implemented here: http://www.random-generator.com/index.php?title=Goetic_Demon_Names
- * @return {String} a name
- */
-const demonname = function () {
-	let name = '';
-	const format = randomizer.getWeightedRandom([ ['first', 'last'], ['first', 'inner', 'last'], ['first', 'inner', 'inner', 'last'], ['first', 'inner', 'inner', 'inner', 'last'] ], [55, 35, 7, 3]);
-	for (let i = 0; i < format.length; i++) {
-		name += randomizer.rollRandomString(namedata.demonic[format[i]]);
-	}
-	return name;
 };
 
 /**
