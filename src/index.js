@@ -4,7 +4,7 @@ import normalizeData from './table_normalizer.js';
 import * as r_helpers from './r_helpers.js';
 import RandomName from './random_name.js';
 import names from '../sample/names.js';
-import npc_generator from './npc.js';
+import * as npc_generator from './npc.js';
 import { NPCSchema, NPCSchemaField }  from './npc_schema.js';
 
 // Instantiate the randomizer and set it up with the random name generator.

@@ -87,7 +87,7 @@ const initializeNewNPC = function(schemaKey, randomizer) {
 };
 
 
-export default {
+export {
 	NPC,
 	registerSchema,
 	getSchemaByKey,

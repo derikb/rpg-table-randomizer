@@ -14,7 +14,7 @@ import RandomTable from "./random_table.js";
 import normalizeData from "./table_normalizer.js";
 import RandomName from "./random_name.js";
 import * as r_helpers from "./r_helpers.js";
-import npc_generator from "./npc.js";
+import * as npc_generator from "./npc.js";
 import { NPCSchema } from "./npc_schema.js";
 import { NPCSchemaField } from "./npc_schema.js";
 import Randomizer from "./randomizer.js";
