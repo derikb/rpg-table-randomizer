@@ -45,6 +45,21 @@ class NPCSchemaField {
 		}
         return null;
     }
+    /**
+	 * Custom JSON handler to strip empty props.
+	 * @returns {Object}
+	 */
+	toJSON() {
+		let returnObj = {};
+		for (const property in this) {
+			let value = this[property];
+			if (isEmpty(value)) {
+				continue;
+			}
+			returnObj[property] = value;
+		}
+		return returnObj;
+	}
 }
 
 

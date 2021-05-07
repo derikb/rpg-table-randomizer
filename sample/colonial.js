@@ -219,7 +219,7 @@ export default [
   "title": "Companies (Colonial)",
   "author": "Derik Badman",
   "description": "Quick company.",
-  "print": {
+  "display_opt": {
 	  "name": { "hide_table": 1 },
 	  "name_1": { "hide_table": 1 },
 	  "name_2": { "hide_table": 1 },
@@ -439,7 +439,7 @@ export default [
     "colonial",
     "encounters"
   ],
-  "print": {
+  "display_opt": {
 	  "actions_men": { "hide_table": 1 },
 	  "actions_animal": { "hide_table": 1 },
 	  "men": { "hide_table": 1 },
@@ -574,7 +574,7 @@ export default [
     "colonial",
     "encounters"
   ],
-  "print": {
+  "display_opt": {
 	  "actions_men": { "hide_table": 1 },
 	  "actions_animal": { "hide_table": 1 },
 	  "men": { "hide_table": 1 },
@@ -739,7 +739,7 @@ export default [
     "colonial",
     "encounters"
   ],
-  "print": {
+  "display_opt": {
 	  "actions_men": { "hide_table": 1 },
 	  "actions_animal": { "hide_table": 1 },
 	  "men": { "hide_table": 1 },
@@ -839,7 +839,7 @@ export default [
     "colonial",
     "encounters"
   ],
-  "print": {
+  "display_opt": {
 	  "actions_men": { "hide_table": 1 },
 	  "actions_animal": { "hide_table": 1 },
 	  "men": { "hide_table": 1 },
@@ -971,7 +971,7 @@ export default [
     "encounters",
     "colonial"
   ],
-  "print": {
+  "display_opt": {
 	  "actions_men": { "hide_table": 1 },
 	  "actions_animal": { "hide_table": 1 },
 	  "men": { "hide_table": 1 },

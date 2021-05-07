@@ -24,6 +24,25 @@ class DisplayOptions {
 		this.hide_result = (hide_result === true || hide_result == 1);
 		this.hide_desc = (hide_desc === true || hide_desc == 1);
 	}
+	/**
+	 * Custom JSON handler to strip defaults.
+	 * @returns {Object}
+	 */
+	toJSON() {
+		let returnObj = {
+			table: this.table
+		};
+		if (this.hide_table) {
+			returnObj.hide_table = true;
+		}
+		if (this.hide_result) {
+			returnObj.hide_result = true;
+		}
+		if (this.hide_desc) {
+			returnObj.hide_desc = true;
+		}
+		return returnObj;
+	}
 }
 
 
@@ -60,7 +79,21 @@ class RandomTableEntry {
 		} else if (Array.isArray(subtable)) {
 			this.subtable = subtable.map((el) => { return el.toString(); });
 		}
-
+	}
+	/**
+	 * Custom JSON handler because Map doesn't JSON stringify automatically.
+	 * @returns {Object}
+	 */
+	toJSON() {
+		let returnObj = {};
+		for (const property in this) {
+			let value = this[property];
+			if (isEmpty(value)) {
+				continue;
+			}
+			returnObj[property] = value;
+		}
+		return returnObj;
 	}
 }
 
@@ -325,7 +358,13 @@ class RandomTable {
 		for (const property in this) {
 			let value = this[property];
 			if (value instanceof Map) {
-				returnObj[property] = Array.from(value.values());
+				const mapArray = Array.from(value.values());
+				if (mapArray.length > 0) {
+					returnObj[property] = Array.from(value.values());
+				}
+				continue;
+			}
+			if (isEmpty(value)) {
 				continue;
 			}
 			returnObj[property] = value;
@@ -367,6 +406,21 @@ class RandomTable {
     toString() {
         return this.result;
     }
+	/**
+	 * Custom JSON handler to strip empty props.
+	 * @returns {Object}
+	 */
+	toJSON() {
+		let returnObj = {};
+		for (const property in this) {
+			let value = this[property];
+			if (isEmpty(value)) {
+				continue;
+			}
+			returnObj[property] = value;
+		}
+		return returnObj;
+	}
 }
 /**
  * Set of table results.
@@ -473,12 +527,18 @@ class RandomTableResultSet {
 	 * Custom JSON handler because Map doesn't JSON stringify automatically.
 	 * @returns {Object}
 	 */
-	 toJSON() {
+	toJSON() {
 		let returnObj = {};
 		for (const property in this) {
 			let value = this[property];
 			if (value instanceof Map) {
-				returnObj[property] = Array.from(value.values());
+				const mapArray = Array.from(value.values());
+				if (mapArray.length > 0) {
+					returnObj[property] = Array.from(value.values());
+				}
+				continue;
+			}
+			if (isEmpty(value)) {
 				continue;
 			}
 			returnObj[property] = value;
