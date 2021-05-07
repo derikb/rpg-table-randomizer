@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.10.0](https://github.com/derikb/rpg-table-randomizer/compare/v0.9.0...v0.10.0) (2021-05-07)
+
+
+### Features
+
+* **json:** Make json output ignore empty ([b562d11](https://github.com/derikb/rpg-table-randomizer/commit/b562d112a2f971c1c53c4f2dd7b95dad31d6c193)), closes [#30](https://github.com/derikb/rpg-table-randomizer/issues/30)
+* **names:** Add mixed option for names ([7816d33](https://github.com/derikb/rpg-table-randomizer/commit/7816d33d02517863cc6b7f4017d394471100eea5)), closes [#33](https://github.com/derikb/rpg-table-randomizer/issues/33)
+* **npc:** Add label to schema field ([52c8544](https://github.com/derikb/rpg-table-randomizer/commit/52c854416d9b9b7f59539efa73b1d957316ca7b5)), closes [#28](https://github.com/derikb/rpg-table-randomizer/issues/28)
+* **tokens:** Simply token output for tables ([b0d0bed](https://github.com/derikb/rpg-table-randomizer/commit/b0d0bed39684ec795cb309fe2b1fe17cd11c8c77))
+* Add typescript types as a test ([e6f5400](https://github.com/derikb/rpg-table-randomizer/commit/e6f5400bef3bd508705689a2f0ab1ef67538161c)), closes [#26](https://github.com/derikb/rpg-table-randomizer/issues/26)
+
+
+### Bug Fixes
+
+* **names:** Fix name:random token type not working ([a1056aa](https://github.com/derikb/rpg-table-randomizer/commit/a1056aa8ec85b8a11d507a2ebd3dbec30e79ceda)), closes [#31](https://github.com/derikb/rpg-table-randomizer/issues/31)
+* **npc:** Remove default export ([a8274d6](https://github.com/derikb/rpg-table-randomizer/commit/a8274d6f634c22a08279151020f1f0611a028400)), closes [#27](https://github.com/derikb/rpg-table-randomizer/issues/27)
+
 ## [0.9.0](https://github.com/derikb/rpg-table-randomizer/compare/v0.8.1...v0.9.0) (2021-05-01)
 
 
