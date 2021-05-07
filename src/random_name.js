@@ -29,6 +29,29 @@ const setRandomizer = function(instance) {
 }
 
 /**
+ * Get a random name type from the available types.
+ * @returns {String}
+ */
+const getRandomNameType = function() {
+	return randomizer.rollRandomString(Object.keys(namedata.options));
+};
+
+/**
+ * Capitalize names, account for multiword lastnames like "Van Hausen"
+ * @param {String} name a name
+ * @return {String} name capitalized
+ */
+ const capitalizeName = function (name) {
+	const leave_lower = ['of', 'the', 'from', 'de', 'le', 'la'];
+	// need to find spaces in name and capitalize letter after space
+	const parts = name.split(' ');
+	const upper_parts = parts.map((w) => {
+		return (leave_lower.indexOf(w) >= 0) ? w : `${capitalize(w)}`;
+	});
+	return upper_parts.join(' ');
+};
+
+/**
  * Generate a bunch of names, half male, half female
  * @param {Number} [number=10] number of names in the list (half will be male, half will be female)
  * @param {String} [name_type] type of name or else it will randomly select
@@ -50,35 +73,26 @@ const generateList = function (number = 10, name_type = 'random', create = false
 };
 
 /**
- * Select a name from one of the lists
- * @param {String} name_type What name list/process to use else random
- * @param {String} gender male, female, random, ''
- * @param {String} style first=first name only, else full name
- * @returns {String} a name
+ * Select a personal name from one of the lists.
+ * @param {String} name_type what list/process to use, else random
+ * @param {String} gender
+ * @returns {String}
  */
-const selectName = function (name_type = 'random', gender = 'random', style = '') {
+const selectPersonalName = function(name_type = 'random', gender = 'random') {
 	let name = '';
-
-	if (name_type === 'random' || isEmpty(name_type)) {
+	if (name_type === 'random' || name_type === 'mixed') {
 		// randomize a type...
-		name_type = randomizer.rollRandomString(Object.keys(namedata.options));
+		name_type = getRandomNameType();
+	}
+	if (isEmpty(namedata[name_type])) {
+		// Or should an error be thrown?
+		return '';
 	}
 	if (gender === 'random' || isEmpty(gender)) {
 		// randomize a gender...
 		gender = randomizer.rollRandomString(['male', 'female']);
 	}
-	if (style !== 'first') {
-		style = '';
-	}
-
-	if (isEmpty(namedata[name_type])) {
-		// Or should an error be thrown?
-		return '';
-	}
 	name = randomizer.rollRandomString(namedata[name_type][gender]);
-	if (style !== 'first' && typeof namedata[name_type]['surname'] !== 'undefined' && !isEmpty(namedata[name_type]['surname'])) {
-		name += ' ' + randomizer.rollRandomString(namedata[name_type]['surname']);
-	}
 	name = randomizer.findToken(name).trim();
 	return capitalizeName(name);
 };
@@ -90,9 +104,9 @@ const selectName = function (name_type = 'random', gender = 'random', style = ''
  */
 const selectSurname = function (name_type = 'random') {
 	let name = '';
-	if (name_type === 'random') {
+	if (name_type === 'random' || name_type === 'mixed') {
 		// randomize a type...
-		name_type = randomizer.rollRandomString(Object.keys(namedata.options));
+		name_type = getRandomNameType();
 	}
 	if (isEmpty(namedata[name_type]['surname'])) {
 		return '';
@@ -100,6 +114,78 @@ const selectSurname = function (name_type = 'random') {
 	name = randomizer.rollRandomString(namedata[name_type]['surname']);
 	name = randomizer.findToken(name);
 	return capitalizeName(name);
+};
+
+/**
+ * Select a name from one of the lists
+ * @param {String} name_type What name list/process to use else random
+ * @param {String} gender male, female, random, ''
+ * @param {String} style first=first name only, else full name
+ * @returns {String} a name
+ */
+ const selectName = function (name_type = 'random', gender = 'random', style = '') {
+	if (name_type === 'random' || isEmpty(name_type)) {
+		// randomize a type...
+		name_type = getRandomNameType();
+	}
+	let name = selectPersonalName(name_type, gender);
+	if (style !== 'first') {
+		name += ' ' + selectSurname(name_type);
+	}
+	return name.trim();
+};
+
+/**
+ * Create a personal name using markov chains.
+ * @param {String} name_type what list/process to use, else random
+ * @param {String} gender
+ * @returns {String}
+ */
+const createPersonalName = function(name_type = 'random', gender = 'random') {
+	if (name_type === 'random' || name_type === 'mixed' || isEmpty(name_type)) {
+		// randomize a type...
+		name_type = getRandomNameType();
+	}
+	if (gender !== 'male' && gender !== 'female' && gender !== 'mixed') {
+		gender = randomizer.rollRandomString(['male', 'female']);
+	}
+	const mkey = `${name_type}_${gender}`;
+	if (!markov.isMemoryKeySet(mkey)) {
+		let namelist = [];
+		if (gender === 'mixed') {
+			namelist = namedata[name_type]['male'];
+			namelist = namelist.concat(namedata[name_type]['female']);
+		} else {
+			namelist = namedata[name_type][gender];
+		}
+		namelist.forEach((v) => {
+			markov.learn(mkey, v);
+		});
+	}
+	return capitalizeName(markov.generate(mkey).trim());
+};
+
+/**
+ * Create a sur/last name using markov chains.
+ * @param {String} name_type what list/process to use, else random
+ * @returns {String} a name
+ */
+const createSurName = function (name_type = 'random') {
+	if (name_type === 'random' || name_type === 'mixed' || isEmpty(name_type)) {
+		// randomize a type...
+		name_type = getRandomNameType();
+	}
+	if (isEmpty(namedata[name_type]['surname'])) {
+		return '';
+	}
+	const skey = `${name_type}_last`;
+	if (!markov.isMemoryKeySet(skey)) {
+		const namelist = namedata[name_type]['surname'];
+		namelist.forEach((v) => {
+			markov.learn(skey, v);
+		});
+	}
+	return capitalizeName(markov.generate(skey).trim());
 };
 
 /**
@@ -112,61 +198,13 @@ const selectSurname = function (name_type = 'random') {
 const createName = function (name_type = 'random', gender = 'random', style = '') {
 	if (name_type === 'random' || isEmpty(name_type)) {
 		// randomize a type...
-		name_type = randomizer.rollRandomString(Object.keys(namedata.options));
+		name_type = getRandomNameType();
 	}
-	if (!namedata[name_type]) {
-		return '';
+	let name = createPersonalName(name_type, gender);
+	if (style !== 'first') {
+		name = name + ' ' + createSurName(name_type);
 	}
-	if (gender !== 'male' && gender !== 'female') {
-		gender = randomizer.rollRandomString(['male', 'female']);
-	}
-
-	const mkey = `${name_type}_${gender}`;
-	let lastname = '';
-
-	if (!markov.isMemoryKeySet(mkey)) {
-		// console.log('learn '+mkey);
-		let namelist = [];
-		if (gender === '') {
-			namelist = namedata[name_type]['male'];
-			namelist = namelist.concat(namedata[name_type]['female']);
-		} else {
-			namelist = namedata[name_type][gender];
-		}
-		namelist.forEach((v) => {
-			markov.learn(mkey, v);
-		});
-	}
-
-	if (style !== 'first' && !isEmpty(namedata[name_type]['surname'])) {
-		const skey = `${name_type}_last`;
-		if (!markov.isMemoryKeySet(skey)) {
-			// console.log('learn surname '+skey);
-			const namelist = namedata[name_type]['surname'];
-			namelist.forEach((v) => {
-				markov.learn(skey, v);
-			});
-		}
-		lastname = markov.generate(skey);
-	}
-
-	const thename = `${markov.generate(mkey)} ${lastname}`;
-	return capitalizeName(thename.trim());
-};
-
-/**
- * Capitalize names, account for multiword lastnames like "Van Hausen"
- * @param {String} name a name
- * @return {String} name capitalized
- */
-const capitalizeName = function (name) {
-	const leave_lower = ['of', 'the', 'from', 'de', 'le', 'la'];
-	// need to find spaces in name and capitalize letter after space
-	const parts = name.split(' ');
-	const upper_parts = parts.map((w) => {
-		return (leave_lower.indexOf(w) >= 0) ? w : `${capitalize(w)}`;
-	});
-	return upper_parts.join(' ');
+	return name.trim();
 };
 
 /**
@@ -181,7 +219,7 @@ const capitalizeName = function (name) {
  * @return {Boolean} success or failure
  */
 const registerNameType = function (name_type, data = {}, label = '') {
-	if (typeof name_type === 'undefined' || isEmpty(data)) {
+	if (typeof name_type === 'undefined' || isEmpty(data) ||  name_type === 'random' ||  name_type === 'mixed') {
 		return false;
 	}
 	if (label === '') {
@@ -227,7 +265,10 @@ export default {
 	setRandomizer,
 	generateList,
 	selectName,
+	selectPersonalName,
 	selectSurname,
+	createPersonalName,
+	createSurName,
 	createName,
 	registerNameType,
 	nameTokenCallback

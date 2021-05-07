@@ -581,7 +581,11 @@ Functions export from random_name.js
 
 Methods that can generate names of all sorts both from lists of names and via Markov chains.
 
-@todo I should handle non-binary names somehow shouldn't I.
+In general:
+
+- `name_type` can be set to any type set in your namedata (the default data includes types such as "flemish" or "japanese") as well as "random" (it will randomize from the available options) and "mixed" (this is like random but it will randomize separately for both personal and sur names).
+- `gender` can be set to "male", "female", "random", or "mixed" (the latter really only works when creating new names).
+  - @todo I should handle non-binary names somehow, shouldn't I? One way is to create names and use the "mixed" option as that will generate a new name based on both the male and female names. Also setting the gender to random will randomize which list is selected from when not creating names.
 
 ### setNameData (data)
 
@@ -620,6 +624,21 @@ const names = random_name.generateList('flemish', 6, true);
 */
 ```
 
+#### selectPersonalName (name_type, gender)
+
+* @param {String} [name_type=random]
+* @param {String} [gender=random]
+* @returns {String}
+
+Select a personal name from one of the lists.
+
+#### selectSurname (name_type)
+
+* @param {String} [name_type=random]
+* @returns {String}
+
+Select a surname from one of the lists.
+
 #### selectName (name_type, gender, style)
 
 * @param {String} _[name_type=random]_ What name list/process to use
@@ -635,12 +654,20 @@ const name2 = random_name.selectName('cornish', 'male'); // Carasek Godden
 
 ```
 
-#### selectSurname (name_type)
+#### createPersonalName (name_type, gender)
 
-* @param {String} _[name_type=random]_ what list/process to use
-* @returns {String} a name
+* @param {String} [name_type=random]
+* @param {String} [gender=random]
+* @returns {String}
 
-Just returns a surname from one of the lists.
+Create a personal name using markov chains.
+
+#### createSurname (name_type)
+
+* @param {String} [name_type=random]
+* @returns {String}
+
+Create a sur/last name using markov chains.
 
 #### createName (name_type, gender, surname)
 
