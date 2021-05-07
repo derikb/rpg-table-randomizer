@@ -69,13 +69,25 @@
             printToScreen(swampEncounter);
             const swampEncounterResult = randomizer.getTableResultSetByKey('colonial_encounters_swamp');
             printToScreen(swampEncounterResult);
-           printToScreen(swampEncounterResult.niceString());
+            printToScreen(swampEncounterResult.niceString());
 
-           printToScreen('Demon name: ' + randomizer.getTableResultSetByKey('demon_name').niceString());
+            printToScreen('Demon name: ' + randomizer.getTableResultSetByKey('demon_name').niceString());
 
-           printToScreen('Holmes name: ' + randomizer.getTableResultSetByKey('holmes_name').niceString());
+            printToScreen('Holmes name: ' + randomizer.getTableResultSetByKey('holmes_name').niceString());
 
-           printToScreen(RandomName.createName('french', 'mixed'));
+            printToScreen(RandomName.createName('french', 'mixed'));
+
+            // Example of too complicated tables used as tokens... and how niceString(true) really pares them down.
+            const anotherTable = new RandomTable({
+               key: 'another_table',
+               title: 'Trying something complicated',
+               tables: {
+                   default: [
+                       '{{table:mission_generator}} {{table:colonial_encounters_swamp}}'
+                   ]
+                }
+            });
+           printToScreen(randomizer.getTableResult(anotherTable));
         </script>
     </body>
 </html>

@@ -430,7 +430,7 @@ class Randomizer {
 
 		for (var i = 1; i <= multiplier; i++) {
 			const set = this.getResultSetForTable(t, subtable);
-			string += set.niceString() + ', ';
+			string += set.niceString(true) + ', ';
 		}
 		string = string.trim();
 		string = string.replace(/,$/, '');

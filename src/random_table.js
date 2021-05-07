@@ -428,7 +428,7 @@ class RandomTableResultSet {
 		}
 
 		if (simple) {
-			return this.results[0].toString();
+			return this.results.map((r) => { return r.toString(); }).join(' ');
 		}
 
 		let output = '';
