@@ -3,7 +3,10 @@ declare namespace _default {
     export { setRandomizer };
     export { generateList };
     export { selectName };
+    export { selectPersonalName };
     export { selectSurname };
+    export { createPersonalName };
+    export { createSurName };
     export { createName };
     export { registerNameType };
     export { nameTokenCallback };
@@ -32,11 +35,31 @@ declare function generateList(number?: number, name_type?: string, create?: any)
  */
 declare function selectName(name_type?: string, gender?: string, style?: string): string;
 /**
+ * Select a personal name from one of the lists.
+ * @param {String} name_type what list/process to use, else random
+ * @param {String} gender
+ * @returns {String}
+ */
+declare function selectPersonalName(name_type?: string, gender?: string): string;
+/**
  * Select a sur/last name only from one of the lists
  * @param {String} name_type what list/process to use, else random
  * @returns {String} a name
  */
 declare function selectSurname(name_type?: string): string;
+/**
+ * Create a personal name using markov chains.
+ * @param {String} name_type what list/process to use, else random
+ * @param {String} gender
+ * @returns {String}
+ */
+declare function createPersonalName(name_type?: string, gender?: string): string;
+/**
+ * Create a sur/last name using markov chains.
+ * @param {String} name_type what list/process to use, else random
+ * @returns {String} a name
+ */
+declare function createSurName(name_type?: string): string;
 /**
  * Create a name using Markov chains
  * @param {String} [name_type=random] what list/process to use

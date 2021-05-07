@@ -5,12 +5,12 @@
 class NPCSchemaField {
     /**
      *
-     * @param {String} key Identifying key
-     * @param {String} label Readable label for field.
-     * @param {String} type Type of data in field. Valid: string, text, array, number, modifier
-     * @param {String} source Source of data for Randomizer in the form of a token (see Randomizer, ex: "name:french", "table:color", etc.)
-     * @param {Number} count Number of entries for array types.
-     * @param {Array|String|Number} starting_value An optional starting value.
+     * @property {String} key Identifying key
+     * @property {String} label Readable label for field.
+     * @property {String} type Type of data in field. Valid: string, text, array, number, modifier
+     * @property {String} source Source of data for Randomizer in the form of a token (see Randomizer, ex: "name:french", "table:color", etc.)
+     * @property {Number} count Number of entries for array types.
+     * @property {Array|String|Number} starting_value An optional starting value.
      */
     constructor({
         key = '',
@@ -69,9 +69,9 @@ class NPCSchemaField {
 class NPCSchema {
     /**
      *
-     * @param {String} key Identifying key
-     * @param {String} name Name of field.
-     * @param {NPCSchemaField[]|obj[]} fields Data fields will be converted to NPCSchemaField if necessary)
+     * @property {String} key Identifying key
+     * @property {String} name Name of field.
+     * @property {NPCSchemaField[]} fields Data fields will be converted to NPCSchemaField if necessary)
      */
     constructor({
         key = '',

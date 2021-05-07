@@ -139,6 +139,11 @@ export class RandomTableEntry {
     description: string;
     weight: number;
     subtable: any[];
+    /**
+     * Custom JSON handler because Map doesn't JSON stringify automatically.
+     * @returns {Object}
+     */
+    toJSON(): any;
 }
 /**
  * Display options for subtable results. Used in RandomTable and RandomTableResultSet
@@ -162,6 +167,11 @@ export class DisplayOptions {
     hide_table: boolean;
     hide_result: boolean;
     hide_desc: boolean;
+    /**
+     * Custom JSON handler to strip defaults.
+     * @returns {Object}
+     */
+    toJSON(): any;
 }
 /**
  * Class for results from RandomTable
@@ -189,6 +199,11 @@ export class RandomTableResult {
      */
     get isError(): boolean;
     toString(): string;
+    /**
+     * Custom JSON handler to strip empty props.
+     * @returns {Object}
+     */
+    toJSON(): any;
 }
 /**
  * Set of table results.
@@ -220,11 +235,11 @@ export class RandomTableResultSet {
      * @returns {RandomTableResult|null}
      */
     findResultByTable(table?: string): RandomTableResult | null;
-    niceString(simple?: boolean): any;
+    niceString(simple?: boolean): string;
     /**
      * Simple base output of result set.
      */
-    toString(): any;
+    toString(): string;
     /**
      * Custom JSON handler because Map doesn't JSON stringify automatically.
      * @returns {Object}
