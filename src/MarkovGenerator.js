@@ -8,7 +8,7 @@ class MarkovGenerator {
      * @param {String} separator If you want to delimit the generated parts
      * @param {Number} order How many... something... to something.... oh it's been too long I don't remember how this works...
      */
-    constructor({
+    constructor ({
         memory = {},
         separator = '',
         order = 2
@@ -21,22 +21,22 @@ class MarkovGenerator {
      * Is the memory key already set.
      * @param {String} key
      */
-    isMemoryKeySet(key) {
+    isMemoryKeySet (key) {
         return !!this.memory[key];
     }
     /**
      * Generate a starting array for the chain based on the order number
      * @return {Array} just an empty array of length=order
      */
-    genInitial() {
+    genInitial () {
         return Array(this.order).fill('');
     }
     /**
      * Get a random array element
      * @param {Array} arr an array
-     * @return {String|Object}	random value
+     * @return {String|Object} random value
      */
-    getRandomValue(arr) {
+    getRandomValue (arr) {
         return arr[Math.floor(Math.random() * arr.length)];
     }
     /**
@@ -45,7 +45,7 @@ class MarkovGenerator {
      * @param {Function} cb callback function
      * @return {null} null
      */
-    breakText(txt, cb) {
+    breakText (txt, cb) {
         const parts = txt.split(this.separator);
         const prev = this.genInitial();
 
@@ -63,7 +63,7 @@ class MarkovGenerator {
      * @param {String} txt word or phrase
      * @return {null} null
      */
-    learn(key, txt) {
+    learn (key, txt) {
         const mem = (this.memory[key]) ? this.memory[key] : {};
         // split up text then add the calculated parts to the memory for this key
         this.breakText(txt, (key, value) => {
@@ -81,7 +81,7 @@ class MarkovGenerator {
      * @param {Array} ret the chain
      * @return {Array}
      */
-    step(state, ret) {
+    step (state, ret) {
         const nextAvailable = this.memory[this.cur_key][state] || [''];
         const next = this.getRandomValue(nextAvailable);
         // we don't have anywhere to go
@@ -98,7 +98,7 @@ class MarkovGenerator {
      * @param {String} key key for the chain (so we can store multiples
      * @param {Array} seed letters to start the response (?)
      */
-    generate(key, seed) {
+    generate (key, seed) {
         if (!seed) {
             seed = this.genInitial();
         }

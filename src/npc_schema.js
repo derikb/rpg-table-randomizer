@@ -1,3 +1,4 @@
+import { isEmpty } from './r_helpers.js';
 
 /**
  * Specific field in NPC Schema.
@@ -12,7 +13,7 @@ class NPCSchemaField {
      * @property {Number} count Number of entries for array types.
      * @property {Array|String|Number} starting_value An optional starting value.
      */
-    constructor({
+    constructor ({
         key = '',
         label = '',
         type = 'string',
@@ -32,36 +33,35 @@ class NPCSchemaField {
     /**
      * Default value for this field by type if empty.
      */
-    get defaultEmpty() {
+    get defaultEmpty () {
         switch (this.type) {
-			case 'string':
-			case 'text':
-				return '';
-			case 'array':
-				return [];
-			case 'number':
-			case 'modifier':
-				return 0;
-		}
+            case 'string':
+            case 'text':
+                return '';
+            case 'array':
+                return [];
+            case 'number':
+            case 'modifier':
+                return 0;
+        }
         return null;
     }
     /**
-	 * Custom JSON handler to strip empty props.
-	 * @returns {Object}
-	 */
-	toJSON() {
-		let returnObj = {};
-		for (const property in this) {
-			let value = this[property];
-			if (isEmpty(value)) {
-				continue;
-			}
-			returnObj[property] = value;
-		}
-		return returnObj;
-	}
+     * Custom JSON handler to strip empty props.
+     * @returns {Object}
+     */
+    toJSON () {
+        const returnObj = {};
+        for (const property in this) {
+            const value = this[property];
+            if (isEmpty(value)) {
+                continue;
+            }
+            returnObj[property] = value;
+        }
+        return returnObj;
+    }
 }
-
 
 /**
  * Schema for creating NPCs.
@@ -73,7 +73,7 @@ class NPCSchema {
      * @property {String} name Name of field.
      * @property {NPCSchemaField[]} fields Data fields will be converted to NPCSchemaField if necessary)
      */
-    constructor({
+    constructor ({
         key = '',
         name = '',
         fields = []
@@ -92,7 +92,6 @@ class NPCSchema {
         }
     }
 }
-
 
 export {
     NPCSchema,
