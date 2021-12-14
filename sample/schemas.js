@@ -3,7 +3,7 @@
  */
 const simple = {
     key: 'simple',
-    title: 'Simple NPC',
+    name: 'Simple NPC',
     author: 'Derik A Badman',
     fields: [
         { key: 'name', type: 'string', source: 'name:random', label: 'Name' },

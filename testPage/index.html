@@ -44,26 +44,31 @@
 
             randomizer.registerTokenType('name', RandomName.nameTokenCallback);
 
-           printToScreen(randomizer.roll('2d6+1'));
-           printToScreen(RandomName.generateList(4, 'flemish'));
-           printToScreen(RandomName.createName('french', 'female'));
+            printToScreen(randomizer.roll('2d6+1'));
+            printToScreen(RandomName.generateList(4, 'flemish'));
+            printToScreen(RandomName.createName('french', 'female'));
             const ordResult = randomizer.getTableResultSetByKey('ordinal');
-           printToScreen(ordResult);
-           printToScreen(ordResult.niceString());
+            printToScreen(ordResult);
+            printToScreen(ordResult.niceString());
             const companyResult = randomizer.getTableResultSetByKey('colonial_companies');
-           printToScreen(companyResult);
-           printToScreen(companyResult.niceString());
+            printToScreen(companyResult);
+            printToScreen(companyResult.niceString());
             const missionResult = randomizer.getTableResultSetByKey('mission_generator');
-           printToScreen(missionResult);
-           printToScreen(missionResult.niceString());
+            printToScreen(missionResult);
+            printToScreen(missionResult.niceString());
 
             const simpleSchema = new NPCSchema(simpleSchemaData);
 
+            printToScreen(JSON.stringify(simpleSchema));
+
             npcGenerator.registerSchema(simpleSchema);
 
-           printToScreen(
-                npcGenerator.initializeNewNPC('simple', randomizer)
+            const npc = npcGenerator.initializeNewNPC('simple', randomizer);
+
+            printToScreen(
+                npc
             );
+            console.log(npc);
 
             const swampEncounter = randomizer.getTableByKey('colonial_encounters_swamp');
             printToScreen(swampEncounter);
@@ -87,7 +92,7 @@
                    ]
                 }
             });
-           printToScreen(randomizer.getTableResult(anotherTable));
+            printToScreen(randomizer.getTableResult(anotherTable));
         </script>
     </body>
 </html>

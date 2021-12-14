@@ -122,14 +122,13 @@ const checkType = function (data) {
         return '';
     }
     if (isString(data)) {
-        // html should start with a tag.... right?
-        // @todo I'm sure there's a better way
         try {
             JSON.parse(data);
             return 'json';
         } catch (e) {
             // not json
         }
+        // html should start with a tag.
         if (data.substring(0, 1) === '<') {
             this.data_type = 'html';
             return 'html';

@@ -510,8 +510,18 @@ Classes for npc schemas.
 #### NPCSchema
 
 * @param {String} key Identifying key
-* @param {String} name Name of field.
-* @param {NPCSchemaField[]|obj[]} fields Data fields will be converted to NPCSchemaField if necessary)
+* @param {String} name Name of schema.
+* @param {Map<String, NPCSchemaField>} fields Data fields will be converted to NPCSchemaField if necessary
+
+##### getFieldByKey (key)
+
+* @param {String} key Identifying key
+* @returns {NPCSchemaField|undefined}
+
+##### getFieldLabelByKey (key)
+
+* @param {String} key Identifying key
+* @returns {String}
 
 #### NPCSchemaField
 
@@ -538,10 +548,11 @@ This function takes the passed in `NPCSchema` and adds it by key to the availabl
 * @param {String} key Schema key.
 * @returns {NPCSchema|null}
 
-#### initializeNewNPC (schemaKey, Randomizer)
+#### initializeNewNPC (schemaKey, Randomizer, generateId)
 
 * @param {String} schemaKey Key for an NPCSchema
 * @param {Randomizer} randomizer
+* @param {Boolean} [generateId=true] If true NPC will have a uuid assigned to its id property.
 * @returns NPC
 
 #### NPC
@@ -550,7 +561,7 @@ An NPC class.
 
 * @param {String} id Some kind of indentifier.
 * @param {String} schema Key for a NPCSchema used for this NPC.
-* @param {Object} fields Field values indexed by NPCSchemaField key.
+* @param {Map<String, Any>} fields Field values indexed by NPCSchemaField key.
 
 
 Sample of making an NPC.

@@ -21,7 +21,8 @@ const isString = function (obj) {
     return toString.call(obj) === '[object String]';
 };
 /**
- * Is it an Object (stolen from Underscore)
+ * Is it an Object (stolen from Underscore).
+ * Note: This will return True for an Array also.
  * @param {Object|String|?} obj some type of things
  * @return {Boolean} is it an object?
  */
@@ -45,11 +46,54 @@ const isUndefined = function (obj) {
 const capitalize = function (string) {
     return isEmpty(string) ? string : string.charAt(0).toUpperCase() + string.slice(1);
 };
+/**
+ * Default toJSON for classes.
+ * Bind this to the class instance when calling.
+ * @returns {Object}
+ */
+const defaultToJSON = function () {
+    const returnObj = {};
+    for (const property in this) {
+        const value = this[property];
+        if (value instanceof Map) {
+            if (value.size === 0) {
+                continue;
+            }
+            // for Object values we store an array of objects.
+            // for anything else we store an object of key->value.
+            const mapObject = Object.fromEntries(value.entries());
+            const mapStrings = {};
+            const mapArray = [];
+            Object.keys(mapObject).forEach((key) => {
+                const v = mapObject[key];
+                if (isObject(v) && !Array.isArray(v)) {
+                    mapArray.push(v);
+                } else {
+                    mapStrings[key] = v;
+                }
+            });
+            if (mapArray.length > 0) {
+                returnObj[property] = mapArray;
+                continue;
+            }
+            if (Object.keys(mapStrings).length > 0) {
+                returnObj[property] = mapStrings;
+            }
+            continue;
+        }
+        if (isEmpty(value)) {
+            continue;
+        }
+        returnObj[property] = value;
+    }
+    return returnObj;
+};
 
 export {
     isEmpty,
     isString,
     isObject,
     isUndefined,
-    capitalize
+    capitalize,
+    defaultToJSON
 };

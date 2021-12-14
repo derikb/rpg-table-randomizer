@@ -1,4 +1,4 @@
-import { isEmpty, capitalize, isUndefined, isString, isObject } from './r_helpers.js';
+import { isEmpty, capitalize, isUndefined, isString, isObject, defaultToJSON } from './r_helpers.js';
 
 /**
  * Display options for subtable results. Used in RandomTable and RandomTableResultSet
@@ -83,15 +83,7 @@ class RandomTableEntry {
      * @returns {Object}
      */
     toJSON () {
-        const returnObj = {};
-        for (const property in this) {
-            const value = this[property];
-            if (isEmpty(value)) {
-                continue;
-            }
-            returnObj[property] = value;
-        }
-        return returnObj;
+        return defaultToJSON.call(this);
     }
 }
 
@@ -352,22 +344,7 @@ class RandomTable {
      * @returns {Object}
      */
     toJSON () {
-        const returnObj = {};
-        for (const property in this) {
-            const value = this[property];
-            if (value instanceof Map) {
-                const mapArray = Array.from(value.values());
-                if (mapArray.length > 0) {
-                    returnObj[property] = Array.from(value.values());
-                }
-                continue;
-            }
-            if (isEmpty(value)) {
-                continue;
-            }
-            returnObj[property] = value;
-        }
-        return returnObj;
+        return defaultToJSON.call(this);
     }
 }
 
@@ -409,15 +386,7 @@ class RandomTableResult {
      * @returns {Object}
      */
     toJSON () {
-        const returnObj = {};
-        for (const property in this) {
-            const value = this[property];
-            if (isEmpty(value)) {
-                continue;
-            }
-            returnObj[property] = value;
-        }
-        return returnObj;
+        return defaultToJSON.call(this);
     }
 }
 /**
@@ -526,22 +495,7 @@ class RandomTableResultSet {
      * @returns {Object}
      */
     toJSON () {
-        const returnObj = {};
-        for (const property in this) {
-            const value = this[property];
-            if (value instanceof Map) {
-                const mapArray = Array.from(value.values());
-                if (mapArray.length > 0) {
-                    returnObj[property] = Array.from(value.values());
-                }
-                continue;
-            }
-            if (isEmpty(value)) {
-                continue;
-            }
-            returnObj[property] = value;
-        }
-        return returnObj;
+        return defaultToJSON.call(this);
     }
 }
 

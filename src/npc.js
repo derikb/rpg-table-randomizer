@@ -1,5 +1,6 @@
 import Randomizer from './randomizer.js';
-import { isEmpty } from './r_helpers.js';
+import { isEmpty, defaultToJSON, isObject } from './r_helpers.js';
+import { v4 as uuidv4 } from '../node_modules/uuid/dist/esm-browser/index.js';
 
 /**
  * Object store for registered schemas
@@ -10,17 +11,33 @@ const Schemas = {};
  * Class for NPCs.
  * @param {String} id Some kind of indentifier.
  * @param {String} schema Key for a NPCSchema used for this NPC.
- * @param {Object} fields Field values indexed by NPCSchemaField key.
+ * @param {Map<String, Any>} fields Field values indexed by NPCSchemaField key.
  */
 class NPC {
     constructor ({
-        id = '',
+        id = null,
         schema = '',
-        fields = {}
+        fields = new Map()
     }) {
-        this.id = id;
+        // if null, generate a uuid
+        if (id === null) {
+            this.id = uuidv4();
+        } else {
+            this.id = id;
+        }
         this.schema = schema;
-        this.fields = fields;
+        if (fields instanceof Map) {
+            this.fields = fields;
+        } else if (isObject(fields)) {
+            this.fields = new Map(Object.entries(fields));
+        }
+    }
+    /**
+     * Custom JSON handler to strip empty props.
+     * @returns {Object}
+     */
+    toJSON () {
+        return defaultToJSON.call(this);
     }
 }
 
@@ -49,9 +66,10 @@ const getSchemaByKey = function (key) {
  * Create a new NPC from a Schema.
  * @param {String} schemaKey Key for an NPCSchema
  * @param {Randomizer} randomizer
+ * @param {Boolean} generateId Should the npc get a uuid.
  * @returns NPC
  */
-const initializeNewNPC = function (schemaKey, randomizer) {
+const initializeNewNPC = function (schemaKey, randomizer, generateId = true) {
     const schema = getSchemaByKey(schemaKey);
     if (!schema) {
         throw Error('Schema not found.');
@@ -60,29 +78,33 @@ const initializeNewNPC = function (schemaKey, randomizer) {
         throw Error('Invalid randomizer');
     }
 
-    const npc = new NPC({});
-    npc.schema = schemaKey;
+    const fields = new Map();
     schema.fields.forEach((field) => {
         const key = field.key;
         if (!isEmpty(field.starting_value)) {
-            npc.fields[key] = field.starting_value;
+            fields.set(key, field.starting_value);
             return;
         }
         if (!isEmpty(field.source)) {
             if (field.type === 'array') {
-                npc.fields[key] = [];
+                const value = [];
                 const ct = (field.count) ? field.count : 1;
                 for (let i = 0; i < ct; i++) {
-                    npc.fields[key].push(randomizer.convertToken(field.source));
+                    value.push(randomizer.convertToken(field.source));
                 }
+                fields.set(key, value);
             } else {
-                npc.fields[key] = randomizer.convertToken(field.source);
+                fields.set(key, randomizer.convertToken(field.source));
             }
             return;
         }
-        npc.fields[key] = field.defaultEmpty;
+        fields.set(key, field.defaultEmpty);
     });
-    return npc;
+    return new NPC({
+        schema: schemaKey,
+        fields: fields,
+        id: (generateId ? null : '')
+    });
 };
 
 export {
