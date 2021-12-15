@@ -427,14 +427,14 @@ class Randomizer {
         }
 
         // what table do we roll on
-        let t = null;
+        let rtable = null;
         if (token_parts[1] === 'this') {
             // reroll on same table
-            t = this.getTableByKey(curtable);
+            rtable = this.getTableByKey(curtable);
         } else {
-            t = this.getTableByKey(token_parts[1]);
+            rtable = this.getTableByKey(token_parts[1]);
         }
-        if (!t) {
+        if (!rtable) {
             return full_token;
         }
         if (typeof token_parts[2] !== 'undefined' && token_parts[2].indexOf('*') !== -1) {
@@ -445,7 +445,7 @@ class Randomizer {
         const subtable = (isUndefined(token_parts[2])) ? '' : token_parts[2];
 
         for (let i = 1; i <= multiplier; i++) {
-            const set = this.getResultSetForTable(t, subtable);
+            const set = this.getResultSetForTable(rtable, subtable);
             string += `${set.niceString(true)}, `;
         }
         string = string.trim();
