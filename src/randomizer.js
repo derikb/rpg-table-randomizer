@@ -180,7 +180,7 @@ class Randomizer {
     }
     /**
      * Generate a result from a RandomTable object
-     * @param {Object} rtable the RandomTable
+     * @param {RandomTable} rtable the RandomTable
      * @param {String} [start=''] subtable to roll on
      * @return {RandomTableResult[]}
      */
@@ -244,7 +244,7 @@ class Randomizer {
             return this._getErrorResultSet('No table key.');
         }
         const rtable = this.getTableByKey(tableKey);
-        if (isEmpty(rtable) || !(rtable instanceof RandomTable)) {
+        if (!rtable) {
             return this._getErrorResultSet(`No table found to key: ${tableKey}`);
         }
         const results = this.getTableResult(rtable, table);
@@ -366,19 +366,35 @@ class Randomizer {
     }
     /**
      * Since tables are stored outside of this module, this function allows for the setting of a function which will be used to lookup a table by it's key
-     * @param {Function} lookup a function that takes a table key and returns the table data object
-     * @return {null} nothing
+     * @param {Function} lookup a function that takes a table key and returns a RandomTable or null
      */
     setTableKeyLookup (lookup) {
-        this.getTableByKey = lookup;
+        this._customGetTableByKey = lookup;
     }
     /**
      * Placeholder that should be replaced by a function outside this module
      * @param {String} key human readable table identifier
      * @return {null} nothing, when replaced this function should return a table object
      */
-    getTableByKey (key) {
+    _customGetTableByKey (key) {
         return null;
+    }
+    /**
+     * Return a table based on it's key.
+     * This requires calling setTableKeyLookup and setting a lookup method
+     * That returns a RandomTable object or null.
+     * @param {String} key human readable table identifier
+     * @returns {RandomTable|null}
+     */
+    getTableByKey (key) {
+        if (!key) {
+            return null;
+        }
+        const table = this._customGetTableByKey(key);
+        if (!table || !(table instanceof RandomTable)) {
+            return null;
+        }
+        return table;
     }
     /**
      * Add a token variable
@@ -418,7 +434,7 @@ class Randomizer {
         } else {
             t = this.getTableByKey(token_parts[1]);
         }
-        if (t === null || typeof t !== 'object') {
+        if (!t) {
             return full_token;
         }
         if (typeof token_parts[2] !== 'undefined' && token_parts[2].indexOf('*') !== -1) {

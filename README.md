@@ -201,8 +201,7 @@ const result = randomizer.getTableResult(colortable);
 
 #### setTableKeyLookup (lookup)
 
-* @param {Function} _lookup_ a function that takes a table key and returns the table data object
-* @return {null} nothing
+* @param {Function} _lookup_ a function that takes a table key and returns a RandomTable instance or null
 
 Use this to set-up a way to retrieve RandomTable objects from a source. Necessary for cross-table tokens.
 
@@ -219,7 +218,7 @@ randomizer.setTableKeyLookup(table_retrieve);
 #### getTableByKey (key)
 
 * @param {String} key table key identifier
-* @return {null} nothing, when replaced this function should return a table object
+* @return {RandomTable|null}
 
 Used to access the function set with setTableKeyLookup(). Mostly used internally.
 
