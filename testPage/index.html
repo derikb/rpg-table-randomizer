@@ -5,7 +5,8 @@
     <body>
         <p>Demo output...</p>
         <script type="module">
-            import Randomizer from '../src/randomizer.js';
+            import TableRoller from '../src/TableRoller.js';
+            import { rollDie, getDiceResult } from '../src/dice_roller.js';
             import RandomTable from '../src/random_table.js';
             import normalizeData from '../src/table_normalizer.js';
             import RandomName from '../src/random_name.js';
@@ -18,6 +19,13 @@
             import npcTables from '../sample/npc_tables.js';
             import { simple as simpleSchemaData } from '../sample/schemas.js';
 
+
+            console.log(JSON.stringify(
+                [
+                    getDiceResult('d6'),
+                    getDiceResult('2d6+1')
+                ]
+            ));
 
             const printToScreen = function(any) {
                 const p = document.createElement('p');
@@ -34,26 +42,27 @@
                 printToScreen(`Loaded table ${table}`);
             });
 
-            const randomizer = new Randomizer({});
-            RandomName.setRandomizer(randomizer);
+            const tableRoller = new TableRoller({});
+            RandomName.setTableRoller(tableRoller);
             RandomName.setNameData(names);
 
-            randomizer.setTableKeyLookup(function(key) {
+            tableRoller.setTableKeyLookup(function(key) {
                 return testTables[key] || null;
             });
 
-            randomizer.registerTokenType('name', RandomName.nameTokenCallback);
+            tableRoller.registerTokenType('name', RandomName.nameTokenCallback);
 
-            printToScreen(randomizer.roll('2d6+1'));
+            printToScreen(rollDie('2d6+1'));
+            printToScreen(getDiceResult('4d6+1'));
             printToScreen(RandomName.generateList(4, 'flemish'));
             printToScreen(RandomName.createName('french', 'female'));
-            const ordResult = randomizer.getTableResultSetByKey('ordinal');
+            const ordResult = tableRoller.getTableResultSetByKey('ordinal');
             printToScreen(ordResult);
             printToScreen(ordResult.niceString());
-            const companyResult = randomizer.getTableResultSetByKey('colonial_companies');
+            const companyResult = tableRoller.getTableResultSetByKey('colonial_companies');
             printToScreen(companyResult);
             printToScreen(companyResult.niceString());
-            const missionResult = randomizer.getTableResultSetByKey('mission_generator');
+            const missionResult = tableRoller.getTableResultSetByKey('mission_generator');
             printToScreen(missionResult);
             printToScreen(missionResult.niceString());
 
@@ -63,22 +72,22 @@
 
             npcGenerator.registerSchema(simpleSchema);
 
-            const npc = npcGenerator.initializeNewNPC('simple', randomizer);
+            const npc = npcGenerator.initializeNewNPC('simple', tableRoller);
 
             printToScreen(
                 npc
             );
             console.log(npc);
 
-            const swampEncounter = randomizer.getTableByKey('colonial_encounters_swamp');
+            const swampEncounter = tableRoller.getTableByKey('colonial_encounters_swamp');
             printToScreen(swampEncounter);
-            const swampEncounterResult = randomizer.getTableResultSetByKey('colonial_encounters_swamp');
+            const swampEncounterResult = tableRoller.getTableResultSetByKey('colonial_encounters_swamp');
             printToScreen(swampEncounterResult);
             printToScreen(swampEncounterResult.niceString());
 
-            printToScreen('Demon name: ' + randomizer.getTableResultSetByKey('demon_name').niceString());
+            printToScreen('Demon name: ' + tableRoller.getTableResultSetByKey('demon_name').niceString());
 
-            printToScreen('Holmes name: ' + randomizer.getTableResultSetByKey('holmes_name').niceString());
+            printToScreen('Holmes name: ' + tableRoller.getTableResultSetByKey('holmes_name').niceString());
 
             printToScreen(RandomName.createName('french', 'mixed'));
 
@@ -92,7 +101,7 @@
                    ]
                 }
             });
-            printToScreen(randomizer.getTableResult(anotherTable));
+            printToScreen(tableRoller.getTableResult(anotherTable));
         </script>
     </body>
 </html>

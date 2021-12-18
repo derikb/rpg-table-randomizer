@@ -9,7 +9,7 @@ class NPCSchemaField {
      * @property {String} key Identifying key
      * @property {String} label Readable label for field.
      * @property {String} type Type of data in field. Valid: string, text, array, number, modifier
-     * @property {String} source Source of data for Randomizer in the form of a token (see Randomizer, ex: "name:french", "table:color", etc.)
+     * @property {String} source Source of data for TableRoller in the form of a token (see TableRoller, ex: "name:french", "table:color", etc.)
      * @property {Number} count Number of entries for array types.
      * @property {Array|String|Number} starting_value An optional starting value.
      */

@@ -1,6 +1,6 @@
 declare namespace _default {
     export { setNameData };
-    export { setRandomizer };
+    export { setTableRoller };
     export { generateList };
     export { selectName };
     export { selectPersonalName };
@@ -17,7 +17,7 @@ export default _default;
  * @param {Object} data a lot of names divided by type. see /samples/names.json for formatting
  */
 declare function setNameData(data: any): void;
-declare function setRandomizer(instance: any): void;
+declare function setTableRoller(instance: any): void;
 /**
  * Generate a bunch of names, half male, half female
  * @param {Number} [number=10] number of names in the list (half will be male, half will be female)
@@ -25,7 +25,7 @@ declare function setRandomizer(instance: any): void;
  * @param {Bool} [create=false] new names or just pick from list
  * @return {Object} arrays of names inside male/female property
  */
-declare function generateList(number?: number, name_type?: string, create?: any): any;
+declare function generateList(number?: number, name_type?: string, create?: Bool): any;
 /**
  * Select a name from one of the lists
  * @param {String} name_type What name list/process to use else random
@@ -85,7 +85,7 @@ declare function registerNameType(name_type: string, data?: {
     surnames: any[];
 }, label?: string): boolean;
 /**
- * Callback for the Randomizer to generate names from a token.
+ * Callback for the TableRoller to generate names from a token.
  * Token parts will be:
  * 0: "name" literally
  * 1: type of name (often a nationality/language/ethnicity/etc)

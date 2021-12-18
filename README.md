@@ -5,15 +5,17 @@
 1. [Motivation](#motivation)
 1. [Installation](#installation)
 1. [API Reference](#api-reference)
-  1. [Randomizer](#Randomizer)
-  1. [RandomTable](#RandomTable)
-  2. [RandomTableEntry](#RandomTableEntry)
-  3. [RandomTableResult](#RandomTableResult)
-  4. [RandomTableResultSet](#RandomTableResultSet)
-  5. [TableNormalizer](#tablenormalizer)
-  6. [npc_generator](#npc_generator)
-  7. [RandomName](#RandomName)
-  8. [r_helpers](#r_helpers)
+  1. [randomizer](#randomizer)
+  2. [dice_roller](#dice_roller)
+  3. [TableRoller](#TableRoller)
+  4. [RandomTable](#RandomTable)
+  5. [RandomTableEntry](#RandomTableEntry)
+  6. [RandomTableResult](#RandomTableResult)
+  7. [RandomTableResultSet](#RandomTableResultSet)
+  8. [TableNormalizer](#tablenormalizer)
+  9. [npc_generator](#npc_generator)
+  10. [RandomName](#RandomName)
+  11. [r_helpers](#r_helpers)
 2. [Contributors](#contributors)
 3. [License](#license)
 
@@ -30,17 +32,17 @@ These are models and logic only, there is no ui and only the most limited of vie
 A simple example setting up a very basic unweighted table (with no subtables), then "rolling" on it, and also generating a dice roll and two random names:
 
 ```
-import Randomizer from '../src/randomizer.js';
+import TableRoller from '../src/TableRoller.js';
 import RandomTable from '../src/random_table.js';
 
 // Object to hold tables.
 const testTables = {};
 
-// Instantiate a randomizer
-const randomizer = new Randomizer({});
+// Instantiate a table roller
+const tableRoller = new TableRoller({});
 // Set a really basic table lookup
 // just looks for the key in the testTables Object.
-randomizer.setTableKeyLookup(function(key) {
+tableRoller.setTableKeyLookup(function(key) {
 	return testTables[key] || null;
 });
 
@@ -58,26 +60,26 @@ const colortable = new RandomTable({
 testTables[colortable.key] = colortable;
 
 // Return random result set from the colors table.
-const colorResult = randomizer.getTableResultSetByKey('colors');
+const colorResult = tableRoller.getTableResultSetByKey('colors');
 console.log(colorResult); // full result set
 console.log(colorResult.niceString()); // In this case it would just be a color.
 
 // Random roll
-console.log(randomizer.roll('2d4+1'));
+console.log(tableRoller.roll('2d4+1'));
 ```
 
 Example using the name generator.
 
 ```
-import Randomizer from '../src/randomizer.js';
+import TableRoller from '../src/TableRoller.js';
 import RandomTable from '../src/random_table.js';
 import RandomName from '../src/random_name.js';
 import names from '../sample/names.js';
 
-// Instantiate randomizer
-const randomizer = new Randomizer({});
-// Set the randomizer in the random name module.
-RandomName.setRandomizer(randomizer);
+// Instantiate TableRoller
+const tableRoller = new TableRoller({});
+// Set the tableRoller in the random name module.
+RandomName.setTableRoller(tableRoller);
 
 // Add some name data
 RandomName.setNameData(names);
@@ -86,6 +88,20 @@ RandomName.setNameData(names);
 console.log(RandomName.generateList(4, 'flemish'));
 // Get a single French name from the female name list.
 console.log(RandomName.createName('french', 'female'));
+
+```
+
+Example of just the dice roller:
+
+```
+import { rollDie, getDiceResult } from '../src/dice_roller.js';
+
+// just the number
+console.log(rollDie('2d6+3));
+// get a DiceResult object with the value and the die rolled
+const result = getDiceResult('1d6');
+console.log(result.value); // some number between 1 and 6
+console.log(result.die); // '1d6'
 
 ```
 
@@ -99,8 +115,6 @@ I also really like have a quick way to get a bunch of names.
 
 ## Installation
 
-There are no module requirements for production environment.
-
 You should be able to use it in any modern browser or server side via node.
 
 Install the module via npm:
@@ -109,9 +123,7 @@ Install the module via npm:
 $ npm install --save rpg-table-randomizer
 ```
 
-Or download from git and just use in your project.
-
-The `src/index.js` will export a basic randomizer with name generation setup. Otherwise you'd probably want to figure out what parts you need and then run it through a js bundler.
+The `src/index.js` will export a basic tableRoller with name generation setup. Otherwise you'd probably want to figure out what parts you need and then run it through a js bundler.
 
 
 ## Sample Data
@@ -124,15 +136,67 @@ The module exposes a few objects and constructors.
 
 **This is under construction as I refactor.**
 
-### Randomizer
+### randomizer
 
-Exported from the randomizer.js file.
+Utility classes for random selection/generation.
 
-A class used for generating random results from tables. It can also provide random dice rolls.
+#### randomInteger (min, max)
+
+* @param {Number} [min=0] mininum value
+* @param {Number} [max=null] maximum value
+* @returns {Number} random value
 
 
+#### getWeightedRandom (values, weights)
 
-#### roll (string)
+- @param {Array} _values_ array of values to randomly select from
+- @param {Array} _weights_ array of weighted numbers to correspond to the values array
+- @return {String|Number|Object} a randomly selected element from the values array
+
+This is mostly used internally. Returns a randomly selected element from the values array, where the randomization is weighted based on the weights array.
+
+```
+//a classic bell curve reaction table
+const values = [
+	'Hostile',
+	'Unfriendly',
+	'Indifferent',
+	'Talkative',
+	'Helpful'
+];
+const weights = [
+	1,
+	9,
+	16,
+	9,
+	1
+];
+getWeightedRandom(values, weights); // returns a reaction from the value array
+
+```
+
+#### randomString (data)
+
+- @param {String[]} _data_ Array of strings to select from.
+- @returns {String} the randomly selected string
+
+Takes an array of strings and returns one of the element's value randomly.
+
+```
+const data = [
+	"Hostile",
+	"Unfriendly",
+	"Indifferent",
+	"Talkative",
+	"Helpful"
+];
+randomString(data); // returns one of the reactions
+
+```
+
+### dice_roller
+
+#### rollDie (string)
 
 * @params {String} string a die roll notation
 * @returns {Number} the result of the roll
@@ -140,13 +204,34 @@ A class used for generating random results from tables. It can also provide rand
 For random dice rolling operations. It should accept any form of `[A Number or Blank]d[Another number][An arithmatic operator: +, -, *, or /][Another number]`
 
 ```
-randomizer.roll('d6'); // returns an integer between 1 and 6
-randomizer.roll('d6/3'); // returns an integer between 1 and 3
-randomizer.roll('d6*2'); // returns an integer between 2 and 12
-randomizer.roll('d4+1'); // returns an integer between 2 and 5
-randomizer.roll('d4-1'); // returns an integer between 0 and 3
-randomizer.roll('2d8'); // returns an integer between 2 and 16
+rollDie('d6'); // returns an integer between 1 and 6
+rollDie('d6/3'); // returns an integer between 1 and 3
+rollDie('d6*2'); // returns an integer between 2 and 12
+rollDie('d4+1'); // returns an integer between 2 and 5
+rollDie('d4-1'); // returns an integer between 0 and 3
+rollDie('2d8'); // returns an integer between 2 and 16
 ```
+
+#### getDiceResult (string)
+
+* @param {String} die Die roll notation.
+* @returns {DiceResult}
+
+Get a DiceResult object.
+
+
+#### DiceResult
+
+* @prop {String} die Die notation.
+* @prop {Number} value Random roll for the die notation.
+
+
+### TableRoller
+
+Exported from the TableRoller.js file.
+
+A class used for generating random results from tables.
+
 
 #### getTableResultSetByKey (tableKey, table)
 
@@ -193,7 +278,7 @@ const table_config = {
 };
 const colortable = new RandomTable(table_config);
 
-const result = randomizer.getTableResult(colortable);
+const result = tableRoller.getTableResult(colortable);
 /*
  The return will be a RandomTableResult from the default table and a RandomTableResult from the shade table.
 */
@@ -212,7 +297,7 @@ const table_retrieve = function (key) {
 	return table;
 };
 
-randomizer.setTableKeyLookup(table_retrieve);
+tableRoller.setTableKeyLookup(table_retrieve);
 ```
 
 #### getTableByKey (key)
@@ -234,75 +319,9 @@ const footoken = function (token_parts, full_token, current_table) {
 	return token_parts[1] + ' with big red eyes';
 }
 
-randomizer.registerTokenType('foo', footoken);
+tableRoller.registerTokenType('foo', footoken);
 
 // now a table could have a value like: "You see an {{foo:orange}}" and it would return "You see an orange with big red eyes"
-
-```
-
-#### getWeightedRandom (values, weights)
-
-- @param {Array} _values_ array of values to randomly select from
-- @param {Array} _weights_ array of weighted numbers to correspond to the values array
-- @return {String|Number|Object} a randomly selected element from the values array
-
-This is mostly used internally. Returns a randomly selected element from the values array, where the randomization is weighted based on the weights array.
-
-```
-//a classic bell curve reaction table
-const values = [
-	'Hostile',
-	'Unfriendly',
-	'Indifferent',
-	'Talkative',
-	'Helpful'
-];
-const weights = [
-	1,
-	9,
-	16,
-	9,
-	1
-];
-randomizer.getWeightedRandom(values, weights); // returns a reaction from the value array
-
-```
-
-#### rollRandomString (data)
-
-- @param {String[]} _data_ Array of string to select from.
-- @returns {String} the randomly selected string
-
-Takes an array of strings and returns one of the element's value randomly.
-
-```
-const data = [
-	"Hostile",
-	"Unfriendly",
-	"Indifferent",
-	"Talkative",
-	"Helpful"
-];
-randomizer.rollRandomString(data); // returns one of the reactions
-
-```
-
-#### rollRandomEntry (data)
-
-- @param {RandomTableEntry[]} _data_ An array of entries to choose from
-- @returns {RandomTableEntry}
-
-This is mostly used internally. Takes an array of entries and returns one of them randomly based on weight property.
-
-```
-const data = [
-	new RandomTableEntry({ label: "Hostile", weight: 1 }),
-	new RandomTableEntry({ label: "Unfriendly", weight: 9 }),
-	new RandomTableEntry({ label: "Indifferent", weight: 16 }),
-	new RandomTableEntry({ label: "Talkative", weight: 9 }),
-	new RandomTableEntry({ label: "Helpful", weight: 1 })
-];
-randomizer.rollRandom(data); // returns one of the reactions entries
 
 ```
 
@@ -310,9 +329,9 @@ randomizer.rollRandom(data); // returns one of the reactions entries
 
 - @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}} (This will also work without the enclosing braces.)
 - @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
-- @returns {String} The value with the token(s) replaced by the operation or else just the token (in case it was a mistake or at least to make the error clearer)
+- @returns {RandomTableResultSet|RandomTableResultSet[]|DiceResult|String|Any} The result of the token or else just the token (in case it was a mistake or at least to make the error clearer)
 
-Take a token and perform token replacement, returning the result as a string.
+Take a token and perform token replacement, returning the result as a string or the raw value.
 
 
 #### findToken (entryLabel, curtable)
@@ -328,7 +347,7 @@ Takes a result value, finds, and replaces any tokens in it.
 
 ### RandomTable
 
-A class for random table objects that can be used by the randomizer. A great variety of options are available.
+A class for random table objects that can be used by the tableRoller. A great variety of options are available.
 
 #### constructor (config)
 
@@ -526,7 +545,7 @@ Classes for npc schemas.
 
 * @param {String} key Identifying key
 * @param {String} type Type of data in field. Valid: string, text, array, number, modifier
-* @param {String} source Source of data for Randomizer in the form of a token (see Randomizer, ex: "name:french", "table:color", etc.)
+* @param {String} source Source of data for TableRoller in the form of a token (see TableRoller, ex: "name:french", "table:color", etc.)
 * @param {Number} count Number of entries for array types.
 * @param {Array|String|Number} starting_value An optional starting value.
 
@@ -547,10 +566,10 @@ This function takes the passed in `NPCSchema` and adds it by key to the availabl
 * @param {String} key Schema key.
 * @returns {NPCSchema|null}
 
-#### initializeNewNPC (schemaKey, Randomizer, generateId)
+#### initializeNewNPC (schemaKey, TableRoller, generateId)
 
 * @param {String} schemaKey Key for an NPCSchema
-* @param {Randomizer} randomizer
+* @param {TableRoller} tableRoller
 * @param {Boolean} [generateId=true] If true NPC will have a uuid assigned to its id property.
 * @returns NPC
 
@@ -562,6 +581,7 @@ An NPC class.
 * @param {String} schema Key for a NPCSchema used for this NPC.
 * @param {Map<String, Any>} fields Field values indexed by NPCSchemaField key.
 
+Fields map can include RandomTableResultSet or DiceResult or just a string, depending on the source of the field.
 
 Sample of making an NPC.
 
@@ -580,7 +600,7 @@ const ddSchema = new NPCSchema({
 
 npc_generator.registerSchema(ddSchema);
 
-const npc = npc_generator.initializeNewNPC('dd', randomizer); // a new NPC object using the dd schema, with its fields set to random values.
+const npc = npc_generator.initializeNewNPC('dd', tableRoller); // a new NPC object using the dd schema, with its fields set to random values.
 ```
 
 
@@ -603,9 +623,9 @@ In general:
 
 You need to set this is you want to generate/randomize names.
 
-### setRandomizer (Randomizer)
+### setTableRoller (TableRoller)
 
-@param {Randomizer} Instantiation of the Randomizer class.
+@param {TableRoller} Instantiation of the TableRoller class.
 
 #### generateList (number, name_type, create)
 
@@ -736,11 +756,11 @@ random_name.selectName('caveman', 'female'); // Shelee Tnk
 
 #### nameTokenCallback
 
-This function can be use in a Randomizer to setup the "name" token.
+This function can be use in a TableRoller to setup the "name" token.
 
 ```
-const randomizer = new Randomizer();
-randomizer.registerTokenType('name', RandomName.nameTokenCallback);
+const tableRoller = new TableRoller();
+tableRoller.registerTokenType('name', RandomName.nameTokenCallback);
 ```
 
 ### r_helpers
@@ -753,6 +773,8 @@ I'm not going to document these now, but the methods are:
 - isObject
 - isUndefined
 - capitalize
+- defaultToJSON
+  - This is a custom toJSON function for classes that handles Maps and converts them to objects.
 
 
 ## Contributors

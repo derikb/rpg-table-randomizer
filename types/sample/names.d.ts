@@ -5,8 +5,9 @@ declare var _default: {
         cornish: string;
         japanese: string;
         turkish: string;
-        "native american": string;
+        'native american': string;
         french: string;
+        mexican: string;
     };
     cornish: {
         male: string[];
@@ -33,12 +34,17 @@ declare var _default: {
         female: string[];
         surname: string[];
     };
-    "native american": {
+    'native american': {
         female: string[];
         male: string[];
         surname: any[];
     };
     french: {
+        male: string[];
+        female: string[];
+        surname: string[];
+    };
+    mexican: {
         male: string[];
         female: string[];
         surname: string[];

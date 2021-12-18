@@ -2,17 +2,22 @@
  * Class for NPCs.
  * @param {String} id Some kind of indentifier.
  * @param {String} schema Key for a NPCSchema used for this NPC.
- * @param {Object} fields Field values indexed by NPCSchemaField key.
+ * @param {Map<String, Any>} fields Field values indexed by NPCSchemaField key.
  */
 export class NPC {
     constructor({ id, schema, fields }: {
-        id?: string;
+        id?: any;
         schema?: string;
-        fields?: {};
+        fields?: any;
     });
-    id: string;
+    id: any;
     schema: string;
-    fields: {};
+    fields: any;
+    /**
+     * Custom JSON handler to strip empty props.
+     * @returns {Object}
+     */
+    toJSON(): any;
 }
 /**
  * Add new schema to store.
@@ -28,9 +33,9 @@ export function getSchemaByKey(key: string): NPCSchema | null;
 /**
  * Create a new NPC from a Schema.
  * @param {String} schemaKey Key for an NPCSchema
- * @param {Randomizer} randomizer
+ * @param {TableRoller} tableRoller
+ * @param {Boolean} generateId Should the npc get a uuid.
  * @returns NPC
  */
-export function initializeNewNPC(schemaKey: string, randomizer: Randomizer): NPC;
-import { NPCSchema } from "./npc_schema.js";
-import Randomizer from "./randomizer.js";
+export function initializeNewNPC(schemaKey: string, tableRoller: TableRoller, generateId?: boolean): NPC;
+import TableRoller from "./TableRoller.js";

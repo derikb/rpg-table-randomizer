@@ -26,7 +26,7 @@ declare class MarkovGenerator {
     /**
      * Get a random array element
      * @param {Array} arr an array
-     * @return {String|Object}	random value
+     * @return {String|Object} random value
      */
     getRandomValue(arr: any[]): string | any;
     /**

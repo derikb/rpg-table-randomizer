@@ -1,5 +1,6 @@
 import { isEmpty, capitalize } from './r_helpers.js';
 import MarkovGenerator from './MarkovGenerator.js';
+import { randomString } from './randomizer.js';
 
 /**
  * Stores the Markov object
@@ -20,11 +21,11 @@ const setNameData = function (data) {
     namedata = data;
 };
 
-/** @property {Randomizer} randomizer */
-let randomizer = null;
+/** @property {TableRoller} tableRoller */
+let tableRoller = null;
 
-const setRandomizer = function (instance) {
-    randomizer = instance;
+const setTableRoller = function (instance) {
+    tableRoller = instance;
 };
 
 /**
@@ -32,7 +33,7 @@ const setRandomizer = function (instance) {
  * @returns {String}
  */
 const getRandomNameType = function () {
-    return randomizer.rollRandomString(Object.keys(namedata.options));
+    return randomString(Object.keys(namedata.options));
 };
 
 /**
@@ -89,10 +90,12 @@ const selectPersonalName = function (name_type = 'random', gender = 'random') {
     }
     if (gender === 'random' || isEmpty(gender)) {
         // randomize a gender...
-        gender = randomizer.rollRandomString(['male', 'female']);
+        gender = randomString(['male', 'female']);
     }
-    name = randomizer.rollRandomString(namedata[name_type][gender]);
-    name = randomizer.findToken(name).trim();
+    name = randomString(namedata[name_type][gender]);
+    if (tableRoller) {
+        name = tableRoller.findToken(name).trim();
+    }
     return capitalizeName(name);
 };
 
@@ -110,8 +113,10 @@ const selectSurname = function (name_type = 'random') {
     if (isEmpty(namedata[name_type].surname)) {
         return '';
     }
-    name = randomizer.rollRandomString(namedata[name_type].surname);
-    name = randomizer.findToken(name);
+    name = randomString(namedata[name_type].surname);
+    if (tableRoller) {
+        name = tableRoller.findToken(name);
+    }
     return capitalizeName(name);
 };
 
@@ -146,7 +151,7 @@ const createPersonalName = function (name_type = 'random', gender = 'random') {
         name_type = getRandomNameType();
     }
     if (gender !== 'male' && gender !== 'female' && gender !== 'mixed') {
-        gender = randomizer.rollRandomString(['male', 'female']);
+        gender = randomString(['male', 'female']);
     }
     const mkey = `${name_type}_${gender}`;
     if (!markov.isMemoryKeySet(mkey)) {
@@ -233,7 +238,7 @@ const registerNameType = function (name_type, data = {}, label = '') {
 };
 
 /**
- * Callback for the Randomizer to generate names from a token.
+ * Callback for the TableRoller to generate names from a token.
  * Token parts will be:
  * 0: "name" literally
  * 1: type of name (often a nationality/language/ethnicity/etc)
@@ -261,7 +266,7 @@ const nameTokenCallback = function (token_parts, full_token = '', curtable = '')
 
 export default {
     setNameData,
-    setRandomizer,
+    setTableRoller,
     generateList,
     selectName,
     selectPersonalName,

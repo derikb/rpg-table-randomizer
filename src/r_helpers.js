@@ -52,6 +52,8 @@ const capitalize = function (string) {
  * @returns {Object}
  */
 const defaultToJSON = function () {
+    // @todo Should we save the objects class name as a property
+    // so we can recreate the right structure later?
     const returnObj = {};
     for (const property in this) {
         const value = this[property];
@@ -59,26 +61,9 @@ const defaultToJSON = function () {
             if (value.size === 0) {
                 continue;
             }
-            // for Object values we store an array of objects.
-            // for anything else we store an object of key->value.
-            const mapObject = Object.fromEntries(value.entries());
-            const mapStrings = {};
-            const mapArray = [];
-            Object.keys(mapObject).forEach((key) => {
-                const v = mapObject[key];
-                if (isObject(v) && !Array.isArray(v)) {
-                    mapArray.push(v);
-                } else {
-                    mapStrings[key] = v;
-                }
-            });
-            if (mapArray.length > 0) {
-                returnObj[property] = mapArray;
-                continue;
-            }
-            if (Object.keys(mapStrings).length > 0) {
-                returnObj[property] = mapStrings;
-            }
+            // Note: This will be problematic if Map has keys that are not
+            // permitted as object properties.
+            returnObj[property] = Object.fromEntries(value.entries());
             continue;
         }
         if (isEmpty(value)) {

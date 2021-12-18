@@ -1,6 +1,6 @@
 export default RandomTable;
 /**
- * RandomTable: Model for tables used by Randomizer
+ * RandomTable: Model for tables used by TableRoller
  * @param {Object} config the tables non-default attributes
  */
 export class RandomTable {

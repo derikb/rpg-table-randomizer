@@ -1,4 +1,4 @@
-import Randomizer from './randomizer.js';
+import TableRoller from './TableRoller.js';
 import { isEmpty, defaultToJSON, isObject } from './r_helpers.js';
 import { v4 as uuidv4 } from '../node_modules/uuid/dist/esm-browser/index.js';
 
@@ -29,6 +29,8 @@ class NPC {
         if (fields instanceof Map) {
             this.fields = fields;
         } else if (isObject(fields)) {
+            // @todo do we convert result set objects to classes?
+            // how?
             this.fields = new Map(Object.entries(fields));
         }
     }
@@ -65,17 +67,17 @@ const getSchemaByKey = function (key) {
 /**
  * Create a new NPC from a Schema.
  * @param {String} schemaKey Key for an NPCSchema
- * @param {Randomizer} randomizer
+ * @param {TableRoller} tableRoller
  * @param {Boolean} generateId Should the npc get a uuid.
  * @returns NPC
  */
-const initializeNewNPC = function (schemaKey, randomizer, generateId = true) {
+const initializeNewNPC = function (schemaKey, tableRoller, generateId = true) {
     const schema = getSchemaByKey(schemaKey);
     if (!schema) {
         throw Error('Schema not found.');
     }
-    if (!(randomizer instanceof Randomizer)) {
-        throw Error('Invalid randomizer');
+    if (!(tableRoller instanceof TableRoller)) {
+        throw Error('Invalid tableRoller');
     }
 
     const fields = new Map();
@@ -90,11 +92,11 @@ const initializeNewNPC = function (schemaKey, randomizer, generateId = true) {
                 const value = [];
                 const ct = (field.count) ? field.count : 1;
                 for (let i = 0; i < ct; i++) {
-                    value.push(randomizer.convertToken(field.source));
+                    value.push(tableRoller.convertToken(field.source, ''));
                 }
                 fields.set(key, value);
             } else {
-                fields.set(key, randomizer.convertToken(field.source));
+                fields.set(key, tableRoller.convertToken(field.source, ''));
             }
             return;
         }
