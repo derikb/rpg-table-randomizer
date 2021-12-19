@@ -303,14 +303,17 @@ tableRoller.setTableKeyLookup(table_retrieve);
 #### getTableByKey (key)
 
 * @param {String} key table key identifier
-* @return {RandomTable|null}
+* @return {RandomTable}
+* @throws {TableError}
 
 Used to access the function set with setTableKeyLookup(). Mostly used internally.
+
+Will throw TableError if key is empty or a RandomTable object is not found.
 
 #### registerTokenType (name, process)
 
 * @param {String} name Name of the token (used as first element of token)
-* @param {Function} process Function to return token replacement value function is passed the token_parts (token split by ":"),  original full_token, current table name
+* @param {Function} process Function to return token replacement value function is passed the token_parts (token split by ":"),  original full_token, current table
 
 Register a custom token type for use in tables.
 
@@ -328,7 +331,7 @@ tableRoller.registerTokenType('foo', footoken);
 #### convertToken (string, curtable)
 
 - @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}} (This will also work without the enclosing braces.)
-- @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
+- @param {RandomTable|null} curtable RandomTable the string is from (needed for "this" tokens) or null
 - @returns {RandomTableResultSet|RandomTableResultSet[]|DiceResult|String|Any} The result of the token or else just the token (in case it was a mistake or at least to make the error clearer)
 
 Take a token and perform token replacement, returning the result as a string or the raw value.
@@ -337,7 +340,7 @@ Take a token and perform token replacement, returning the result as a string or 
 #### findToken (entryLabel, curtable)
 
 - @param {String} entryLabel Usually a Label from a RandomTableEntry
-- @param {String} curtable name of the RandomTable the string is from (needed for "this" tokens)
+- @param {RandomTable|null} curtable RandomTable the string is from (needed for "this" tokens) or null
 - @returns {String} String with tokens replaced (if applicable)
 
 In most cases it is not necessary to call this method directly, getTableResult() should be preferred.

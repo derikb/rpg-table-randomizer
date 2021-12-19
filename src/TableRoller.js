@@ -1,8 +1,9 @@
 /* eslint-disable no-useless-escape */
-import { isEmpty, isObject, isUndefined } from './r_helpers.js';
+import { isEmpty, isUndefined } from './r_helpers.js';
 import { RandomTable, RandomTableResult, RandomTableResultSet } from './random_table.js';
 import { getDiceResult } from './dice_roller.js';
 import { getWeightedRandom } from './randomizer.js';
+import TableError from './TableError.js';
 
 /**
  * Define the regex to find tokens
@@ -71,104 +72,10 @@ class TableRoller {
         return getWeightedRandom(values, weights);
     }
     /**
-     * Generate a result from a RandomTable object
-     * @param {RandomTable} rtable the RandomTable
-     * @param {String} [start=''] subtable to roll on
-     * @return {RandomTableResult[]}
-     */
-    getTableResult (rtable, start = '') {
-        if (!isObject(rtable)) {
-            return [
-                this._getErrorResult('No table found to roll on.')
-            ];
-        }
-        let results = [];
-
-        // if macro is set then we ignore a lot of stuff
-        if (rtable.macro.length > 0) {
-            // iterate over the tables and get results
-            // Danger, we could theoretically hit an infinite loop, couldn't we?
-            rtable.macro.forEach((tableKey) => {
-                const set = this.getTableResultSetByKey(tableKey);
-                const result = new RandomTableResult({ table: tableKey, result: set.niceString() });
-                results.push(result);
-            });
-            return results;
-        }
-
-        // we look in the start table for what to roll if the start wasn't explicitly set in the call
-        let sequence = (!start) ? rtable.sequence : [start];
-
-        if (sequence[0] === 'rollall') {
-            // roll all the tables in order
-            sequence = rtable.subtableNames;
-        }
-
-        if (sequence.length === 0) {
-            // if no start attribute
-            // try for "default" table
-            if (typeof rtable.tables.default !== 'undefined') {
-                results = this._selectFromTable(rtable, 'default');
-            } else {
-                // select first item from tables
-                const tables = rtable.subtableNames;
-                results = this._selectFromTable(rtable, tables[0]);
-            }
-            return results;
-        }
-
-        sequence.forEach((seq) => {
-            const r = this._selectFromTable(rtable, seq);
-            results = results.concat(r);
-        });
-
-        return results;
-    }
-
-    /**
-     * Get result set from a table based on the key.
-     * @param {String} tableKey
-     * @param {String} table
-     * @returns {RandomTableResultSet}
-     */
-    getTableResultSetByKey (tableKey, table = '') {
-        if (!tableKey) {
-            return this._getErrorResultSet('No table key.');
-        }
-        const rtable = this.getTableByKey(tableKey);
-        if (!rtable) {
-            return this._getErrorResultSet(`No table found to key: ${tableKey}`);
-        }
-        const results = this.getTableResult(rtable, table);
-        return new RandomTableResultSet({
-            title: rtable.title,
-            results: results,
-            displayOptions: rtable.display_opt
-        });
-    }
-    /**
-     * Get result set from a table based on the key.
-     * @param {RandomTable} rtable Main table object.
-     * @param {String} [table] Subtable
-     * @returns {RandomTableResultSet}
-     */
-    getResultSetForTable (rtable, table = '') {
-        if (!(rtable instanceof RandomTable)) {
-            return this._getErrorResultSet(`Invalid table data.`);
-        }
-        const results = this.getTableResult(rtable, table);
-        return new RandomTableResultSet({
-            title: rtable.title,
-            results: results,
-            displayOptions: rtable.display_opt
-        });
-    }
-    /**
      * Get a result from a table/subtable in a RandomTable object
      * DANGER: you could theoretically put yourself in an endless loop if the data were poorly planned
-     * ...but at worst that would just crash the users browser since there's no server processing involved... (???)
-     * @todo we'll have to fix for this with a node version... make track the tables rolled on hierarchically, so a parent table doesn't call itself...?
-     * @param {Object} rtable the RandomTable object
+     * Calling method try to catch RangeError to handle that possibility.
+     * @param {RandomTable} rtable the RandomTable object
      * @param {String} table table to roll on
      * @returns {RandomTableResult[]}
      */
@@ -188,7 +95,7 @@ class TableRoller {
         // (good for top-level tables that have subtables prop set)
         if (entry.print) {
             // replace any tokens
-            const t_result = this.findToken(entry.label, rtable.key);
+            const t_result = this.findToken(entry.label, rtable);
             o.push(new RandomTableResult({ table: table, result: t_result, desc: entry.description }));
         }
 
@@ -206,12 +113,133 @@ class TableRoller {
         return o;
     }
     /**
+     * Get results array for macro setting of a table.
+     * @param {RandomTable} rtable Table with macro set.
+     * @returns {RandomTableResult[]}
+     */
+    _getTableMacroResult (rtable) {
+        const results = [];
+        try {
+            rtable.macro.forEach((tableKey) => {
+                const set = this.getTableResultSetByKey(tableKey);
+                const result = new RandomTableResult({ table: tableKey, result: set.niceString() });
+                results.push(result);
+            });
+        } catch (e) {
+            if (e instanceof RangeError) {
+                // This could be an infinite loop of table results referencing each other.
+                results.push(this._getErrorResult(e.message));
+            } else {
+                throw e;
+            }
+        }
+        return results;
+    }
+    /**
+     * Generate a result from a RandomTable object
+     * @param {RandomTable} rtable the RandomTable
+     * @param {String} [start=''] subtable to roll on
+     * @return {RandomTableResult[]}
+     */
+    getTableResult (rtable, start = '') {
+        if (!(rtable instanceof RandomTable)) {
+            return [
+                this._getErrorResult('No table found to roll on.')
+            ];
+        }
+        let results = [];
+
+        // if macro is set then we ignore a lot of stuff
+        if (rtable.macro.length > 0) {
+            return this._getTableMacroResult(rtable);
+        }
+
+        // we look in the start table for what to roll if the start wasn't explicitly set in the call
+        let sequence = (!start) ? rtable.sequence : [start];
+
+        if (sequence[0] === 'rollall') {
+            // roll all the tables in order
+            sequence = rtable.subtableNames;
+        }
+
+        try {
+            if (sequence.length === 0) {
+                // if no start attribute
+                // try for "default" table
+                if (typeof rtable.tables.default !== 'undefined') {
+                    results = this._selectFromTable(rtable, 'default');
+                } else {
+                    // select first item from tables
+                    const tables = rtable.subtableNames;
+                    results = this._selectFromTable(rtable, tables[0]);
+                }
+                return results;
+            }
+
+            sequence.forEach((seq) => {
+                const r = this._selectFromTable(rtable, seq);
+                results = results.concat(r);
+            });
+        } catch (e) {
+            // In case of infinite recursion
+            if (e instanceof RangeError) {
+                results.push(this._getErrorResult(e.message));
+            } else {
+                throw e;
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Get result set from a table based on the key.
+     * @param {String} tableKey
+     * @param {String} table
+     * @returns {RandomTableResultSet}
+     */
+    getTableResultSetByKey (tableKey, table = '') {
+        try {
+            const rtable = this.getTableByKey(tableKey);
+            const results = this.getTableResult(rtable, table);
+            return new RandomTableResultSet({
+                title: rtable.title,
+                results: results,
+                displayOptions: rtable.display_opt
+            });
+        } catch (e) {
+            if (e instanceof TableError) {
+                return this._getErrorResultSet(e.message);
+            } else {
+                // Rethrow unexpected errors
+                throw e;
+            }
+        }
+    }
+    /**
+     * Get result set from a table based on the key.
+     * @param {RandomTable} rtable Main table object.
+     * @param {String} [table] Subtable
+     * @returns {RandomTableResultSet}
+     */
+    getResultSetForTable (rtable, table = '') {
+        if (!(rtable instanceof RandomTable)) {
+            return this._getErrorResultSet(`Invalid table data.`);
+        }
+        const results = this.getTableResult(rtable, table);
+        return new RandomTableResultSet({
+            title: rtable.title,
+            results: results,
+            displayOptions: rtable.display_opt
+        });
+    }
+    /**
      * Perform token replacement.  Only table and roll actions are accepted
      * @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}}
-     * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
+     * @param {RandomTable|null} curtable RandomTable the string is from (needed for "this" tokens) or null
      * @returns {RandomTableResultSet|RandomTableResultSet[]|DiceResult|String|Any} The result of the token or else just the token (in case it was a mistake or at least to make the error clearer)
      */
-    convertToken (token, curtable = '') {
+    convertToken (token, curtable = null) {
         let parts = token.replace('{{', '').replace('}}', '').split(':');
         parts = parts.map((el) => {
             return el.trim();
@@ -221,19 +249,28 @@ class TableRoller {
         }
 
         // look for a token type we can run
-        if (this.token_types[parts[0]]) {
-            return this.token_types[parts[0]](parts, token, curtable);
-        } else {
-            return token;
+        try {
+            if (this.token_types[parts[0]]) {
+                return this.token_types[parts[0]](parts, token, curtable);
+            } else {
+                return token;
+            }
+        } catch (e) {
+            if (e instanceof RangeError) {
+                // This could be an infinite loop of table results referencing each other.
+                return this._getErrorResultSet(e.message);
+            } else {
+                throw e;
+            }
         }
     }
     /**
      * Look for tokens to perform replace action on them.
      * @param {String} entryLabel Usually a label from a RandomTableEntry
-     * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
+     * @param {RandomTable|null} curtable RandomTable the string is from (needed for "this" tokens) or null
      * @returns {String} String with tokens replaced (if applicable)
      */
-    findToken (entryLabel, curtable = '') {
+    findToken (entryLabel, curtable = null) {
         if (isEmpty(entryLabel)) {
             return '';
         }
@@ -262,15 +299,16 @@ class TableRoller {
      * This requires calling setTableKeyLookup and setting a lookup method
      * That returns a RandomTable object or null.
      * @param {String} key human readable table identifier
-     * @returns {RandomTable|null}
+     * @returns {RandomTable}
+     * @throws {TableError}
      */
     getTableByKey (key) {
         if (!key) {
-            return null;
+            throw new TableError('No table key.');
         }
         const table = this._customGetTableByKey(key);
         if (!table || !(table instanceof RandomTable)) {
-            return null;
+            throw new TableError(`No table found for key: ${key}`);
         }
         return table;
     }
@@ -286,7 +324,7 @@ class TableRoller {
      * Dice roll token.
      * @returns {DiceResult}
      */
-    _defaultRollToken (token_parts, full_token = '', curtable = '') {
+    _defaultRollToken (token_parts, full_token = '', curtable = null) {
         return getDiceResult(token_parts[1]);
     }
     /**
@@ -294,10 +332,10 @@ class TableRoller {
      * {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{table:SOMETABLE:SUBTABLE*2}} (roll subtable 2 times)
      * @param {String[]} token_parts Token split by :
      * @param {String} full_token Original token
-     * @param {String} curtable Current table's key.
+     * @param {RandomTable|null} curtable Current table or null.
      * @returns {RandomTableResultSet|RandomTableResultSet[]} One or more result sets.
      */
-    _defaultTableToken (token_parts, full_token, curtable) {
+    _defaultTableToken (token_parts, full_token, curtable = null) {
         if (isUndefined(token_parts[1])) {
             return full_token;
         }
@@ -311,14 +349,25 @@ class TableRoller {
         // what table do we roll on
         let rtable = null;
         if (token_parts[1] === 'this') {
+            if (!curtable) {
+                return full_token;
+            }
             // reroll on same table
-            rtable = this.getTableByKey(curtable);
+            rtable = curtable;
         } else {
-            rtable = this.getTableByKey(token_parts[1]);
+            // Table lookup
+            try {
+                rtable = this.getTableByKey(token_parts[1]);
+            } catch (e) {
+                if (e instanceof TableError) {
+                    return full_token;
+                } else {
+                    // Rethrow unexpected errors
+                    throw e;
+                }
+            }
         }
-        if (!rtable) {
-            return full_token;
-        }
+
         if (typeof token_parts[2] !== 'undefined' && token_parts[2].indexOf('*') !== -1) {
             const x = token_parts[2].split('*');
             token_parts[2] = x[0];

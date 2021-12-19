@@ -92,11 +92,11 @@ const initializeNewNPC = function (schemaKey, tableRoller, generateId = true) {
                 const value = [];
                 const ct = (field.count) ? field.count : 1;
                 for (let i = 0; i < ct; i++) {
-                    value.push(tableRoller.convertToken(field.source, ''));
+                    value.push(tableRoller.convertToken(field.source));
                 }
                 fields.set(key, value);
             } else {
-                fields.set(key, tableRoller.convertToken(field.source, ''));
+                fields.set(key, tableRoller.convertToken(field.source));
             }
             return;
         }

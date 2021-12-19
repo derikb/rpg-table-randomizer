@@ -1,0 +1,51 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <p>Loop output...</p>
+        <script type="module">
+            import TableRoller from '../src/TableRoller.js';
+            import RandomTable from '../src/random_table.js';
+
+            const printToScreen = function(any) {
+                const p = document.createElement('p');
+                p.innerText = JSON.stringify(any);
+                document.body.appendChild(p);
+            }
+
+            const loopTable1 = new RandomTable({
+                name: 'loopTable_1',
+                key: 'loopTable_1',
+                tables: {
+                    default: [
+                        // { label: '1 north', weight: 1 },
+                        { label: '1 {{ table:loopTable_2 }}', weight: 100 }
+                    ]
+                }
+            });
+            const loopTable2 = new RandomTable({
+                name: 'loopTable_2',
+                key: 'loopTable_2',
+                tables: {
+                    default: [
+                        { label: '2 {{ table:loopTable_1 }}', weight: 50 },
+                    ]
+                }
+            });
+
+            const testTables = {
+                loopTable_1: loopTable1,
+                loopTable_2: loopTable2,
+            };
+
+            const tableRoller = new TableRoller({});
+            tableRoller.setTableKeyLookup(function(key) {
+                return testTables[key] || null;
+            });
+
+
+            printToScreen(tableRoller.getTableResult(loopTable1));
+        </script>
+    </body>
+</html>

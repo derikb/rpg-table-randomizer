@@ -31,6 +31,21 @@ declare class TableRoller {
      */
     _rollRandomEntry(entries: RandomTableEntry[]): RandomTableEntry | null;
     /**
+     * Get a result from a table/subtable in a RandomTable object
+     * DANGER: you could theoretically put yourself in an endless loop if the data were poorly planned
+     * Calling method try to catch RangeError to handle that possibility.
+     * @param {RandomTable} rtable the RandomTable object
+     * @param {String} table table to roll on
+     * @returns {RandomTableResult[]}
+     */
+    _selectFromTable(rtable: RandomTable, table: string): RandomTableResult[];
+    /**
+     * Get results array for macro setting of a table.
+     * @param {RandomTable} rtable Table with macro set.
+     * @returns {RandomTableResult[]}
+     */
+    _getTableMacroResult(rtable: RandomTable): RandomTableResult[];
+    /**
      * Generate a result from a RandomTable object
      * @param {RandomTable} rtable the RandomTable
      * @param {String} [start=''] subtable to roll on
@@ -52,29 +67,19 @@ declare class TableRoller {
      */
     getResultSetForTable(rtable: RandomTable, table?: string): RandomTableResultSet;
     /**
-     * Get a result from a table/subtable in a RandomTable object
-     * DANGER: you could theoretically put yourself in an endless loop if the data were poorly planned
-     * ...but at worst that would just crash the users browser since there's no server processing involved... (???)
-     * @todo we'll have to fix for this with a node version... make track the tables rolled on hierarchically, so a parent table doesn't call itself...?
-     * @param {Object} rtable the RandomTable object
-     * @param {String} table table to roll on
-     * @returns {RandomTableResult[]}
-     */
-    _selectFromTable(rtable: any, table: string): RandomTableResult[];
-    /**
      * Perform token replacement.  Only table and roll actions are accepted
      * @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}}
-     * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
+     * @param {RandomTable|null} curtable RandomTable the string is from (needed for "this" tokens) or null
      * @returns {RandomTableResultSet|RandomTableResultSet[]|DiceResult|String|Any} The result of the token or else just the token (in case it was a mistake or at least to make the error clearer)
      */
-    convertToken(token: string, curtable?: string): RandomTableResultSet | RandomTableResultSet[] | DiceResult | string | Any;
+    convertToken(token: string, curtable?: RandomTable | null): RandomTableResultSet | RandomTableResultSet[] | DiceResult | string | Any;
     /**
      * Look for tokens to perform replace action on them.
      * @param {String} entryLabel Usually a label from a RandomTableEntry
-     * @param {String} curtable key of the RandomTable the string is from (needed for "this" tokens)
+     * @param {RandomTable|null} curtable RandomTable the string is from (needed for "this" tokens) or null
      * @returns {String} String with tokens replaced (if applicable)
      */
-    findToken(entryLabel: string, curtable?: string): string;
+    findToken(entryLabel: string, curtable?: RandomTable | null): string;
     /**
      * Since tables are stored outside of this module, this function allows for the setting of a function which will be used to lookup a table by it's key
      * @param {Function} lookup a function that takes a table key and returns a RandomTable or null
@@ -91,9 +96,10 @@ declare class TableRoller {
      * This requires calling setTableKeyLookup and setting a lookup method
      * That returns a RandomTable object or null.
      * @param {String} key human readable table identifier
-     * @returns {RandomTable|null}
+     * @returns {RandomTable}
+     * @throws {TableError}
      */
-    getTableByKey(key: string): RandomTable | null;
+    getTableByKey(key: string): RandomTable;
     /**
      * Add a token variable
      * @param {String} name Name of the token (used as first element).
@@ -104,18 +110,17 @@ declare class TableRoller {
      * Dice roll token.
      * @returns {DiceResult}
      */
-    _defaultRollToken(token_parts: any, full_token?: string, curtable?: string): DiceResult;
+    _defaultRollToken(token_parts: any, full_token?: string, curtable?: any): DiceResult;
     /**
      * Table token lookup in the form:
      * {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{table:SOMETABLE:SUBTABLE*2}} (roll subtable 2 times)
      * @param {String[]} token_parts Token split by :
      * @param {String} full_token Original token
-     * @param {String} curtable Current table's key.
+     * @param {RandomTable|null} curtable Current table or null.
      * @returns {RandomTableResultSet|RandomTableResultSet[]} One or more result sets.
      */
-    _defaultTableToken(token_parts: string[], full_token: string, curtable: string): RandomTableResultSet | RandomTableResultSet[];
+    _defaultTableToken(token_parts: string[], full_token: string, curtable?: RandomTable | null): RandomTableResultSet | RandomTableResultSet[];
 }
 import { RandomTableResult } from "./random_table.js";
 import { RandomTableResultSet } from "./random_table.js";
 import { RandomTable } from "./random_table.js";
-import { DiceResult } from "./dice_roller.js";
