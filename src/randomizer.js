@@ -55,7 +55,7 @@ const randomString = function (data) {
     const values = [];
     const weights = [];
 
-    if (!Array.isArray(data)) {
+    if (!Array.isArray(data) || data.length === 0) {
         return null;
     }
     data.forEach((entry) => {

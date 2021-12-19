@@ -42,7 +42,7 @@ To roll on subtables of the current table use `{{table:this:SUBTABLE_NAME}}`
 
 ### Generate a Name
 
-`{{name:NAMETYPE:GENDER:STYLE}}` will insert a name into the table. `nametype` is required and should be one of the name lists (flemish, dutch, etc. from random_name.table_data.options) or "random". `gender` is optional and can be male, female, or random. If left blank, only a surname will be generated. `style` is optional and only accepts the value "first", in which case only a first name will be generated.
+`{{name:NAMETYPE:GENDER:STYLE}}` will insert a name into the table. `nametype` is required and should be one of the name lists keys ('flemish', 'dutch', etc. from RandomNameGenerator::getValidNameTypes) or "random". `gender` is optional and can be male, female, or random. If left blank, only a surname will be generated. `style` is optional and only accepts the value "first", in which case only a first name will be generated.
 
 ### Custom token
 

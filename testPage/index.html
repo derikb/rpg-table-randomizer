@@ -9,7 +9,8 @@
             import { rollDie, getDiceResult } from '../src/dice_roller.js';
             import RandomTable from '../src/random_table.js';
             import normalizeData from '../src/table_normalizer.js';
-            import RandomName from '../src/random_name.js';
+            import RandomNameGenerator from '../src/RandomNameGenerator.js';
+            import RandomNameType from '../src/RandomNameType.js';
             import { NPCSchema } from '../src/npc_schema.js';
             import * as npcGenerator from '../src/npc.js';
             import names from '../sample/names.js';
@@ -39,23 +40,45 @@
             tableObjs.forEach((obj) => {
                 const table = new RandomTable(obj);
                 testTables[table.key] = table;
-                printToScreen(`Loaded table ${table}`);
+                // printToScreen(`Loaded table ${table}`);
             });
 
             const tableRoller = new TableRoller({});
-            RandomName.setTableRoller(tableRoller);
-            RandomName.setNameData(names);
+
+            // Format name data
+            const nameTypes = [];
+            names.forEach((data) => {
+                nameTypes.push(new RandomNameType(data));
+            });
+            // Create a default name generator.
+            const defaultNameGenerator = new RandomNameGenerator({ namedata: nameTypes });
+            // Assign it to the name token of the table roller.
+            tableRoller.registerTokenType('name', defaultNameGenerator.nameTokenCallback.bind(defaultNameGenerator));
 
             tableRoller.setTableKeyLookup(function(key) {
                 return testTables[key] || null;
             });
 
-            tableRoller.registerTokenType('name', RandomName.nameTokenCallback);
-
+            printToScreen('Dice roller...');
             printToScreen(rollDie('2d6+1'));
             printToScreen(getDiceResult('4d6+1'));
-            printToScreen(RandomName.generateList(4, 'flemish'));
-            printToScreen(RandomName.createName('french', 'female'));
+            printToScreen('Name generator...');
+            printToScreen(defaultNameGenerator.generateList(4, 'flemish'));
+            printToScreen(defaultNameGenerator.createName('french', 'female'));
+            printToScreen(defaultNameGenerator.createName('french', 'mixed'));
+
+            printToScreen('NPC generator...');
+            const simpleSchema = new NPCSchema(simpleSchemaData);
+
+            printToScreen(JSON.stringify(simpleSchema));
+            npcGenerator.registerSchema(simpleSchema);
+            const npc = npcGenerator.initializeNewNPC('simple', tableRoller);
+            printToScreen(
+                npc
+            );
+            console.log(npc);
+
+            printToScreen('TableRoller...');
             const ordResult = tableRoller.getTableResultSetByKey('ordinal');
             printToScreen(ordResult);
             printToScreen(ordResult.niceString());
@@ -65,19 +88,6 @@
             const missionResult = tableRoller.getTableResultSetByKey('mission_generator');
             printToScreen(missionResult);
             printToScreen(missionResult.niceString());
-
-            const simpleSchema = new NPCSchema(simpleSchemaData);
-
-            printToScreen(JSON.stringify(simpleSchema));
-
-            npcGenerator.registerSchema(simpleSchema);
-
-            const npc = npcGenerator.initializeNewNPC('simple', tableRoller);
-
-            printToScreen(
-                npc
-            );
-            console.log(npc);
 
             const swampEncounter = tableRoller.getTableByKey('colonial_encounters_swamp');
             printToScreen(swampEncounter);
@@ -89,7 +99,6 @@
 
             printToScreen('Holmes name: ' + tableRoller.getTableResultSetByKey('holmes_name').niceString());
 
-            printToScreen(RandomName.createName('french', 'mixed'));
 
             // Example of too complicated tables used as tokens... and how niceString(true) really pares them down.
             const anotherTable = new RandomTable({

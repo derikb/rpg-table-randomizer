@@ -1,15 +1,7 @@
-export default {
-    options: {
-        flemish: 'Flemish',
-        dutch: 'Dutch',
-        cornish: 'Cornish',
-        japanese: 'Japanese',
-        turkish: 'Turkish',
-        'native american': 'Native American',
-        french: 'French',
-        mexican: 'Mexican (Spanish)'
-    },
-    cornish: {
+export default [
+    {
+        key: 'cornish',
+        label: 'Cornish',
         male: [
             'Aedan',
             'Alan',
@@ -337,7 +329,9 @@ export default {
             'Warne'
         ]
     },
-    flemish: {
+    {
+        key: 'flemish',
+        label: 'Flemish',
         male: [
             'Adam',
             'Adolf',
@@ -517,7 +511,9 @@ export default {
             'Vroomen'
         ]
     },
-    dutch: {
+    {
+        key: 'dutch',
+        label: 'Dutch',
         male: [
             'Aart',
             'Abe',
@@ -1818,7 +1814,9 @@ export default {
             'Vroom'
         ]
     },
-    japanese: {
+    {
+        key: 'japanese',
+        label: 'Japanese',
         female: [
             'ai',
             'aiko',
@@ -2169,7 +2167,9 @@ export default {
             'yukimura'
         ]
     },
-    turkish: {
+    {
+        key: 'turkish',
+        label: 'Turkish',
         male: [
             'abdullah',
             'adem',
@@ -2574,7 +2574,9 @@ export default {
             'yilmaz'
         ]
     },
-    'native american': {
+    {
+        key: 'native american',
+        label: 'Native American',
         female: [
             'abedabun',
             'abequa',
@@ -3243,7 +3245,9 @@ export default {
         ],
         surname: []
     },
-    french: {
+    {
+        key: 'french',
+        label: 'French',
         male: [
             'Abel',
             'Abraham',
@@ -4403,7 +4407,9 @@ export default {
             'Voclain'
         ]
     },
-    mexican: {
+    {
+        key: 'mexican',
+        label: 'Mexican (Spanish)',
         male: [
             'Aarón',
             'Abel',
@@ -5831,4 +5837,4 @@ export default {
             'Zavala'
         ]
     }
-};
+];

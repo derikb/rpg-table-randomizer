@@ -71,23 +71,22 @@ console.log(tableRoller.roll('2d4+1'));
 Example using the name generator.
 
 ```
-import TableRoller from '../src/TableRoller.js';
-import RandomTable from '../src/random_table.js';
-import RandomName from '../src/random_name.js';
+import RandomNameGenerator from '../src/RandomNameGenerator.js';
+import RandomNameType from '../src/RandomNameType.js';
 import names from '../sample/names.js';
 
-// Instantiate TableRoller
-const tableRoller = new TableRoller({});
-// Set the tableRoller in the random name module.
-RandomName.setTableRoller(tableRoller);
-
-// Add some name data
-RandomName.setNameData(names);
+// Format name data
+const nameTypes = [];
+names.forEach((data) => {
+    nameTypes.push(new RandomNameType(data));
+});
+// Create a default name generator.
+const defaultNameGenerator = new RandomNameGenerator({ namedata: nameTypes });
 
 // List of 4 names of the Flemish type.
-console.log(RandomName.generateList(4, 'flemish'));
+console.log(defaultNameGenerator.generateList(4, 'flemish'));
 // Get a single French name from the female name list.
-console.log(RandomName.createName('french', 'female'));
+console.log(defaultNameGenerator.createName('french', 'female'));
 
 ```
 
@@ -606,11 +605,33 @@ npc_generator.registerSchema(ddSchema);
 const npc = npc_generator.initializeNewNPC('dd', tableRoller); // a new NPC object using the dd schema, with its fields set to random values.
 ```
 
+### RandomNameType
+
+Class exports from RandomNameType.js
+
+#### constructor (object)
+
+* @param {String} key Key to identify uniquely in tokens and methods.
+* @param {label} label Human readable label.
+* @param {String[]} male Names.
+* @param {String[]} female Names.
+* @param {String[]} surname Names.
+
+##### getAllPersonalNames ()
+
+* @returns {String[]}
+
+Return all the male and female names.
+
+### RandomNameGenerator
+
+Class exports from RandomNameGenerator.js
 
 
-### RandomName
+#### constructor (object)
 
-Functions export from random_name.js
+* @param {RandomNameType[]} namedata
+* @param {Number} [markovOrder=3] Markov generator settings.
 
 Methods that can generate names of all sorts both from lists of names and via Markov chains.
 
@@ -620,15 +641,12 @@ In general:
 - `gender` can be set to "male", "female", "random", or "mixed" (the latter really only works when creating new names).
   - @todo I should handle non-binary names somehow, shouldn't I? One way is to create names and use the "mixed" option as that will generate a new name based on both the male and female names. Also setting the gender to random will randomize which list is selected from when not creating names.
 
-### setNameData (data)
 
-@param {Object} data a lot of names divided by type. see /samples/names.json for formatting
+#### getValidNameTypes ()
 
-You need to set this is you want to generate/randomize names.
+* @returns {String[]}
 
-### setTableRoller (TableRoller)
-
-@param {TableRoller} Instantiation of the TableRoller class.
+Get all name type keys registered for this generator.
 
 #### generateList (number, name_type, create)
 
@@ -636,11 +654,12 @@ You need to set this is you want to generate/randomize names.
 * @param {String} _[name_type]_ type of name or else it will randomly select
 * @param {Bool} _[create=false]_ new names or just pick from list
 * @return {Object} arrays of names inside male/female property
+* @throws {RandomNameError}
 
-This will give you a list of number/2 male names and number/2 female names. _name_type_ can be any of the keys in random_name.name_date.options If _create_ is set to true, a Markov chain will be used to create names based on the dataset (i.e. they should sound/look like the names in the list but (in most cases) be new/different).
+This will give you a list of number/2 male names and number/2 female names. _name_type_ can be any of the keys from RandomNameGenerator::getValidNameTypes. If _create_ is set to true, a Markov chain will be used to create names based on the dataset (i.e. they should sound/look like the names in the list but (in most cases) be new/different).
 
 ```
-const names = random_name.generateList('flemish', 6, true);
+const names = randomNameGenerator.generateList('flemish', 6, true);
 /*
 	{
 		male: [
@@ -662,6 +681,7 @@ const names = random_name.generateList('flemish', 6, true);
 * @param {String} [name_type=random]
 * @param {String} [gender=random]
 * @returns {String}
+* @throws {RandomNameError}
 
 Select a personal name from one of the lists.
 
@@ -669,6 +689,7 @@ Select a personal name from one of the lists.
 
 * @param {String} [name_type=random]
 * @returns {String}
+* @throws {RandomNameError}
 
 Select a surname from one of the lists.
 
@@ -678,12 +699,13 @@ Select a surname from one of the lists.
 * @param {String} _[gender=random]_ male, female, random, ''
 * @param {String} _[style]_ first=first name only, else full name
 * @returns {String} a name
+* @throws {RandomNameError}
 
 Returns a single name from one of the name lists.
 
 ```
-const name = random_name.selectName('flemish', 'female'); // Benedicta Ambroos
-const name2 = random_name.selectName('cornish', 'male'); // Carasek Godden
+const name = randomNameGenerator.selectName('flemish', 'female'); // Benedicta Ambroos
+const name2 = randomNameGenerator.selectName('cornish', 'male'); // Carasek Godden
 
 ```
 
@@ -692,6 +714,7 @@ const name2 = random_name.selectName('cornish', 'male'); // Carasek Godden
 * @param {String} [name_type=random]
 * @param {String} [gender=random]
 * @returns {String}
+* @throws {RandomNameError}
 
 Create a personal name using markov chains.
 
@@ -699,6 +722,7 @@ Create a personal name using markov chains.
 
 * @param {String} [name_type=random]
 * @returns {String}
+* @throws {RandomNameError}
 
 Create a sur/last name using markov chains.
 
@@ -708,33 +732,31 @@ Create a sur/last name using markov chains.
 * @param {String} _[gender=random]_ male or female or randomly selected
 * @param {String} _[style]_ first=first name only, else full name
 * @returns {String} a name
+* @throws {RandomNameError}
 
 Uses a Markov chain to generate a name in the style of the given name type/list.
 
 Note: because of the way the generator works it will occasionally (or often depending on the data list) return names that are on the list already.
 
 ```
-const name = random_name.createName('turkish', 'female'); // Merya
-const name2 = random_name.createName('japanese', 'male'); // Hinobu
+const name = randomNameGenerator.createName('turkish', 'female'); // Merya
+const name2 = randomNameGenerator.createName('japanese', 'male'); // Hinobu
 
 ```
 
-#### registerNameType (name_type, data, label)
+#### registerNameType (RandomNameType)
 
-* @param {String} name_type the shortname for the type
-* @param {Object} data names
-* @param {Array} data.male male names
-* @param {Array} data.female female names
-* @param {Array} data.surnames surnames
-* @param {String} [label] descriptive name of type (defaults to just the name_type)
-* @return {Boolean} success or failure
+* @param {RandomNameType} type
+* @throws {RandomNameError}
 
 Add name data to the generator.
 
-Note: you can overwrite existing name_types if you use an existing _name_type_
+Note: you can overwrite existing name_types if you use an existing type key.
 
 ```
-const new_names = {
+const newNames = new RandomNameType(
+	key: 'new_names',
+	label: 'Cave Names',
 	male: [
 		'Urk',
 		'Thruk',
@@ -749,11 +771,11 @@ const new_names = {
 		'Tnk',
 		'Oooo'
 	]
-}
+});
 
-random_name.registerNameType('caveman', new_names, 'Cave-Man');
+randomNameGenerator.registerNameType(newNames);
 
-random_name.selectName('caveman', 'female'); // Shelee Tnk
+randomNameGenerator.selectName('new_names', 'female'); // Shelee Tnk
 
 ```
 
@@ -763,7 +785,8 @@ This function can be use in a TableRoller to setup the "name" token.
 
 ```
 const tableRoller = new TableRoller();
-tableRoller.registerTokenType('name', RandomName.nameTokenCallback);
+// Make sure the callback is bound to the generator.
+tableRoller.registerTokenType('name', randomNameGenerator.nameTokenCallback.bind(randomNameGenerator));
 ```
 
 ### r_helpers
