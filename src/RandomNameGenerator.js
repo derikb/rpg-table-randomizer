@@ -48,16 +48,16 @@ class RandonNameGenerator {
      */
     registerNameType (type) {
         if (!(type instanceof RandomNameType)) {
-            throw RandomNameError('Must be instance of RandomNameType');
+            throw new RandomNameError('Must be instance of RandomNameType');
         }
         if (!type.key) {
-            throw RandomNameError('RandomNameType must have key set.');
+            throw new RandomNameError('RandomNameType must have key set.');
         }
-        if (type.key === 'random' || type.key === 'mixed') {
-            throw RandomNameError(`RandomNameType key ${type.key} is reserved.`);
+        if (type.key === 'random') {
+            throw new RandomNameError(`RandomNameType key ${type.key} is reserved.`);
         }
         if (type.male.length === 0 && type.female.length === 0 && type.surname.length === 0) {
-            throw RandomNameError(`RandomNameType ${type.key} must include male, female, or surname lists.`);
+            throw new RandomNameError(`RandomNameType ${type.key} must include male, female, or surname lists.`);
         }
         this.nameTypes.set(type.key, type);
     }
@@ -76,7 +76,7 @@ class RandonNameGenerator {
             return;
         }
         if (!Array.isArray(type[subtype]) || type[subtype].length === 0) {
-            throw new RandomNameError(`${name_type} type does have subtype ${subtype}`);
+            throw new RandomNameError(`${name_type} type does not have subtype ${subtype}`);
         }
     }
     /**
@@ -94,6 +94,43 @@ class RandonNameGenerator {
         return randomString(Array.from(this.nameTypes.keys()));
     }
     /**
+     * Get the name type
+     * @param {String} name_type Name type key or random.
+     * @returns {RandomNameType}
+     * @throws {RandomNameError}
+     */
+    _getNameType (name_type) {
+        if (name_type === 'random') {
+            // randomize a type...
+            name_type = this.getRandomNameType();
+        }
+        const nameType = this.nameTypes.get(name_type);
+        if (!nameType) {
+            throw new RandomNameError('Invalid name type.');
+        }
+        return nameType;
+    }
+    /**
+     * Get a name list
+     * @param {String} name_type
+     * @param {String} subtype
+     * @returns {String[]}
+     */
+    _getNameList (name_type = 'random', subtype = 'mixed') {
+        const nameType = this._getNameType(name_type);
+        if (subtype === 'surname') {
+            if (nameType.surname.length === 0) {
+                throw new RandomNameError(`${name_type} type does not have subtype ${subtype}`);
+            }
+            return nameType.surname;
+        }
+        const list = nameType.getPersonalNameList(subtype);
+        if (list.length === 0) {
+            throw new RandomNameError(`${name_type} type does not have subtype ${subtype}`);
+        }
+        return list;
+    }
+    /**
      * Select a personal name from one of the lists.
      * @param {String} name_type what list/process to use, else random
      * @param {String} gender
@@ -101,16 +138,8 @@ class RandonNameGenerator {
      * @throws {RandomNameError}
      */
     selectPersonalName (name_type = 'random', gender = 'random') {
-        if (name_type === 'random' || name_type === 'mixed') {
-            // randomize a type...
-            name_type = this.getRandomNameType();
-        }
-        if (gender === 'random' || gender === '') {
-            // randomize a gender...
-            gender = randomString(['male', 'female']);
-        }
-        this._validateNameType(name_type, gender);
-        return capitalizeName(randomString(this.nameTypes.get(name_type)[gender]));
+        const nameList = this._getNameList(name_type, gender);
+        return capitalizeName(randomString(nameList));
     }
     /**
      * Select a sur/last name only from one of the lists
@@ -119,12 +148,8 @@ class RandonNameGenerator {
      * @throws {RandomNameError}
      */
     selectSurname (name_type = 'random') {
-        if (name_type === 'random' || name_type === 'mixed') {
-            // randomize a type...
-            name_type = this.getRandomNameType();
-        }
-        this._validateNameType(name_type, 'surname');
-        return capitalizeName(randomString(this.nameTypes.get(name_type).surname));
+        const nameList = this._getNameList(name_type, 'surname');
+        return capitalizeName(randomString(nameList));
     }
     /**
      * Select a name from one of the lists
@@ -135,13 +160,14 @@ class RandonNameGenerator {
      * @throws {RandomNameError}
      */
     selectName (name_type = 'random', gender = 'random', style = '') {
-        if (name_type === 'random' || !name_type) {
-            // randomize a type...
-            name_type = this.getRandomNameType();
+        const nameType = this._getNameType(name_type);
+        const personalNameList = nameType.getPersonalNameList(gender);
+        if (personalNameList.length === 0) {
+            throw new RandomNameError(`${nameType.key} does not have list for ${gender}`);
         }
-        let name = this.selectPersonalName(name_type, gender);
+        let name = capitalizeName(randomString(personalNameList));
         if (style !== 'first') {
-            name += ` ${this.selectSurname(name_type)}`;
+            name += ` ${capitalizeName(randomString(nameType.surname))}`;
         }
         return name.trim();
     }
@@ -153,25 +179,13 @@ class RandonNameGenerator {
      * @throws {RandomNameError}
      */
     createPersonalName (name_type = 'random', gender = 'random') {
-        if (name_type === 'random' || name_type === 'mixed' || !name_type) {
-            // randomize a type...
-            name_type = this.getRandomNameType();
+        const nameType = this._getNameType(name_type);
+        const namelist = nameType.getPersonalNameList(gender);
+        if (namelist.length === 0) {
+            throw new RandomNameError('Starting name list is empty.');
         }
-        this._validateNameType(name_type);
-        if (gender !== 'male' && gender !== 'female' && gender !== 'mixed') {
-            gender = randomString(['male', 'female']);
-        }
-        const mkey = `${name_type}_${gender}`;
+        const mkey = `${nameType.key}_${gender}`;
         if (!this._markov.isMemoryKeySet(mkey)) {
-            let namelist = [];
-            if (gender === 'mixed') {
-                namelist = this.nameTypes.get(name_type).getAllPersonalNames();
-            } else {
-                namelist = this.nameTypes.get(name_type)[gender];
-            }
-            if (namelist.length === 0) {
-                throw new RandomNameError('Starting name list is empty.');
-            }
             namelist.forEach((v) => {
                 this._markov.learn(mkey, v);
             });
@@ -185,14 +199,13 @@ class RandonNameGenerator {
      * @throws {RandomNameError}
      */
     createSurName (name_type = 'random') {
-        if (name_type === 'random' || name_type === 'mixed' || !name_type) {
-            // randomize a type...
-            name_type = this.getRandomNameType();
+        const nameType = this._getNameType(name_type);
+        const namelist = nameType.surname;
+        if (namelist.length === 0) {
+            throw new RandomNameError('Starting name list is empty.');
         }
-        this._validateNameType(name_type, 'surname');
-        const skey = `${name_type}_last`;
+        const skey = `${nameType.key}_surname`;
         if (!this._markov.isMemoryKeySet(skey)) {
-            const namelist = this.nameTypes.get(name_type).surname;
             namelist.forEach((v) => {
                 this._markov.learn(skey, v);
             });
@@ -208,8 +221,7 @@ class RandonNameGenerator {
      * @throws {RandomNameError}
      */
     createName (name_type = 'random', gender = 'random', style = '') {
-        if (name_type === 'random' || !name_type) {
-            // randomize a type...
+        if (name_type === 'random') {
             name_type = this.getRandomNameType();
         }
         let name = this.createPersonalName(name_type, gender);
@@ -232,7 +244,7 @@ class RandonNameGenerator {
         for (let i = 1; i <= number; i++) {
             const gender = (i <= Math.ceil(number / 2)) ? 'male' : 'female';
             if (create) {
-                names[gender].push(this.createName(name_type, gender, true));
+                names[gender].push(this.createName(name_type, gender));
             } else {
                 names[gender].push(this.selectName(name_type, gender));
             }
@@ -253,13 +265,13 @@ class RandonNameGenerator {
      */
     nameTokenCallback (token_parts, full_token = '', curtable = null) {
         let string = '';
-        if (typeof token_parts[1] === 'undefined' || token_parts[1] === '') {
+        if (!token_parts[1]) {
             token_parts[1] = 'random';
         }
-        if (typeof token_parts[3] === 'undefined' || token_parts[3] !== 'first') {
+        if (!token_parts[3] || token_parts[3] !== 'first') {
             token_parts[3] = '';
         }
-        if (typeof token_parts[2] === 'undefined' || token_parts[2] === '') {
+        if (!token_parts[2]) {
             token_parts[2] = 'random';
         }
         try {

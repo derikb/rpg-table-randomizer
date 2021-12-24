@@ -623,6 +623,16 @@ Class exports from RandomNameType.js
 
 Return all the male and female names.
 
+##### getPersonalNameList (gender)
+
+* @param {String} gender Mixed, random, male, female
+* @returns {String[]}
+
+Return personal name list from type.
+- `mixed` returns male and female name.
+- `male` or `female` returns the specified one
+- `random` return either the male or female list, but will only return an empty list if both are empty (i.e. if there is just a female list it won't randomly return the empty male list)
+
 ### RandomNameGenerator
 
 Class exports from RandomNameGenerator.js
@@ -638,7 +648,7 @@ Methods that can generate names of all sorts both from lists of names and via Ma
 In general:
 
 - `name_type` can be set to any type set in your namedata (the default data includes types such as "flemish" or "japanese") as well as "random" (it will randomize from the available options) and "mixed" (this is like random but it will randomize separately for both personal and sur names).
-- `gender` can be set to "male", "female", "random", or "mixed" (the latter really only works when creating new names).
+- `gender` can be set to "male", "female", "random", or "mixed".
   - @todo I should handle non-binary names somehow, shouldn't I? One way is to create names and use the "mixed" option as that will generate a new name based on both the male and female names. Also setting the gender to random will randomize which list is selected from when not creating names.
 
 
