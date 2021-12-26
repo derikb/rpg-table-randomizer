@@ -1,4 +1,3 @@
-export default RandomTable;
 /**
  * RandomTable: Model for tables used by TableRoller
  * @param {Object} config the tables non-default attributes
@@ -97,6 +96,12 @@ export class RandomTable {
      */
     outputCode(editmode?: boolean, compress?: boolean): string;
     /**
+     * Get a random entry from a subtable.
+     * @param {String} subtableNames
+     * @returns {RandomTableEntry|null}
+     */
+    getRandomEntry(subtableNames: string): RandomTableEntry | null;
+    /**
      * Get an entry in case we only have the label and need other data from it
      * @param {String} label The item we are looking for
      * @param {String} [table=default] the table to search
@@ -108,138 +113,6 @@ export class RandomTable {
      * @return {Array} table keys
      */
     findDependencies(): any[];
-    /**
-     * Custom JSON handler because Map doesn't JSON stringify automatically.
-     * @returns {Object}
-     */
-    toJSON(): any;
-}
-/**
- * Class for entries in a random (sub)table.
- * This normalizes the various options into a class that makes the other code simpler.
- */
-export class RandomTableEntry {
-    /**
-     *
-     * @property {String} label Basic string label. Only required field. Can include tokens.
-     * @property {Boolean} [print=true] Should the result be included in the output.
-     * @property {String} [description] Extra description for the label.
-     * @property {String[]} [subtable] Other tables to roll on.
-     * @proparty {Number} [weight=1] Number to weight entry relative to other entries.
-     */
-    constructor({ label, print, description, subtable, weight }: {
-        label?: string;
-        print?: boolean;
-        description?: string;
-        subtable?: any[];
-        weight?: number;
-    });
-    label: string;
-    print: boolean;
-    description: string;
-    weight: number;
-    subtable: any[];
-    /**
-     * Custom JSON handler because Map doesn't JSON stringify automatically.
-     * @returns {Object}
-     */
-    toJSON(): any;
-}
-/**
- * Display options for subtable results. Used in RandomTable and RandomTableResultSet
- */
-export class DisplayOptions {
-    /**
-     *
-     * @property {String} table Subtable name.
-     * @property {Boolean} hide_table Hide the subtable name.
-     * @property {Boolean} hide_result Hide the result.
-     * @property {Boolean} hide_desc Hide the description field.
-     */
-    constructor({ table, hide_table, hide_result, hide_desc }: {
-        table?: string;
-        hide_table?: boolean;
-        hide_result?: boolean;
-        hide_desc?: boolean;
-    });
-    table: string;
-    /** Accept true, 1, or '1' to set these properties */
-    hide_table: boolean;
-    hide_result: boolean;
-    hide_desc: boolean;
-    /**
-     * Custom JSON handler to strip defaults.
-     * @returns {Object}
-     */
-    toJSON(): any;
-}
-/**
- * Class for results from RandomTable
- */
-export class RandomTableResult {
-    /**
-     * @property {String} table Title of subtable.
-     * @property {String} result Randomized result label.
-     * @property {String} desc Extra result description.
-     */
-    constructor({ table, result, desc }: {
-        table?: string;
-        result?: string;
-        desc?: string;
-    });
-    table: string;
-    result: string;
-    desc: string;
-    /**
-     * Is this from the "default" table.
-     */
-    get isDefault(): boolean;
-    /**
-     * Is this an error result.
-     */
-    get isError(): boolean;
-    toString(): string;
-    /**
-     * Custom JSON handler to strip empty props.
-     * @returns {Object}
-     */
-    toJSON(): any;
-}
-/**
- * Set of table results.
- */
-export class RandomTableResultSet {
-    /**
-     * @property {String} title Title from the RandomTable parent
-     * @property {RandomTableResult[]} results Randomized results.
-     * @property {Map[DisplayOptions]} displayOptions Display settings from the RandomTable parent.
-     */
-    constructor({ title, results, displayOptions }: {
-        title?: string;
-        results?: any[];
-        displayOptions?: any;
-    });
-    title: string;
-    results: any[];
-    displayOptions: any;
-    /**
-     * Add a result to the set.
-     * @param {RandomTableResult|object} data
-     * @returns
-     */
-    addResult(data: RandomTableResult | object): void;
-    get isSimple(): boolean;
-    /**
-     * Find the result for a specific table/subtable
-     * @param {String} table The table to look for
-     * @returns {RandomTableResult|null}
-     */
-    findResultByTable(table?: string): RandomTableResult | null;
-    niceString(simple?: boolean): string;
-    /**
-     * Simple base output of result set.
-     */
-    toString(): string;
     /**
      * Custom JSON handler because Map doesn't JSON stringify automatically.
      * @returns {Object}

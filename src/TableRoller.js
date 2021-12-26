@@ -1,8 +1,10 @@
 /* eslint-disable no-useless-escape */
 import { isEmpty, isUndefined } from './r_helpers.js';
-import { RandomTable, RandomTableResult, RandomTableResultSet } from './random_table.js';
+import RandomTable from './RandomTable.js';
+import RandomTableEntry from './RandomTableEntry.js';
+import RandomTableResult from './RandomTableResult.js';
+import RandomTableResultSet from './RandomTableResultSet.js';
 import { getDiceResult } from './dice_roller.js';
-import { getWeightedRandom } from './randomizer.js';
 import TableError from './TableError.js';
 
 /**
@@ -36,7 +38,7 @@ class TableRoller {
      */
     _getErrorResult (error = '') {
         return new RandomTableResult({
-            table: 'Error',
+            table: 'error',
             result: error
         });
     }
@@ -53,25 +55,6 @@ class TableRoller {
         });
     }
     /**
-     * Random selection from TableEntries, wrapper for getWeightedRandom that processes the data into values/weights arrays
-     * @param {RandomTableEntry[]} entries Table entries.
-     * @returns {RandomTableEntry|null} the randomly selected entry
-     */
-    _rollRandomEntry (entries) {
-        const values = [];
-        const weights = [];
-
-        if (!Array.isArray(entries)) {
-            return null;
-        }
-        entries.forEach((entry, k, l) => {
-            weights.push(entry.weight);
-            values.push(entry);
-        });
-
-        return getWeightedRandom(values, weights);
-    }
-    /**
      * Get a result from a table/subtable in a RandomTable object
      * DANGER: you could theoretically put yourself in an endless loop if the data were poorly planned
      * Calling method try to catch RangeError to handle that possibility.
@@ -85,12 +68,10 @@ class TableRoller {
         }
 
         let o = []; // Results
-        const entries = rtable.getSubtableEntries(table); // the table/subtable
-        if (entries.length === 0) {
-            return [this._getErrorResult('Invalid table name.')];
+        const entry = rtable.getRandomEntry(table);
+        if (entry === null || !(entry instanceof RandomTableEntry)) {
+            return [this._getErrorResult('Invalid subtable name.')];
         }
-        const entry = this._rollRandomEntry(entries);
-
         // if print is false we suppress the output from this table
         // (good for top-level tables that have subtables prop set)
         if (entry.print) {
@@ -121,7 +102,12 @@ class TableRoller {
         const results = [];
         try {
             rtable.macro.forEach((tableKey) => {
+                if (tableKey === rtable.key) {
+                    throw new TableError(`Macros can't self reference.`);
+                }
                 const set = this.getTableResultSetByKey(tableKey);
+                // @todo maybe this could be handled better
+                // because forcing the result set to a string is not versatile.
                 const result = new RandomTableResult({ table: tableKey, result: set.niceString() });
                 results.push(result);
             });
@@ -154,30 +140,13 @@ class TableRoller {
             return this._getTableMacroResult(rtable);
         }
 
-        // we look in the start table for what to roll if the start wasn't explicitly set in the call
-        let sequence = (!start) ? rtable.sequence : [start];
-
-        if (sequence[0] === 'rollall') {
-            // roll all the tables in order
-            sequence = rtable.subtableNames;
+        const sequence = rtable.getSequence(start);
+        if (sequence.length === 0) {
+            return results;
         }
-
         try {
-            if (sequence.length === 0) {
-                // if no start attribute
-                // try for "default" table
-                if (typeof rtable.tables.default !== 'undefined') {
-                    results = this._selectFromTable(rtable, 'default');
-                } else {
-                    // select first item from tables
-                    const tables = rtable.subtableNames;
-                    results = this._selectFromTable(rtable, tables[0]);
-                }
-                return results;
-            }
-
-            sequence.forEach((seq) => {
-                const r = this._selectFromTable(rtable, seq);
+            sequence.forEach((seqKey) => {
+                const r = this._selectFromTable(rtable, seqKey);
                 results = results.concat(r);
             });
         } catch (e) {
@@ -188,10 +157,8 @@ class TableRoller {
                 throw e;
             }
         }
-
         return results;
     }
-
     /**
      * Get result set from a table based on the key.
      * @param {String} tableKey

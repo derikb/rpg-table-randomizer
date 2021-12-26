@@ -19,7 +19,6 @@ These are properties on the RandomTable object. Most are optional.
 * @property {RandomTableEntries[]} tables[subtablename] Entries for subtables.
 * @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
 * @property {Map[DisplayOptions]} [display_opt] Display options for the subtables.
-* @property @deprecated {Object} [print] Backwards compatible. Key => Object data for display options.
 * @property {Array} [dependencies] table keys that are needed to get full results from this table
 
 At the most basic level `key`, `title`, and either `table` or `tables.default` need to be set for the RandomTable to be effective. If `table` is set its data will be moved to `tables.default` on initialization.

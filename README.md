@@ -13,9 +13,12 @@
   6. [RandomTableResult](#RandomTableResult)
   7. [RandomTableResultSet](#RandomTableResultSet)
   8. [TableNormalizer](#tablenormalizer)
-  9. [npc_generator](#npc_generator)
-  10. [RandomName](#RandomName)
-  11. [r_helpers](#r_helpers)
+  9. [NPCSchema](#npcschema)
+  10. [NPCSchemaField](#npcschemafield)
+  11. [npc_generator](#npc_generator)
+  12. [NPC](#npc)
+  13. [RandomName](#RandomName)
+  14. [r_helpers](#r_helpers)
 2. [Contributors](#contributors)
 3. [License](#license)
 
@@ -33,7 +36,7 @@ A simple example setting up a very basic unweighted table (with no subtables), t
 
 ```
 import TableRoller from '../src/TableRoller.js';
-import RandomTable from '../src/random_table.js';
+import RandomTable from '../src/RandomTable.js';
 
 // Object to hold tables.
 const testTables = {};
@@ -366,7 +369,6 @@ A class for random table objects that can be used by the tableRoller. A great va
 * @property {RandomTableEntries[]} tables[subtablename] Entries for subtables.
 * @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
 * @property {Map[DisplayOptions]} [display_opt] Display options for the subtables.
-* @property @deprecated {Object} [print] Backwards compatible. Key => Object data for display options.
 * @property {Array} [dependencies] table keys that are needed to get full results from this table
 
 Constructs a new RandomTable object or instantiates and existing one from some data source.
@@ -391,21 +393,6 @@ Return all subtable names.
 * @returns {RandomTableEntry[]}
 
 Return entries for a subtable
-
-#### outputObject (editmode)
-
-* @param {Boolean} [editmode=false] if false empty properties will be stripped out
-* @returns {Object} table properties
-
-Outputs the json data for the table (import/export).
-
-#### outputCode (editmode, compress)
-
-* @param {Boolean} [editmode=false] if false empty properties will be stripped out
-* @param {Boolean} [compress=false] if true JSON will not have indentation, etc.
-* @returns {String} table properties in JSON
-
-Outputs the json data for the table (import/export).
 
 #### findEntry (label, table)
 
@@ -523,27 +510,21 @@ Tries to normalize the data for RandomTable usage... Probably the thing that wil
 
 ### NPCSchema
 
-Exported from npc_schema.js
-
-Classes for npc schemas.
-
-#### NPCSchema
-
 * @param {String} key Identifying key
 * @param {String} name Name of schema.
 * @param {Map<String, NPCSchemaField>} fields Data fields will be converted to NPCSchemaField if necessary
 
-##### getFieldByKey (key)
+#### getFieldByKey (key)
 
 * @param {String} key Identifying key
 * @returns {NPCSchemaField|undefined}
 
-##### getFieldLabelByKey (key)
+#### getFieldLabelByKey (key)
 
 * @param {String} key Identifying key
 * @returns {String}
 
-#### NPCSchemaField
+### NPCSchemaField
 
 * @param {String} key Identifying key
 * @param {String} type Type of data in field. Valid: string, text, array, number, modifier
@@ -554,7 +535,7 @@ Classes for npc schemas.
 
 ### npc_generator
 
-Exported from npc.js
+Exported from npc_generator.js
 An object containing functions for the creation of Non-player characters based on custom schemas.
 
 #### registerSchema (NPCSchema)
@@ -562,6 +543,10 @@ An object containing functions for the creation of Non-player characters based o
 * @param {NPCSchema} schema NPC schema instance
 
 This function takes the passed in `NPCSchema` and adds it by key to the available schemas memory store.
+
+#### getAllSchemas ()
+
+* @returns {NPCSchema[]}
 
 #### getSchemaByKey (key)
 
@@ -575,7 +560,7 @@ This function takes the passed in `NPCSchema` and adds it by key to the availabl
 * @param {Boolean} [generateId=true] If true NPC will have a uuid assigned to its id property.
 * @returns NPC
 
-#### NPC
+### NPC
 
 An NPC class.
 

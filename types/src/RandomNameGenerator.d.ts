@@ -37,6 +37,20 @@ declare class RandonNameGenerator {
      */
     getRandomNameType(): string;
     /**
+     * Get the name type
+     * @param {String} name_type Name type key or random.
+     * @returns {RandomNameType}
+     * @throws {RandomNameError}
+     */
+    _getNameType(name_type: string): RandomNameType;
+    /**
+     * Get a name list
+     * @param {String} name_type
+     * @param {String} subtype
+     * @returns {String[]}
+     */
+    _getNameList(name_type?: string, subtype?: string): string[];
+    /**
      * Select a personal name from one of the lists.
      * @param {String} name_type what list/process to use, else random
      * @param {String} gender

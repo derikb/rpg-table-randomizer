@@ -25,12 +25,6 @@ declare class TableRoller {
      */
     _getErrorResultSet(error?: string): RandomTableResultSet;
     /**
-     * Random selection from TableEntries, wrapper for getWeightedRandom that processes the data into values/weights arrays
-     * @param {RandomTableEntry[]} entries Table entries.
-     * @returns {RandomTableEntry|null} the randomly selected entry
-     */
-    _rollRandomEntry(entries: RandomTableEntry[]): RandomTableEntry | null;
-    /**
      * Get a result from a table/subtable in a RandomTable object
      * DANGER: you could theoretically put yourself in an endless loop if the data were poorly planned
      * Calling method try to catch RangeError to handle that possibility.
@@ -121,6 +115,3 @@ declare class TableRoller {
      */
     _defaultTableToken(token_parts: string[], full_token: string, curtable?: RandomTable | null): RandomTableResultSet | RandomTableResultSet[];
 }
-import { RandomTableResult } from "./random_table.js";
-import { RandomTableResultSet } from "./random_table.js";
-import { RandomTable } from "./random_table.js";

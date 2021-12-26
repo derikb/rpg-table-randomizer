@@ -10,7 +10,9 @@
     "build": "",
     "release": "standard-version -a",
     "serve": "http-server ./ -a localhost",
-    "compileTypes": "npx tsc"
+    "compileTypes": "npx tsc",
+    "mocha": "nyc mocha ",
+    "mocha-no-coverage": "mocha "
   },
   "types": "./types/*",
   "repository": {
@@ -39,6 +41,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.2.0",
     "mocha": "^9.1.3",
+    "nyc": "^15.1.0",
     "sinon": "^12.0.1",
     "standard-version": "^9.3.2",
     "typescript": "^4.5.3"

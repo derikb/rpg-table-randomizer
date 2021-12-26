@@ -22,4 +22,10 @@ declare class RandomNameType {
      * @returns {String[]}
      */
     getAllPersonalNames(): string[];
+    /**
+     * Return a personal name list.
+     * @param {String} gender Mixed, random, male, female
+     * @returns {String[]}
+     */
+    getPersonalNameList(gender?: string): string[];
 }
