@@ -1,6 +1,6 @@
 import TableRoller from './TableRoller.js';
 import { isEmpty } from './r_helpers.js';
-import NPC from './NPC_class.js';
+import NPC from './NPC.js';
 import NPCSchema from './NPCSchema.js';
 
 /**
