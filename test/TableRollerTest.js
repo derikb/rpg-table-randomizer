@@ -10,6 +10,7 @@ import RandomTableResult from '../src/RandomTableResult.js';
 import RandomTableResultSet from '../src/RandomTableResultSet.js';
 import TableError from '../src/TableError.js';
 import TableRoller from '../src/TableRoller.js';
+import TableErrorResult from '../src/TableErrorResult.js';
 
 const roller = new TableRoller({
     token_types: {
@@ -81,8 +82,10 @@ describe('TableRoller', function () {
 
     describe('_selectFromTable', function () {
         it('should return error on invalid subtable', function () {
-            expect(roller._selectFromTable(colorTable, 'shades')[0]).to.deep.include({
-                table: 'error',
+            const errorResult = roller._selectFromTable(colorTable, 'shades')[0];
+            expect(errorResult).to.be.instanceOf(TableErrorResult);
+            expect(errorResult).to.deep.include({
+                table: 'shades',
                 result: 'Invalid subtable name.'
             });
         });
@@ -160,8 +163,8 @@ describe('TableRoller', function () {
         it('should return Error ResultSet for thrown range error', function () {
             // Catch RangeError
             const errorResult = roller.convertToken('{{range_error:foo:bar}}');
+            expect(errorResult.results[0]).to.be.instanceOf(TableErrorResult);
             expect(errorResult.results[0]).to.deep.include({
-                table: 'error',
                 result: 'out of memory'
             });
         });
@@ -170,8 +173,8 @@ describe('TableRoller', function () {
     describe('getResultSetForTable', function () {
         it('should return error set on invalid table', function () {
             const errorResult = roller.getResultSetForTable('table_string');
+            expect(errorResult.results[0]).to.be.instanceOf(TableErrorResult);
             expect(errorResult.results[0]).to.deep.include({
-                table: 'error',
                 result: 'Invalid table data.'
             });
         });
@@ -190,9 +193,7 @@ describe('TableRoller', function () {
     describe('getTableResultSetByKey', function () {
         it('should return error result on bad table', function () {
             const errorResult = roller.getTableResultSetByKey('table_string');
-            expect(errorResult.results[0]).to.deep.include({
-                table: 'error'
-            });
+            expect(errorResult.results[0]).to.be.instanceOf(TableErrorResult);
         });
 
         it('should return result set', function () {

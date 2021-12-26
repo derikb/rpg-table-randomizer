@@ -6,6 +6,7 @@ import RandomTableResult from './RandomTableResult.js';
 import RandomTableResultSet from './RandomTableResultSet.js';
 import { getDiceResult } from './dice_roller.js';
 import TableError from './TableError.js';
+import TableErrorResult from './TableErrorResult.js';
 
 /**
  * Define the regex to find tokens
@@ -34,11 +35,12 @@ class TableRoller {
     /**
      * Return an error result
      * @param {String} error Error message
-     * @returns {RandomTableResult}
+     * @param {String} table Sub/table name if relevant.
+     * @returns {TableErrorResult}
      */
-    _getErrorResult (error = '') {
-        return new RandomTableResult({
-            table: 'error',
+    _getErrorResult (error = '', table = '') {
+        return new TableErrorResult({
+            table: table,
             result: error
         });
     }
@@ -70,7 +72,7 @@ class TableRoller {
         let o = []; // Results
         const entry = rtable.getRandomEntry(table);
         if (entry === null || !(entry instanceof RandomTableEntry)) {
-            return [this._getErrorResult('Invalid subtable name.')];
+            return [this._getErrorResult('Invalid subtable name.', table)];
         }
         // if print is false we suppress the output from this table
         // (good for top-level tables that have subtables prop set)

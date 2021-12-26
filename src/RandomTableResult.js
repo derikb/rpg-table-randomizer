@@ -28,7 +28,7 @@ export default class RandomTableResult {
      * Is this an error result.
      */
     get isError () {
-        return this.table === 'error';
+        return false;
     }
     toString () {
         return this.result;
