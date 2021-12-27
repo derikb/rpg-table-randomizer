@@ -41,7 +41,7 @@ To roll on subtables of the current table use `{{table:this:SUBTABLE_NAME}}`
 
 ### Generate a Name
 
-`{{name:NAMETYPE:GENDER:STYLE}}` will insert a name into the table. `nametype` is required and should be one of the name lists keys ('flemish', 'dutch', etc. from RandomNameGenerator::getValidNameTypes) or "random". `gender` is optional and can be male, female, or random. If left blank, only a surname will be generated. `style` is optional and only accepts the value "first", in which case only a first name will be generated.
+`{{name:NAMETYPE:GENDER:STYLE}}` will insert a name into the table. `nametype` is required and should be one of the name lists keys ('flemish', 'dutch', etc. from RandomNameGenerator::getValidNameTypes) or "random". `gender` is optional and can be "mixed", "male", "female", or "random". If left blank, it will default to "mixed". `style` is optional and only accepts the value "first", in which case only a first name will be generated.
 
 ### Custom token
 
@@ -55,6 +55,8 @@ The `tables` property is an Object with properties for each subtable. All Random
 I've tried to build in an escalating scale of complexity. Simple tables can be formatted very simply, but complex tables require more complexity to the formatting.
 
 I've tried to build in as much forgiveness as possible into the format.
+
+The RandomTable class will convert any entries on the table/subtables to RandomTableEntry objects on initialization.
 
 ### Simple unweighted table
 
@@ -110,7 +112,7 @@ The `subtable` property in a result can have a number of properties that effect 
 * @property {String} _description_ an elaboration on the label that can be used when outputting/displaying results
 * @property {Boolean} _print_ should this result be included in various result outputs (good for use with the subtable property where you only want the result on the subtable to be displayed/output)
 
-Here's an example using these various properties. The default table is rolled on first (it is weighted so in this case humanoids are most common). The result of the default table decides what subtable should be rolled on next. Some of the subtables then have further subtables to be rolled on (so the "human" subtable will often cause a roll on the "actions_human" subtable).
+Here's an example using these various properties. The default table is rolled on first (it is weighted, so in this case humanoids are most common). The result of the default table decides what subtable should be rolled on next. Some of the subtables then have further subtables to be rolled on (so the "human" subtable will often cause a roll on the "actions_human" subtable).
 
 ```
 "tables": {

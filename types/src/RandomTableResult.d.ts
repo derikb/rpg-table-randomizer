@@ -1,7 +1,7 @@
 /**
  * Class for results from RandomTable
  */
-export class RandomTableResult {
+export default class RandomTableResult {
     /**
      * @property {String} table Title of subtable.
      * @property {String} result Randomized result label.

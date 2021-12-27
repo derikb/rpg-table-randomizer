@@ -1,7 +1,7 @@
 /**
  * Specific field in NPC Schema.
  */
-export class NPCSchemaField {
+export default class NPCSchemaField {
     /**
      *
      * @property {String} key Identifying key

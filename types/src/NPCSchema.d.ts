@@ -1,7 +1,7 @@
 /**
  * Schema for creating NPCs.
  */
-export class NPCSchema {
+export default class NPCSchema {
     /**
      * @property {String} key Identifying key
      * @property {String} name Name of schema.
@@ -36,3 +36,4 @@ export class NPCSchema {
      */
     toJSON(): any;
 }
+import NPCSchemaField from "./NPCSchemaField.js";

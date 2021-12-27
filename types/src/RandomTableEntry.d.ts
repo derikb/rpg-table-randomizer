@@ -2,7 +2,7 @@
  * Class for entries in a random (sub)table.
  * This normalizes the various options into a class that makes the other code simpler.
  */
-export class RandomTableEntry {
+export default class RandomTableEntry {
     /**
      *
      * @property {String} label Basic string label. Only required field. Can include tokens.

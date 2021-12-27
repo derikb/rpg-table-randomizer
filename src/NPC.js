@@ -1,5 +1,5 @@
 import { defaultToJSON, isObject } from './r_helpers.js';
-import { v4 as uuidv4 } from 'uuid/dist/esm-browser';
+import uuidv4 from '../node_modules/uuid/dist/esm-browser/v4.js';
 
 /**
  * Class for NPCs

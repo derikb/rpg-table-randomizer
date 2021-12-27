@@ -15,9 +15,10 @@ declare class TableRoller {
     /**
      * Return an error result
      * @param {String} error Error message
-     * @returns {RandomTableResult}
+     * @param {String} table Sub/table name if relevant.
+     * @returns {TableErrorResult}
      */
-    _getErrorResult(error?: string): RandomTableResult;
+    _getErrorResult(error?: string, table?: string): TableErrorResult;
     /**
      * Return a result set with an error.
      * @param {String} error Error message
@@ -115,3 +116,7 @@ declare class TableRoller {
      */
     _defaultTableToken(token_parts: string[], full_token: string, curtable?: RandomTable | null): RandomTableResultSet | RandomTableResultSet[];
 }
+import TableErrorResult from "./TableErrorResult.js";
+import RandomTableResultSet from "./RandomTableResultSet.js";
+import RandomTable from "./RandomTable.js";
+import RandomTableResult from "./RandomTableResult.js";

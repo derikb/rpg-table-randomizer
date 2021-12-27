@@ -1,7 +1,7 @@
 /**
  * Display options for subtable results. Used in RandomTable and RandomTableResultSet
  */
-export class DisplayOptions {
+export default class DisplayOptions {
     /**
      *
      * @property {String} table Subtable name.

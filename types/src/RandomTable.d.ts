@@ -2,7 +2,7 @@
  * RandomTable: Model for tables used by TableRoller
  * @param {Object} config the tables non-default attributes
  */
-export class RandomTable {
+export default class RandomTable {
     /**
      * The primary attributes of this table
      * @property {String} id id for the table, primary key for database if used
@@ -16,14 +16,13 @@ export class RandomTable {
      * @property {String[]|Object[]} [table] default table. array of strings or objects. removed after initialization.
      * @property {Object} [tables] a property for each subtables.
      * @property {RandomTableEntries[]} tables[subtablename] Entries for subtables.
-     * @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
+     * @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys and optionsl subtables to be rolled on in order
      * @property {Map[DisplayOptions]} [display_opt] Display options for the subtables.
-     * @property @deprecated {Object} [print] Backwards compatible. Key => Object data for display options.
      * @property {Array} [dependencies] table keys that are needed to get full results from this table
      *
      * Note the Constructor args are not exactly the same as the properties. Some type changes are made to convert data.
      */
-    constructor({ id, key, title, author, description, source, tags, sequence, tables, macro, print, dependencies, table, display_opt }: {
+    constructor({ id, key, title, author, description, source, tags, sequence, tables, macro, dependencies, table, display_opt }: {
         id?: number;
         key?: any;
         title?: string;
@@ -34,7 +33,6 @@ export class RandomTable {
         sequence?: any[];
         tables?: {};
         macro?: any[];
-        print?: {};
         dependencies?: any;
         table?: any;
         display_opt?: any[];
@@ -72,6 +70,13 @@ export class RandomTable {
      */
     validate(properties: any): any;
     /**
+     * Basic sequence of table rolls.
+     * Either the start, the default sequence, the default table, or just the first one.
+     * @param {String} start Subtable name to start with.
+     * @returns {String[]}
+     */
+    getSequence(start?: string): string[];
+    /**
      * All the subtable names.
      * @returns {String[]}
      */
@@ -83,24 +88,11 @@ export class RandomTable {
      */
     getSubtableEntries(name?: string): RandomTableEntry[];
     /**
-     * outputs the json data for the table (import/export)
-     * @param {Boolean} [editmode=false] if false empty properties will be stripped out
-     * @returns {Object} table attributes
-     */
-    outputObject(editmode?: boolean): any;
-    /**
-     * outputs the json data for the table (import/export)
-     * @param {Boolean} [editmode=false] if false empty properties will be stripped out
-     * @param {Boolean} [compress=false] if true JSON will not have indentation, etc.
-     * @returns {String} table properties in JSON
-     */
-    outputCode(editmode?: boolean, compress?: boolean): string;
-    /**
      * Get a random entry from a subtable.
-     * @param {String} subtableNames
+     * @param {String} subtableName
      * @returns {RandomTableEntry|null}
      */
-    getRandomEntry(subtableNames: string): RandomTableEntry | null;
+    getRandomEntry(subtableName: string): RandomTableEntry | null;
     /**
      * Get an entry in case we only have the label and need other data from it
      * @param {String} label The item we are looking for
@@ -109,7 +101,7 @@ export class RandomTable {
      */
     findEntry(label: string, table?: string): RandomTableEntry | null;
     /**
-     * find the dependent tables to get full results for this table
+     * Find the dependent tables to get full results for this table
      * @return {Array} table keys
      */
     findDependencies(): any[];
@@ -119,3 +111,4 @@ export class RandomTable {
      */
     toJSON(): any;
 }
+import RandomTableEntry from "./RandomTableEntry.js";

@@ -30,6 +30,8 @@ Modules for randomization focused on tables used in roleplaying games.
 
 These are models and logic only, there is no ui and only the most limited of view data. No functions are provided for the organization or storage of table data.
 
+**If you were using pre-v1 release see the upgrading notes at the bottom of this file.**
+
 ## Code Example
 
 A simple example setting up a very basic unweighted table (with no subtables), then "rolling" on it, and also generating a dice roll and two random names:
@@ -107,6 +109,29 @@ console.log(result.die); // '1d6'
 
 ```
 
+Add the name token to a table roller:
+
+```
+import TableRoller from './TableRoller.js';
+import RandomNameGenerator from './RandomNameGenerator.js';
+import names from '../sample/names.js';
+
+// Instantiate the TableRoller
+const tableRoller = new TableRoller({});
+
+// Format name data
+const nameTypes = [];
+names.forEach((data) => {
+    nameTypes.push(new RandomNameType(data));
+});
+// Create a default name generator.
+const defaultNameGenerator = new RandomNameGenerator({ namedata: nameTypes });
+// Assign it to the name token of the table roller.
+// Bind it to the name generator (else it won't work)
+tableRoller.registerTokenType('name', defaultNameGenerator.nameTokenCallback.bind(defaultNameGenerator));
+
+```
+
 Other more complicated (and useful) operations are possible. See below.
 
 ## Motivation
@@ -134,13 +159,11 @@ The `sample` directory includes a few example data sources. A simple way to hand
 
 ## API Reference
 
-The module exposes a few objects and constructors.
-
-**This is under construction as I refactor.**
+The module includes a number of classes and functions. In general files with CamelCasing are exporting a single class, while those with snake_case are exporting one or more functions.
 
 ### randomizer
 
-Utility classes for random selection/generation.
+Utility classes for random selection/generation. Mostly used internally by the other classes.
 
 #### randomInteger (min, max)
 
@@ -155,7 +178,7 @@ Utility classes for random selection/generation.
 - @param {Array} _weights_ array of weighted numbers to correspond to the values array
 - @return {String|Number|Object} a randomly selected element from the values array
 
-This is mostly used internally. Returns a randomly selected element from the values array, where the randomization is weighted based on the weights array.
+Returns a randomly selected element from the values array, where the randomization is weighted based on the weights array.
 
 ```
 //a classic bell curve reaction table
@@ -182,7 +205,7 @@ getWeightedRandom(values, weights); // returns a reaction from the value array
 - @param {String[]} _data_ Array of strings to select from.
 - @returns {String} the randomly selected string
 
-Takes an array of strings and returns one of the element's value randomly.
+Takes an array of strings and returns one of the strings randomly.
 
 ```
 const data = [
@@ -197,6 +220,8 @@ randomString(data); // returns one of the reactions
 ```
 
 ### dice_roller
+
+Some simple dice like randomization functions.
 
 #### rollDie (string)
 
@@ -230,10 +255,7 @@ Get a DiceResult object.
 
 ### TableRoller
 
-Exported from the TableRoller.js file.
-
-A class used for generating random results from tables.
-
+A class used for generating random results from RandomTable objects. Also handling for tokens in the results.
 
 #### getTableResultSetByKey (tableKey, table)
 
@@ -259,7 +281,7 @@ This is one of two primary ways to generate results from the RandomTable objects
 - @param {String} _[start='']_ subtable to roll on
 - @return {RandomTableResult[]}
 
-Takes a RandomTable object and returns an array of results. If RandomTable.sequence is set, multiple results may be returned. Optionally a specific subtable can be selected to select from. This is basically a wrapper for selectFromTable() that may, depending on the RandomTable's properties, concatenate multiple selectFromTable() results.
+Takes a RandomTable object and returns an array of results. If RandomTable.sequence is set, multiple results may be returned. Optionally a specific subtable can be selected to select from.
 
 ```
 const table_config = {
@@ -320,6 +342,12 @@ Will throw TableError if key is empty or a RandomTable object is not found.
 Register a custom token type for use in tables.
 
 ```
+/**
+ * @param {Array} token_parts Parts of token when brackets are removed and it is then split by the colon
+ * @param {String} full_token Full original token. If the token fails generally just return the full_token back.
+ * @param {RandomTable|null} current_table The table the currently processed entry/token came from (or null).
+ * @returns {Any} Always return something that has a toString() method.
+ */
 const footoken = function (token_parts, full_token, current_table) {
 	return token_parts[1] + ' with big red eyes';
 }
@@ -348,6 +376,8 @@ Take a token and perform token replacement, returning the result as a string or 
 In most cases it is not necessary to call this method directly, getTableResult() should be preferred.
 
 Takes a result value, finds, and replaces any tokens in it.
+
+Unlike convertToken this will find multiple tokens in a string and will always return the original entryLabel with tokens replaced by strings (or the original token if an error occurs).
 
 
 ### RandomTable
@@ -402,14 +432,13 @@ Return entries for a subtable
 
 Get an entry in case we only have the label and need other data from it.
 
+Warning: if your label had tokens you need to base on the original token, not a replaced version.
+
 #### findDependencies
 
 * @returns {Array} array of table keys that the current table calls on (via tokens)
 
-This method returns an array of table keys that the current table refers to in `{{table:SOMETABLE}}` tokens. Can be useful for making sure you have all the tables necessary to return full results from the current table.
-
-
-
+This method returns an array of table keys that the current table refers to in `{{table:SOMETABLE}}` tokens. Can be useful for making sure you have all the tables necessary to return full results from the current table. This will also look in the macros property.
 
 
 ### DisplayOptions
@@ -458,7 +487,7 @@ If it's the default (sub)table.
 
 #### isError
 
-If it's an error result.
+If it's an error result, this will be an instance of the TableErrorResult class (which is otherwise identical to the parent class).
 
 ### RandomTableResultSet
 
@@ -798,9 +827,25 @@ I'm not going to document these now, but the methods are:
   - This is a custom toJSON function for classes that handles Maps and converts them to objects.
 
 
+## Upgrading to v1
+
+There are a number of breaking changes in the v1 release. I think/hope these changes make things a little more consistent and versatile.
+
+Here are at least some of the changes to note:
+
+- More classes added and all existing classes have been moved to their own file/export (they are all in CamelCase).
+- Dice functions have been revamped and moved to their own export (dice_roller.js) (The old roll method on the randomizer has been removed.)
+- The random name generator is now a class (RandomNameGenerator) and no longer requires the old randomizer class. (This way you could have different name generators and give them different tokens for use in a TableRoller.)
+- Name data is now used via the RandomNameType class. See index.js for how that works.
+- The old Randomizer class is now TableRoller class. A number of lower level methods have been moved out of that class (to the randomizer.js file).
+- The basic format for random table data should not have changed.
+- NPCs will now generate their own UUID.
+- A number of Error classes have been added, most of the time they will be thrown and caught internally (generator a TableErrorResult), but note there are places where a method may throw something specific (the docblocks should specify this).
+
+
 ## Contributors
 
-I'd be happy to accept feature requests, bug reports, and pull requests via the github repository. There is an eslint config file for style, which can be run on the code via `npm run eslint:src`
+I'd be happy to accept feature requests, bug reports, and pull requests via the github repository. There is an eslint config file for style, and tests (via mocha) are in the test directory.
 
 ## License
 

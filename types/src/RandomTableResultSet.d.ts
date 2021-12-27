@@ -1,7 +1,7 @@
 /**
  * Set of table results.
  */
-export class RandomTableResultSet {
+export default class RandomTableResultSet {
     /**
      * @property {String} title Title from the RandomTable parent
      * @property {RandomTableResult[]} results Randomized results.
@@ -28,6 +28,11 @@ export class RandomTableResultSet {
      * @returns {RandomTableResult|null}
      */
     findResultByTable(table?: string): RandomTableResult | null;
+    /**
+     * Output the set as a string.
+     * @param {Boolean} simple Simplify the output (just the result labels)
+     * @returns
+     */
     niceString(simple?: boolean): string;
     /**
      * Simple base output of result set.
@@ -39,3 +44,4 @@ export class RandomTableResultSet {
      */
     toJSON(): any;
 }
+import RandomTableResult from "./RandomTableResult.js";

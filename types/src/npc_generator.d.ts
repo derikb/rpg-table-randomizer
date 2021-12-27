@@ -21,5 +21,7 @@ export function getSchemaByKey(key: string): NPCSchema | null;
  * @param {Boolean} generateId Should the npc get a uuid.
  * @returns NPC
  */
-export function initializeNewNPC(schemaKey: string, tableRoller: TableRoller, generateId?: boolean): any;
+export function initializeNewNPC(schemaKey: string, tableRoller: TableRoller, generateId?: boolean): NPC;
+import NPCSchema from "./NPCSchema.js";
 import TableRoller from "./TableRoller.js";
+import NPC from "./NPC.js";
