@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0](https://github.com/derikb/rpg-table-randomizer/compare/v0.10.3...v1.0.0) (2021-12-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **docs:** See README for breaking change information for v1
+
+### Features
+
+* **docs:** Add updating info ([e6820b6](https://github.com/derikb/rpg-table-randomizer/commit/e6820b6b18f860fbbd0efadcb6b0c7373a120081))
+* **npc:** Fix toJSON, add Schema methods ([4eff768](https://github.com/derikb/rpg-table-randomizer/commit/4eff76867db011e06d5095d10f019da0e6f58c6b)), closes [#35](https://github.com/derikb/rpg-table-randomizer/issues/35) [#34](https://github.com/derikb/rpg-table-randomizer/issues/34)
+
+
+### Bug Fixes
+
+* **randomizer:** Improve table by key lookup ([df3c012](https://github.com/derikb/rpg-table-randomizer/commit/df3c01296b1780ea0d7fbcac0a72e58c38d4adef)), closes [#39](https://github.com/derikb/rpg-table-randomizer/issues/39)
+* **tables:** Handle infinite loops ([5dda97c](https://github.com/derikb/rpg-table-randomizer/commit/5dda97cccee008d1f9ac4874aa968ba18b9603db)), closes [#38](https://github.com/derikb/rpg-table-randomizer/issues/38)
+
 ### [0.10.3](https://github.com/derikb/rpg-table-randomizer/compare/v0.10.2...v0.10.3) (2021-10-08)
 
 ### [0.10.2](https://github.com/derikb/rpg-table-randomizer/compare/v0.10.1...v0.10.2) (2021-06-20)
