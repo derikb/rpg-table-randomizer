@@ -90,8 +90,9 @@ class TableRoller {
 
         // Select from each subtable and add to results.
         entry.subtable.forEach((subtableName) => {
-            const r2 = this._selectFromTable(rtable, subtableName);
-            o = o.concat(r2);
+            const subresult = this._selectFromTable(rtable, subtableName);
+            // concat because subresult is an array.
+            o = o.concat(subresult);
         });
         return o;
     }
@@ -101,17 +102,28 @@ class TableRoller {
      * @returns {RandomTableResult[]}
      */
     _getTableMacroResult (rtable) {
-        const results = [];
+        let results = [];
         try {
-            rtable.macro.forEach((tableKey) => {
+            rtable.macro.forEach((macroKey) => {
+                const parts = macroKey.split(':');
+                const tableKey = parts[0];
+                const subtable = parts[1] || '';
                 if (tableKey === rtable.key) {
                     throw new TableError(`Macros can't self reference.`);
                 }
-                const set = this.getTableResultSetByKey(tableKey);
-                // @todo maybe this could be handled better
-                // because forcing the result set to a string is not versatile.
-                const result = new RandomTableResult({ table: tableKey, result: set.niceString() });
-                results.push(result);
+                try {
+                    const mtable = this.getTableByKey(tableKey);
+                    const result = this.getTableResult(mtable, subtable);
+                    // concat because result is an array.
+                    results = results.concat(result);
+                } catch (e) {
+                    if (e instanceof TableError) {
+                        results.push(this._getErrorResult(e.message, tableKey));
+                    } else {
+                        // Rethrow unexpected errors
+                        throw e;
+                    }
+                }
             });
         } catch (e) {
             if (e instanceof RangeError) {

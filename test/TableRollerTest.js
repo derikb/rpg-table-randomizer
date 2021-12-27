@@ -55,7 +55,7 @@ const complicatedTable = new RandomTable({
             'down'
         ]
     },
-    macro: ['colors', 'nonexistent']
+    macro: ['colors:secondary', 'nonexistent']
 });
 
 const getTables = function (key) {
@@ -116,13 +116,21 @@ describe('TableRoller', function () {
             const results = roller._getTableMacroResult(complicatedTable);
             expect(results.length).to.equal(2);
             expect(results[0]).to.deep.include({
-                table: 'colors',
-                result: 'Primary: Blue'
+                table: 'secondary',
+                result: 'green'
             });
             expect(results[1]).to.deep.include({
                 table: 'nonexistent',
-                result: 'Error: No table found for key: nonexistent'
+                result: 'No table found for key: nonexistent'
             });
+        });
+
+        it('should throw error for self reference', function () {
+            const selfTable = new RandomTable({
+                key: 'self',
+                macro: ['colors', 'self']
+            });
+            expect(() => { roller._getTableMacroResult(selfTable); }).to.throw(TableError, 'self reference');
         });
     });
 
@@ -210,10 +218,10 @@ describe('TableRoller', function () {
     describe('getTableResult', function () {
         it('should handle macros in tables', function () {
             const macroStub = stub(roller, '_getTableMacroResult');
-            const resultSet = new RandomTableResultSet({ title: 'macro set' });
-            macroStub.returns(resultSet);
+            const resultSet = new RandomTableResult({ table: 'macro' });
+            macroStub.returns([resultSet]);
 
-            expect(roller.getTableResult(complicatedTable)).to.equal(resultSet);
+            expect(roller.getTableResult(complicatedTable)).to.deep.equal([resultSet]);
 
             macroStub.restore();
         });

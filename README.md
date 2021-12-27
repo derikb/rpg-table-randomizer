@@ -367,7 +367,7 @@ A class for random table objects that can be used by the tableRoller. A great va
 * @property {String[]|Object[]} [table] default table. array of strings or objects. removed after initialization.
 * @property {Object} [tables] a property for each subtables.
 * @property {RandomTableEntries[]} tables[subtablename] Entries for subtables.
-* @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
+* @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys (and optional subtables) to be rolled on in order
 * @property {Map[DisplayOptions]} [display_opt] Display options for the subtables.
 * @property {Array} [dependencies] table keys that are needed to get full results from this table
 

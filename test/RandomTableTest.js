@@ -83,8 +83,17 @@ describe('RandomTable', function () {
             new RandomTableEntry({ label: 'blue {{table:weather:wind}}' }),
             new RandomTableEntry({ label: 'blue {{table:directions}} {{table:dragons}}' })
         ];
+        rtable.macro = [
+            'pattern',
+            'pattern:plaid',
+            'texture',
+            'sample:colors'
+        ];
 
         expect(rtable.findDependencies()).to.deep.equal([
+            'pattern',
+            'texture',
+            'sample',
             'weather',
             'directions',
             'dragons'

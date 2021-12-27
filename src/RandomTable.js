@@ -21,7 +21,7 @@ export default class RandomTable {
      * @property {String[]|Object[]} [table] default table. array of strings or objects. removed after initialization.
      * @property {Object} [tables] a property for each subtables.
      * @property {RandomTableEntries[]} tables[subtablename] Entries for subtables.
-     * @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys to be rolled on in order
+     * @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys and optionsl subtables to be rolled on in order
      * @property {Map[DisplayOptions]} [display_opt] Display options for the subtables.
      * @property {Array} [dependencies] table keys that are needed to get full results from this table
      *
@@ -231,6 +231,14 @@ export default class RandomTable {
         }
         // iterate over the tables and look for table tokens
         let dep = [];
+
+        // Check macro
+        this.macro.forEach((macro) => {
+            const parts = macro.split(':');
+            if (parts.length > 0 && parts[0] !== 'this') {
+                dep.push(parts[0]);
+            }
+        });
         const tokenRegExp = /({{2}.+?}{2})/g;
         const tnames = Object.keys(this.tables);
         tnames.forEach((n) => {
