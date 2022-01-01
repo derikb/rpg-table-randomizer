@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://github.com/derikb/rpg-table-randomizer/compare/v1.0.0...v1.0.1) (2022-01-01)
+
+
+### Features
+
+* **npc:** Add some helper methods ([70a15e8](https://github.com/derikb/rpg-table-randomizer/commit/70a15e86d1e2655be1da8233880e6b40e30f9b15))
+
+
+### Bug Fixes
+
+* **npc:** Fix import of uuid ([7e56a67](https://github.com/derikb/rpg-table-randomizer/commit/7e56a677968d5e9d3da2c0df53a56386c41fa1a7))
+
 ## [1.0.0](https://github.com/derikb/rpg-table-randomizer/compare/v0.10.3...v1.0.0) (2021-12-27)
 
 
