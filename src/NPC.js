@@ -30,6 +30,21 @@ export default class NPC {
         }
     }
     /**
+     * Get field keys as array.
+     * @returns {String[]}
+     */
+    getFieldKeys () {
+        return Array.from(this.fields.keys());
+    }
+    /**
+     * Get value by field key.
+     * @param {String} key NPCSchemaField.key
+     * @returns {RandomTableResultSet|RandomTableResultSet[]|DiceResult|String|Any}
+     */
+    getFieldValue (key) {
+        return this.fields.get(key) || '';
+    }
+    /**
      * Custom JSON handler to strip empty props.
      * @returns {Object}
      */
