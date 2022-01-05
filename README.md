@@ -150,7 +150,9 @@ Install the module via npm:
 $ npm install --save rpg-table-randomizer
 ```
 
-The `src/index.js` will export a basic tableRoller with name generation setup. Otherwise you'd probably want to figure out what parts you need and then run it through a js bundler.
+The `src/index.js` will export a basic tableRoller and a default name generation setup as well as most of the classes/methods. Otherwise you'd probably want to figure out what parts you need and then run it through a js bundler.
+
+Because of the included uuid library, you will need to run the library through a bundler of some kind if you are using the NPC class.
 
 
 ## Sample Data
@@ -846,6 +848,8 @@ Here are at least some of the changes to note:
 ## Contributors
 
 I'd be happy to accept feature requests, bug reports, and pull requests via the github repository. There is an eslint config file for style, and tests (via mocha) are in the test directory.
+
+The npm script `buildTest` will build a default export in `./testPage/index.js` that can be used in the testPage to confirm some functionality.
 
 ## License
 

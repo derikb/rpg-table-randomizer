@@ -5,21 +5,23 @@
     <body>
         <p>Demo output...</p>
         <script type="module">
-            import TableRoller from '../src/TableRoller.js';
-            import { rollDie, getDiceResult } from '../src/dice_roller.js';
-            import RandomTable from '../src/RandomTable.js';
-            import normalizeData from '../src/table_normalizer.js';
-            import RandomNameGenerator from '../src/RandomNameGenerator.js';
-            import RandomNameType from '../src/RandomNameType.js';
-            import NPCSchema from '../src/NPCSchema.js';
-            import * as npcGenerator from '../src/npc_generator.js';
-            import names from '../sample/names.js';
             import generalTables from '../sample/general.js';
             import colonialTables from '../sample/colonial.js';
             import colonialMission from '../sample/colonial_mission.js';
             import npcTables from '../sample/npc_tables.js';
             import { simple as simpleSchemaData } from '../sample/schemas.js';
 
+            import {
+                dice_roller,
+                defaultNameGenerator,
+                tableRoller,
+                RandomTable,
+                NPCSchema,
+                npc_generator,
+
+            } from './index.js';
+
+            const { rollDie, getDiceResult } = dice_roller;
 
             console.log(JSON.stringify(
                 [
@@ -43,18 +45,6 @@
                 // printToScreen(`Loaded table ${table}`);
             });
 
-            const tableRoller = new TableRoller({});
-
-            // Format name data
-            const nameTypes = [];
-            names.forEach((data) => {
-                nameTypes.push(new RandomNameType(data));
-            });
-            // Create a default name generator.
-            const defaultNameGenerator = new RandomNameGenerator({ namedata: nameTypes });
-            // Assign it to the name token of the table roller.
-            tableRoller.registerTokenType('name', defaultNameGenerator.nameTokenCallback.bind(defaultNameGenerator));
-
             tableRoller.setTableKeyLookup(function(key) {
                 return testTables[key] || null;
             });
@@ -71,8 +61,8 @@
             const simpleSchema = new NPCSchema(simpleSchemaData);
 
             printToScreen(JSON.stringify(simpleSchema));
-            npcGenerator.registerSchema(simpleSchema);
-            const npc = npcGenerator.initializeNewNPC('simple', tableRoller);
+            npc_generator.registerSchema(simpleSchema);
+            const npc = npc_generator.initializeNewNPC('simple', tableRoller);
             printToScreen(
                 npc
             );
