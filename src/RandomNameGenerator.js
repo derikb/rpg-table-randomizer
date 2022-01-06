@@ -9,6 +9,9 @@ import RandomNameType from './RandomNameType.js';
  * @return {String} name capitalized
  */
 const capitalizeName = function (name) {
+    if (!name) {
+        return '';
+    }
     const leave_lower = ['of', 'the', 'from', 'de', 'le', 'la'];
     // need to find spaces in name and capitalize letter after space
     const parts = name.split(' ');
@@ -91,7 +94,7 @@ class RandonNameGenerator {
      * @returns {String}
      */
     getRandomNameType () {
-        return randomString(Array.from(this.nameTypes.keys()));
+        return randomString(Array.from(this.nameTypes.keys())) || '';
     }
     /**
      * Get the name type
@@ -166,7 +169,7 @@ class RandonNameGenerator {
             throw new RandomNameError(`${nameType.key} does not have list for ${gender}`);
         }
         let name = capitalizeName(randomString(personalNameList));
-        if (style !== 'first') {
+        if (style !== 'first' && nameType.surname.length > 0) {
             name += ` ${capitalizeName(randomString(nameType.surname))}`;
         }
         return name.trim();
