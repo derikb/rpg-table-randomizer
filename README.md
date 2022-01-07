@@ -407,13 +407,6 @@ Constructs a new RandomTable object or instantiates and existing one from some d
 
 For formatting the tables property see the [tableformat.md](/docs/tableformat.md) document.
 
-#### validate (attributes)
-
-* @param {Object} properties new attributes to save
-* @returns {Boolean|Object} error information
-
-In process attempt to validate data to make sure it is formatted right and contains the required properties...
-
 #### subtableNames
 
 * @returns {String[]}

@@ -1,9 +1,10 @@
 import { randomString } from './randomizer.js';
+import { defaultToJSON } from './r_helpers.js';
 
 /**
  * Class for name data.
  */
-class RandomNameType {
+export default class RandomNameType {
     /**
      *
      * @param {String} key Key to identify uniquely in tokens and methods.
@@ -64,6 +65,13 @@ class RandomNameType {
         gender = randomString(randomList);
         return this[gender];
     }
+    /**
+     * Custom JSON handler because Map doesn't JSON stringify automatically.
+     * @returns {Object}
+     */
+    toJSON () {
+        const obj = defaultToJSON.call(this);
+        obj.className = 'RandomNameType';
+        return obj;
+    }
 }
-
-export default RandomNameType;

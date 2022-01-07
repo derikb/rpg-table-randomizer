@@ -57,6 +57,8 @@ export default class NPCSchema {
      * @returns {Object}
      */
     toJSON () {
-        return defaultToJSON.call(this);
+        const obj = defaultToJSON.call(this);
+        obj.className = 'NPCSchema';
+        return obj;
     }
 }

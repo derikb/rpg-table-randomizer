@@ -51,6 +51,8 @@ export default class NPCSchemaField {
      * @returns {Object}
      */
     toJSON () {
-        return defaultToJSON.call(this);
+        const obj = defaultToJSON.call(this);
+        obj.className = 'NPCSchemaField';
+        return obj;
     }
 }

@@ -1,6 +1,5 @@
 /**
  * RandomTable: Model for tables used by TableRoller
- * @param {Object} config the tables non-default attributes
  */
 export default class RandomTable {
     /**
@@ -63,12 +62,6 @@ export default class RandomTable {
      */
     _normalizeTables(tables: any, table: any[]): void;
     tables: {};
-    /**
-     * validate fields before saving
-     * @param {Object} properties new attributes to save
-     * @returns {Object} error information
-     */
-    validate(properties: any): any;
     /**
      * Basic sequence of table rolls.
      * Either the start, the default sequence, the default table, or just the first one.

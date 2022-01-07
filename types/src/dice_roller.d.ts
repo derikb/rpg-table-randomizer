@@ -16,6 +16,11 @@ export class DiceResult {
     die: string;
     value: number;
     toString(): number;
+    toJSON(): {
+        className: string;
+        die: string;
+        value: number;
+    };
 }
 /**
  * Return a dice result.

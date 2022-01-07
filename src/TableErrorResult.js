@@ -10,4 +10,13 @@ export default class TableErrorResult extends RandomTableResult {
     get isError () {
         return true;
     }
+    /**
+     * Custom JSON handler to strip empty props.
+     * @returns {Object}
+     */
+    toJSON () {
+        const obj = super.toJSON();
+        obj.className = 'TableErrorResult';
+        return obj;
+    }
 }

@@ -5,7 +5,6 @@ import { getWeightedRandom } from './randomizer.js';
 
 /**
  * RandomTable: Model for tables used by TableRoller
- * @param {Object} config the tables non-default attributes
  */
 export default class RandomTable {
     /**
@@ -123,29 +122,6 @@ export default class RandomTable {
                 this.tables[name] = this._normalizeTable(data);
             });
         }
-    }
-    /**
-     * validate fields before saving
-     * @param {Object} properties new attributes to save
-     * @returns {Object} error information
-     */
-    validate (properties) {
-        const error = { fields: [], general: '' };
-
-        if (properties.title === '') {
-            error.fields.push({ field: 'title', message: 'Title cannot be blank' });
-            error.general += 'Title cannot be blank. ';
-        }
-
-        if (isEmpty(properties.tables) && isEmpty(properties.macro)) {
-            error.fields.push({ field: 'tables', message: 'Both Tables and Macro cannot be empty' });
-            error.general += 'Both Tables and Macro cannot be empty. ';
-        }
-
-        if (!isEmpty(error.fields) || !isEmpty(error.general)) {
-            return error;
-        }
-        return true;
     }
     /**
      * Basic sequence of table rolls.
@@ -268,6 +244,8 @@ export default class RandomTable {
      * @returns {Object}
      */
     toJSON () {
-        return defaultToJSON.call(this);
+        const obj = defaultToJSON.call(this);
+        obj.className = 'RandomTable';
+        return obj;
     }
 }

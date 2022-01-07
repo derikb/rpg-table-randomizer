@@ -46,30 +46,64 @@ const isUndefined = function (obj) {
 const capitalize = function (string) {
     return isEmpty(string) ? string : string.charAt(0).toUpperCase() + string.slice(1);
 };
+
+/**
+ * Convert a value for serialization.
+ * @param {Any} value
+ * @returns {Any} Though not Map or any class/object with a toJSON method.
+ */
+const serializeValue = function (value) {
+    if (value === null || typeof value === 'undefined') {
+        return;
+    }
+    if (isString(value)) {
+        return value;
+    }
+    if (typeof value === 'number') {
+        return value;
+    }
+    if (Array.isArray(value)) {
+        return value.map((el) => serializeValue(el));
+    }
+    if (typeof value.toJSON === 'function') {
+        return value.toJSON();
+    }
+    if (value instanceof Map) {
+        const obj = {};
+        value.forEach(function (val, key) {
+            obj[key] = serializeValue(val);
+        });
+        return obj;
+    }
+    if (typeof value === 'function') {
+        return;
+    }
+    if (typeof value === 'undefined') {
+        return;
+    }
+    // a plain Object would just return itself, no matter its property values
+    // not sure if I use any in the classes that it is a concern
+    return value;
+};
 /**
  * Default toJSON for classes.
  * Bind this to the class instance when calling.
  * @returns {Object}
  */
 const defaultToJSON = function () {
-    // @todo Should we save the objects class name as a property
-    // so we can recreate the right structure later?
+    // We save the objects class name as a property
+    // so we can recreate the right structure later
+    // but it is done in each class as I can't find a good way
+    // to consistent get the class name.
     const returnObj = {};
     for (const property in this) {
         const value = this[property];
-        if (value instanceof Map) {
-            if (value.size === 0) {
-                continue;
-            }
-            // Note: This will be problematic if Map has keys that are not
-            // permitted as object properties.
-            returnObj[property] = Object.fromEntries(value.entries());
+
+        const value2 = serializeValue(value);
+        if (typeof value2 === 'undefined') {
             continue;
         }
-        if (isEmpty(value)) {
-            continue;
-        }
-        returnObj[property] = value;
+        returnObj[property] = value2;
     }
     return returnObj;
 };

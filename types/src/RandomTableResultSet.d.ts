@@ -17,10 +17,10 @@ export default class RandomTableResultSet {
     displayOptions: any;
     /**
      * Add a result to the set.
-     * @param {RandomTableResult|object} data
+     * @param {RandomTableResult|TableErrorResult|object} data
      * @returns
      */
-    addResult(data: RandomTableResult | object): void;
+    addResult(data: RandomTableResult | TableErrorResult | object): void;
     get isSimple(): boolean;
     /**
      * Find the result for a specific table/subtable
@@ -45,3 +45,4 @@ export default class RandomTableResultSet {
     toJSON(): any;
 }
 import RandomTableResult from "./RandomTableResult.js";
+import TableErrorResult from "./TableErrorResult.js";

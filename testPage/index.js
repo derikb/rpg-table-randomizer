@@ -67,6 +67,13 @@ var DiceResult = class {
   toString() {
     return this.value;
   }
+  toJSON() {
+    return {
+      className: "DiceRoller",
+      die: this.die,
+      value: this.value
+    };
+  }
 };
 var parseDiceNotation = function(die = 6, number = 1, modifier = 0, mod_op = "+") {
   modifier = parseInt(modifier, 10);
@@ -130,6 +137,7 @@ var DisplayOptions = class {
   }
   toJSON() {
     const returnObj = {
+      className: "DisplayOptions",
       table: this.table
     };
     if (this.hide_table) {
@@ -177,21 +185,46 @@ var isUndefined = function(obj) {
 var capitalize = function(string) {
   return isEmpty(string) ? string : string.charAt(0).toUpperCase() + string.slice(1);
 };
+var serializeValue = function(value) {
+  if (value === null || typeof value === "undefined") {
+    return;
+  }
+  if (isString(value)) {
+    return value;
+  }
+  if (typeof value === "number") {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value.map((el) => serializeValue(el));
+  }
+  if (typeof value.toJSON === "function") {
+    return value.toJSON();
+  }
+  if (value instanceof Map) {
+    const obj = {};
+    value.forEach(function(val, key) {
+      obj[key] = serializeValue(val);
+    });
+    return obj;
+  }
+  if (typeof value === "function") {
+    return;
+  }
+  if (typeof value === "undefined") {
+    return;
+  }
+  return value;
+};
 var defaultToJSON = function() {
   const returnObj = {};
   for (const property in this) {
     const value = this[property];
-    if (value instanceof Map) {
-      if (value.size === 0) {
-        continue;
-      }
-      returnObj[property] = Object.fromEntries(value.entries());
+    const value2 = serializeValue(value);
+    if (typeof value2 === "undefined") {
       continue;
     }
-    if (isEmpty(value)) {
-      continue;
-    }
-    returnObj[property] = value;
+    returnObj[property] = value2;
   }
   return returnObj;
 };
@@ -221,7 +254,9 @@ var RandomTableEntry = class {
     }
   }
   toJSON() {
-    return defaultToJSON.call(this);
+    const obj = defaultToJSON.call(this);
+    obj.className = "RandomTableEntry";
+    return obj;
   }
 };
 
@@ -310,21 +345,6 @@ var RandomTable = class {
       });
     }
   }
-  validate(properties) {
-    const error = { fields: [], general: "" };
-    if (properties.title === "") {
-      error.fields.push({ field: "title", message: "Title cannot be blank" });
-      error.general += "Title cannot be blank. ";
-    }
-    if (isEmpty(properties.tables) && isEmpty(properties.macro)) {
-      error.fields.push({ field: "tables", message: "Both Tables and Macro cannot be empty" });
-      error.general += "Both Tables and Macro cannot be empty. ";
-    }
-    if (!isEmpty(error.fields) || !isEmpty(error.general)) {
-      return error;
-    }
-    return true;
-  }
   getSequence(start = "") {
     if (start !== "") {
       return [start];
@@ -409,7 +429,9 @@ var RandomTable = class {
     return dep;
   }
   toJSON() {
-    return defaultToJSON.call(this);
+    const obj = defaultToJSON.call(this);
+    obj.className = "RandomTable";
+    return obj;
   }
 };
 
@@ -434,7 +456,21 @@ var RandomTableResult = class {
     return this.result;
   }
   toJSON() {
-    return defaultToJSON.call(this);
+    const obj = defaultToJSON.call(this);
+    obj.className = "RandonTableResult";
+    return obj;
+  }
+};
+
+// src/TableErrorResult.js
+var TableErrorResult = class extends RandomTableResult {
+  get isError() {
+    return true;
+  }
+  toJSON() {
+    const obj = super.toJSON();
+    obj.className = "TableErrorResult";
+    return obj;
   }
 };
 
@@ -457,8 +493,12 @@ var RandomTableResultSet = class {
     }
   }
   addResult(data) {
-    if (data instanceof RandomTableResult) {
+    if (data instanceof RandomTableResult || data instanceof TableErrorResult) {
       this.results.push(data);
+      return;
+    }
+    if (data.className === "TableErrorResult") {
+      this.results.push(new TableErrorResult(data));
       return;
     }
     this.results.push(new RandomTableResult(data));
@@ -523,7 +563,9 @@ var RandomTableResultSet = class {
     return this.niceString();
   }
   toJSON() {
-    return defaultToJSON.call(this);
+    const obj = defaultToJSON.call(this);
+    obj.className = "RandonTableResultSet";
+    return obj;
   }
 };
 
@@ -535,13 +577,6 @@ var TableError = class extends Error {
   }
 };
 var TableError_default = TableError;
-
-// src/TableErrorResult.js
-var TableErrorResult = class extends RandomTableResult {
-  get isError() {
-    return true;
-  }
-};
 
 // src/TableRoller.js
 var tokenRegExp = /({{2}.+?}{2})/g;
@@ -845,8 +880,33 @@ var NPC = class {
     if (fields instanceof Map) {
       this.fields = fields;
     } else if (isObject(fields)) {
+      this.fields = /* @__PURE__ */ new Map();
+      for (const [key, value] of Object.entries(fields)) {
+        this.fields.set(key, this._convertFieldValue(value));
+      }
       this.fields = new Map(Object.entries(fields));
     }
+  }
+  _convertFieldValue(value) {
+    if (typeof value === "string") {
+      return value;
+    }
+    if (value instanceof RandomTableResultSet || value instanceof RandomTableResult || value instanceof TableErrorResult || value instanceof DiceResult) {
+      return value;
+    }
+    if (value.className === "RandomTableResultSet") {
+      return new RandomTableResultSet(value);
+    }
+    if (value.className === "RandomTableResult") {
+      return new RandomTableResult(value);
+    }
+    if (value.className === "TableErrorResult") {
+      return new TableErrorResult(value);
+    }
+    if (value.className === "DiceResult") {
+      return new DiceResult(value);
+    }
+    return value;
   }
   getFieldKeys() {
     return Array.from(this.fields.keys());
@@ -855,7 +915,9 @@ var NPC = class {
     return this.fields.get(key) || "";
   }
   toJSON() {
-    return defaultToJSON.call(this);
+    const obj = defaultToJSON.call(this);
+    obj.className = "NPC";
+    return obj;
   }
 };
 
@@ -892,7 +954,9 @@ var NPCSchemaField = class {
     return null;
   }
   toJSON() {
-    return defaultToJSON.call(this);
+    const obj = defaultToJSON.call(this);
+    obj.className = "NPCSchemaField";
+    return obj;
   }
 };
 
@@ -930,7 +994,9 @@ var NPCSchema = class {
     return field.label;
   }
   toJSON() {
-    return defaultToJSON.call(this);
+    const obj = defaultToJSON.call(this);
+    obj.className = "NPCSchema";
+    return obj;
   }
 };
 
@@ -1098,11 +1164,18 @@ var RandomNameType = class {
     gender = randomString(randomList);
     return this[gender];
   }
+  toJSON() {
+    const obj = defaultToJSON.call(this);
+    obj.className = "RandomNameType";
+    return obj;
+  }
 };
-var RandomNameType_default = RandomNameType;
 
 // src/RandomNameGenerator.js
 var capitalizeName = function(name) {
+  if (!name) {
+    return "";
+  }
   const leave_lower = ["of", "the", "from", "de", "le", "la"];
   const parts = name.split(" ");
   const upper_parts = parts.map((w) => {
@@ -1124,7 +1197,7 @@ var RandonNameGenerator = class {
     this._markov = new MarkovGenerator_default({ order: markovOrder });
   }
   registerNameType(type) {
-    if (!(type instanceof RandomNameType_default)) {
+    if (!(type instanceof RandomNameType)) {
       throw new RandomNameError_default("Must be instance of RandomNameType");
     }
     if (!type.key) {
@@ -1154,7 +1227,7 @@ var RandonNameGenerator = class {
     return Array.from(this.nameTypes.keys());
   }
   getRandomNameType() {
-    return randomString(Array.from(this.nameTypes.keys()));
+    return randomString(Array.from(this.nameTypes.keys())) || "";
   }
   _getNameType(name_type) {
     if (name_type === "random") {
@@ -1195,7 +1268,7 @@ var RandonNameGenerator = class {
       throw new RandomNameError_default(`${nameType.key} does not have list for ${gender}`);
     }
     let name = capitalizeName(randomString(personalNameList));
-    if (style !== "first") {
+    if (style !== "first" && nameType.surname.length > 0) {
       name += ` ${capitalizeName(randomString(nameType.surname))}`;
     }
     return name.trim();
@@ -7121,7 +7194,7 @@ var names_default = [
 var tableRoller = new TableRoller_default({});
 var nameTypes = [];
 names_default.forEach((data) => {
-  nameTypes.push(new RandomNameType_default(data));
+  nameTypes.push(new RandomNameType(data));
 });
 var defaultNameGenerator = new RandomNameGenerator_default({ namedata: nameTypes });
 tableRoller.registerTokenType("name", defaultNameGenerator.nameTokenCallback.bind(defaultNameGenerator));
@@ -7132,7 +7205,7 @@ export {
   NPCSchemaField,
   RandomNameError_default as RandomNameError,
   RandomNameGenerator_default as RandomNameGenerator,
-  RandomNameType_default as RandomNameType,
+  RandomNameType,
   RandomTable,
   RandomTableEntry,
   RandomTableResult,

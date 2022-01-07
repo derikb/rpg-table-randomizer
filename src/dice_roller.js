@@ -16,6 +16,13 @@ class DiceResult {
     toString () {
         return this.value;
     }
+    toJSON () {
+        return {
+            className: 'DiceRoller',
+            die: this.die,
+            value: this.value
+        };
+    }
 }
 
 /**

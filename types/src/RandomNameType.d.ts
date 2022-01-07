@@ -1,8 +1,7 @@
-export default RandomNameType;
 /**
  * Class for name data.
  */
-declare class RandomNameType {
+export default class RandomNameType {
     /**
      *
      * @param {String} key Key to identify uniquely in tokens and methods.
@@ -28,4 +27,9 @@ declare class RandomNameType {
      * @returns {String[]}
      */
     getPersonalNameList(gender?: string): string[];
+    /**
+     * Custom JSON handler because Map doesn't JSON stringify automatically.
+     * @returns {Object}
+     */
+    toJSON(): any;
 }

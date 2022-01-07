@@ -39,6 +39,8 @@ export default class RandomTableEntry {
      * @returns {Object}
      */
     toJSON () {
-        return defaultToJSON.call(this);
+        const obj = defaultToJSON.call(this);
+        obj.className = 'RandomTableEntry';
+        return obj;
     }
 }

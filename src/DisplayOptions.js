@@ -27,6 +27,7 @@ export default class DisplayOptions {
      */
     toJSON () {
         const returnObj = {
+            className: 'DisplayOptions',
             table: this.table
         };
         if (this.hide_table) {

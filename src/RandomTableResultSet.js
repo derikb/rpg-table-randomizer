@@ -1,5 +1,6 @@
 import { capitalize, defaultToJSON } from './r_helpers.js';
 import RandomTableResult from './RandomTableResult.js';
+import TableErrorResult from './TableErrorResult.js';
 
 /**
  * Set of table results.
@@ -28,12 +29,16 @@ export default class RandomTableResultSet {
     }
     /**
      * Add a result to the set.
-     * @param {RandomTableResult|object} data
+     * @param {RandomTableResult|TableErrorResult|object} data
      * @returns
      */
     addResult (data) {
-        if (data instanceof RandomTableResult) {
+        if (data instanceof RandomTableResult || data instanceof TableErrorResult) {
             this.results.push(data);
+            return;
+        }
+        if (data.className === 'TableErrorResult') {
+            this.results.push(new TableErrorResult(data));
             return;
         }
         this.results.push(new RandomTableResult(data));
@@ -111,6 +116,8 @@ export default class RandomTableResultSet {
      * @returns {Object}
      */
     toJSON () {
-        return defaultToJSON.call(this);
+        const obj = defaultToJSON.call(this);
+        obj.className = 'RandonTableResultSet';
+        return obj;
     }
 }

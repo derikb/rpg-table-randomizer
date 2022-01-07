@@ -38,6 +38,8 @@ export default class RandomTableResult {
      * @returns {Object}
      */
     toJSON () {
-        return defaultToJSON.call(this);
+        const obj = defaultToJSON.call(this);
+        obj.className = 'RandonTableResult';
+        return obj;
     }
 }

@@ -1,5 +1,9 @@
 import { defaultToJSON, isObject } from './r_helpers.js';
 import { v4 as uuidv4 } from 'uuid';
+import { DiceResult } from './dice_roller.js';
+import RandomTableResultSet from './RandomTableResultSet.js';
+import RandomTableResult from './RandomTableResult.js';
+import TableErrorResult from './TableErrorResult.js';
 
 /**
  * Class for NPCs
@@ -23,10 +27,36 @@ export default class NPC {
         if (fields instanceof Map) {
             this.fields = fields;
         } else if (isObject(fields)) {
-            // @todo do we convert result set objects to classes?
-            // how?
+            this.fields = new Map();
+            for (const [key, value] of Object.entries(fields)) {
+                this.fields.set(key, this._convertFieldValue(value));
+            }
             this.fields = new Map(Object.entries(fields));
         }
+    }
+    _convertFieldValue (value) {
+        if (typeof value === 'string') {
+            return value;
+        }
+        if (value instanceof RandomTableResultSet ||
+            value instanceof RandomTableResult ||
+            value instanceof TableErrorResult ||
+            value instanceof DiceResult) {
+            return value;
+        }
+        if (value.className === 'RandomTableResultSet') {
+            return new RandomTableResultSet(value);
+        }
+        if (value.className === 'RandomTableResult') {
+            return new RandomTableResult(value);
+        }
+        if (value.className === 'TableErrorResult') {
+            return new TableErrorResult(value);
+        }
+        if (value.className === 'DiceResult') {
+            return new DiceResult(value);
+        }
+        return value;
     }
     /**
      * Get field keys as array.
@@ -48,6 +78,8 @@ export default class NPC {
      * @returns {Object}
      */
     toJSON () {
-        return defaultToJSON.call(this);
+        const obj = defaultToJSON.call(this);
+        obj.className = 'NPC';
+        return obj;
     }
 }
