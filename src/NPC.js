@@ -31,7 +31,6 @@ export default class NPC {
             for (const [key, value] of Object.entries(fields)) {
                 this.fields.set(key, this._convertFieldValue(value));
             }
-            this.fields = new Map(Object.entries(fields));
         }
     }
     _convertFieldValue (value) {
