@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.2](https://github.com/derikb/rpg-table-randomizer/compare/v1.1.1...v1.1.2) (2022-01-07)
+
+
+### Bug Fixes
+
+* **npc:** Fix unserializing NPC fields ([9e8ca8e](https://github.com/derikb/rpg-table-randomizer/commit/9e8ca8ed885c40380d2d4870b9102ef1ce53d369))
+
 ### [1.1.1](https://github.com/derikb/rpg-table-randomizer/compare/v1.1.0...v1.1.1) (2022-01-07)
 
 
