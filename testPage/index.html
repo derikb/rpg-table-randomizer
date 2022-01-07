@@ -18,7 +18,7 @@
                 RandomTable,
                 NPCSchema,
                 npc_generator,
-
+                NPC
             } from './index.js';
 
             const { rollDie, getDiceResult } = dice_roller;
@@ -68,6 +68,11 @@
             );
             console.log(npc);
             console.log(npc.toJSON());
+
+            const npc2 = new NPC({});
+            printToScreen(npc2);
+            npc_generator.applySchemaToNPC(simpleSchema, tableRoller, npc2);
+            printToScreen(npc2);
 
             printToScreen('TableRoller...');
             const ordResult = tableRoller.getTableResultSetByKey('ordinal');

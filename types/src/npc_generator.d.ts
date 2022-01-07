@@ -22,6 +22,14 @@ export function getSchemaByKey(key: string): NPCSchema | null;
  * @returns NPC
  */
 export function initializeNewNPC(schemaKey: string, tableRoller: TableRoller, generateId?: boolean): NPC;
+/**
+ * Apply a schema to an NPC.
+ * You could pass in children of NPC class here.
+ * @param {NPCSchema} schema
+ * @param {TableRoller} tableRoller
+ * @param {NPC} npc With either blank schema or set to same key as schema arg
+ */
+export function applySchemaToNPC(schema: NPCSchema, tableRoller: TableRoller, npc: NPC): void;
 import NPCSchema from "./NPCSchema.js";
 import TableRoller from "./TableRoller.js";
 import NPC from "./NPC.js";

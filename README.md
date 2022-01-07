@@ -584,6 +584,14 @@ This function takes the passed in `NPCSchema` and adds it by key to the availabl
 * @param {Boolean} [generateId=true] If true NPC will have a uuid assigned to its id property.
 * @returns NPC
 
+#### applySchemaToNPC (schema, TableRoller, npc)
+
+* @param {NPCSchema} schema
+* @param {TableRoller} tableRoller
+* @param {NPC} npc With either blank schema or set to same key as schema arg
+
+Apply a schema to an existing NPC object. This should work with any children of the NPC class. It just sets the schema and then sets all the fields from that schema.
+
 ### NPC
 
 An NPC class.

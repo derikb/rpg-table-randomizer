@@ -59,6 +59,14 @@ export default class NPC {
         return value;
     }
     /**
+     * Set field value.
+     * @param {String} key Field key.
+     * @param {Any} value Value for field.
+     */
+    setFieldValue (key, value) {
+        this.fields.set(key, this._convertFieldValue(value));
+    }
+    /**
      * Get field keys as array.
      * @returns {String[]}
      */

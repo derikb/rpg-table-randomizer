@@ -10,11 +10,11 @@ export default class RandomTableResultSet {
     constructor({ title, results, displayOptions }: {
         title?: string;
         results?: any[];
-        displayOptions?: any;
+        displayOptions?: Map<any, any>;
     });
     title: string;
     results: any[];
-    displayOptions: any;
+    displayOptions: Map<any, any>;
     /**
      * Add a result to the set.
      * @param {RandomTableResult|TableErrorResult|object} data

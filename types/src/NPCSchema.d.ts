@@ -17,7 +17,7 @@ export default class NPCSchema {
     key: string;
     name: string;
     author: string;
-    fields: any;
+    fields: Map<any, any>;
     /**
      * Get a Field by the key.
      * @param {String} key

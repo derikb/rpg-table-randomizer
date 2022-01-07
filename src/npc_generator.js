@@ -77,10 +77,56 @@ const initializeNewNPC = function (schemaKey, tableRoller, generateId = true) {
         id: (generateId ? null : '')
     });
 };
+/**
+ * Apply a schema to an NPC.
+ * You could pass in children of NPC class here.
+ * @param {NPCSchema} schema
+ * @param {TableRoller} tableRoller
+ * @param {NPC} npc With either blank schema or set to same key as schema arg
+ */
+const applySchemaToNPC = function (schema, tableRoller, npc) {
+    if (!(npc instanceof NPC)) {
+        throw Error('npc object must be or inherit from NPC class.');
+    }
+    if (!(schema instanceof NPCSchema)) {
+        throw Error('schema object must be or inherit from NPCSchema class.');
+    }
+    if (!(tableRoller instanceof TableRoller)) {
+        throw Error('Invalid tableRoller');
+    }
+    if (npc.schema === '') {
+        npc.schema = schema.key;
+    }
+    if (npc.schema !== schema.key) {
+        throw Error('npc already has schema set.');
+    }
+    schema.fields.forEach((field) => {
+        const key = field.key;
+        if (!isEmpty(field.starting_value)) {
+            npc.setFieldValue(key, field.starting_value);
+            return;
+        }
+        if (!isEmpty(field.source)) {
+            if (field.type === 'array') {
+                const value = [];
+                const ct = (field.count) ? field.count : 1;
+                for (let i = 0; i < ct; i++) {
+                    value.push(tableRoller.convertToken(field.source));
+                }
+                npc.setFieldValue(key, value);
+            } else {
+                npc.setFieldValue(key, tableRoller.convertToken(field.source));
+            }
+            return;
+        }
+        npc.setFieldValue(key, field.defaultEmpty);
+    });
+};
 
 export {
     registerSchema,
     getAllSchemas,
     getSchemaByKey,
-    initializeNewNPC
+    initializeNewNPC,
+    applySchemaToNPC
 };

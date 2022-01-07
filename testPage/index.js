@@ -156,6 +156,7 @@ var DisplayOptions = class {
 // src/npc_generator.js
 var npc_generator_exports = {};
 __export(npc_generator_exports, {
+  applySchemaToNPC: () => applySchemaToNPC,
   getAllSchemas: () => getAllSchemas,
   getSchemaByKey: () => getSchemaByKey,
   initializeNewNPC: () => initializeNewNPC,
@@ -908,6 +909,9 @@ var NPC = class {
     }
     return value;
   }
+  setFieldValue(key, value) {
+    this.fields.set(key, this._convertFieldValue(value));
+  }
   getFieldKeys() {
     return Array.from(this.fields.keys());
   }
@@ -1048,6 +1052,44 @@ var initializeNewNPC = function(schemaKey, tableRoller2, generateId = true) {
     schema: schemaKey,
     fields,
     id: generateId ? null : ""
+  });
+};
+var applySchemaToNPC = function(schema, tableRoller2, npc) {
+  if (!(npc instanceof NPC)) {
+    throw Error("npc object must be or inherit from NPC class.");
+  }
+  if (!(schema instanceof NPCSchema)) {
+    throw Error("schema object must be or inherit from NPCSchema class.");
+  }
+  if (!(tableRoller2 instanceof TableRoller_default)) {
+    throw Error("Invalid tableRoller");
+  }
+  if (npc.schema === "") {
+    npc.schema = schema.key;
+  }
+  if (npc.schema !== schema.key) {
+    throw Error("npc already has schema set.");
+  }
+  schema.fields.forEach((field) => {
+    const key = field.key;
+    if (!isEmpty(field.starting_value)) {
+      npc.setFieldValue(key, field.starting_value);
+      return;
+    }
+    if (!isEmpty(field.source)) {
+      if (field.type === "array") {
+        const value = [];
+        const ct = field.count ? field.count : 1;
+        for (let i = 0; i < ct; i++) {
+          value.push(tableRoller2.convertToken(field.source));
+        }
+        npc.setFieldValue(key, value);
+      } else {
+        npc.setFieldValue(key, tableRoller2.convertToken(field.source));
+      }
+      return;
+    }
+    npc.setFieldValue(key, field.defaultEmpty);
   });
 };
 
