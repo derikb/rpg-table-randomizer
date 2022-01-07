@@ -117,7 +117,7 @@ export default class RandomTableResultSet {
      */
     toJSON () {
         const obj = defaultToJSON.call(this);
-        obj.className = 'RandonTableResultSet';
+        obj.className = 'RandomTableResultSet';
         return obj;
     }
 }

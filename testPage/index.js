@@ -458,7 +458,7 @@ var RandomTableResult = class {
   }
   toJSON() {
     const obj = defaultToJSON.call(this);
-    obj.className = "RandonTableResult";
+    obj.className = "RandomTableResult";
     return obj;
   }
 };
@@ -565,7 +565,7 @@ var RandomTableResultSet = class {
   }
   toJSON() {
     const obj = defaultToJSON.call(this);
-    obj.className = "RandonTableResultSet";
+    obj.className = "RandomTableResultSet";
     return obj;
   }
 };
@@ -1225,7 +1225,7 @@ var capitalizeName = function(name) {
   });
   return upper_parts.join(" ");
 };
-var RandonNameGenerator = class {
+var RandomNameGenerator = class {
   constructor({
     namedata = [],
     markovOrder = 3
@@ -1388,7 +1388,7 @@ var RandonNameGenerator = class {
     return string;
   }
 };
-var RandomNameGenerator_default = RandonNameGenerator;
+var RandomNameGenerator_default = RandomNameGenerator;
 
 // sample/names.js
 var names_default = [

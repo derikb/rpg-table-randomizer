@@ -1,9 +1,9 @@
-export default RandonNameGenerator;
+export default RandomNameGenerator;
 /**
  * @prop {Map<RandomNameType>} nameTypes
  * @prop {MarkovGenerator} _markov
  */
-declare class RandonNameGenerator {
+declare class RandomNameGenerator {
     /**
      * Random name generation.
      * @param {RandomNameType[]} namedata

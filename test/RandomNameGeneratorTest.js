@@ -3,7 +3,7 @@
 import { expect } from 'chai';
 import { stub } from 'sinon';
 
-import RandonNameGenerator from '../src/RandomNameGenerator.js';
+import RandomNameGenerator from '../src/RandomNameGenerator.js';
 import RandomNameType from '../src/RandomNameType.js';
 import RandomNameError from '../src/RandomNameError.js';
 
@@ -35,7 +35,7 @@ const dwarfType = new RandomNameType({
     ]
 });
 
-describe('RandonNameGenerator', function () {
+describe('RandomNameGenerator', function () {
     it('it should register name type data', function () {
         expect(orcType.getAllPersonalNames()).to.deep.equal([
             'oog',
@@ -72,7 +72,7 @@ describe('RandonNameGenerator', function () {
         ]);
 
 
-        const generator = new RandonNameGenerator({
+        const generator = new RandomNameGenerator({
             namedata: [
                 orcType
             ]
@@ -82,7 +82,7 @@ describe('RandonNameGenerator', function () {
     });
 
     it('it should throw on invalid name type data for registerNameType', function () {
-        const generator = new RandonNameGenerator({});
+        const generator = new RandomNameGenerator({});
         expect(() => { generator.registerNameType('hello'); }).to.throw(RandomNameError, 'instance');
 
         const type1 = new RandomNameType({});
@@ -100,7 +100,7 @@ describe('RandonNameGenerator', function () {
     });
 
     it('it should return a name for selectPersonalName', function () {
-        const generator = new RandonNameGenerator({
+        const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
@@ -117,7 +117,7 @@ describe('RandonNameGenerator', function () {
     });
 
     it('it should return a name for selectSurname', function () {
-        const generator = new RandonNameGenerator({
+        const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
@@ -130,7 +130,7 @@ describe('RandonNameGenerator', function () {
     });
 
     it('it should return a name for selectName', function () {
-        const generator = new RandonNameGenerator({
+        const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
@@ -144,7 +144,7 @@ describe('RandonNameGenerator', function () {
     });
 
     it('it should return a name for createPersonalName', function () {
-        const generator = new RandonNameGenerator({
+        const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
@@ -167,7 +167,7 @@ describe('RandonNameGenerator', function () {
     });
 
     it('it should return a name for createSurName', function () {
-        const generator = new RandonNameGenerator({
+        const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
@@ -191,7 +191,7 @@ describe('RandonNameGenerator', function () {
 
 
     it('it should return a name for createName', function () {
-        const generator = new RandonNameGenerator({
+        const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
@@ -206,7 +206,7 @@ describe('RandonNameGenerator', function () {
     });
 
     it('it should return names for generateList', function () {
-        const generator = new RandonNameGenerator({
+        const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
@@ -223,7 +223,7 @@ describe('RandonNameGenerator', function () {
     });
 
     it('it should create names for generateList', function () {
-        const generator = new RandonNameGenerator({
+        const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
@@ -240,7 +240,7 @@ describe('RandonNameGenerator', function () {
     });
 
     it('it should return names for nameTokenCallback', function () {
-        const generator = new RandonNameGenerator({
+        const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType

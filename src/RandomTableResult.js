@@ -39,7 +39,7 @@ export default class RandomTableResult {
      */
     toJSON () {
         const obj = defaultToJSON.call(this);
-        obj.className = 'RandonTableResult';
+        obj.className = 'RandomTableResult';
         return obj;
     }
 }

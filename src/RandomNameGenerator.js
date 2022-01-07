@@ -25,7 +25,7 @@ const capitalizeName = function (name) {
  * @prop {Map<RandomNameType>} nameTypes
  * @prop {MarkovGenerator} _markov
  */
-class RandonNameGenerator {
+class RandomNameGenerator {
     /**
      * Random name generation.
      * @param {RandomNameType[]} namedata
@@ -290,4 +290,4 @@ class RandonNameGenerator {
     }
 }
 
-export default RandonNameGenerator;
+export default RandomNameGenerator;
