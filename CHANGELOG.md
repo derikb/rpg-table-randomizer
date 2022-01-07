@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/derikb/rpg-table-randomizer/compare/v1.1.0...v1.1.1) (2022-01-07)
+
+
+### Bug Fixes
+
+* **typos:** Embarrassing Randon typos (sigh) ([f797eb4](https://github.com/derikb/rpg-table-randomizer/commit/f797eb456b8a494775f116cc66477d66fb54c937))
+
 ## [1.1.0](https://github.com/derikb/rpg-table-randomizer/compare/v1.0.1...v1.1.0) (2022-01-07)
 
 
