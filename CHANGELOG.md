@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/derikb/rpg-table-randomizer/compare/v1.0.1...v1.1.0) (2022-01-07)
+
+
+### Features
+
+* **npc:** Apply schema to npc function ([a8779ec](https://github.com/derikb/rpg-table-randomizer/commit/a8779ec92fbcaa7bf0dba20a9375b51de9fa1f6b)), closes [#49](https://github.com/derikb/rpg-table-randomizer/issues/49)
+
+
+### Bug Fixes
+
+* **build:** Fix uuid import, add build for test page ([b59c942](https://github.com/derikb/rpg-table-randomizer/commit/b59c94294bf8cea24c95db37a9c117c0f48e1c8f)), closes [#48](https://github.com/derikb/rpg-table-randomizer/issues/48)
+* **names:** Fix for full names where surname is empty on type ([d734e6d](https://github.com/derikb/rpg-table-randomizer/commit/d734e6d59525f2fc1e614a7c5f966dd960ac7cdd))
+* **serialization:** Fix serialization for classes in classes ([f152887](https://github.com/derikb/rpg-table-randomizer/commit/f152887a8905163808675c6e117a4757bb690b3e)), closes [#50](https://github.com/derikb/rpg-table-randomizer/issues/50)
+
 ### [1.0.1](https://github.com/derikb/rpg-table-randomizer/compare/v1.0.0...v1.0.1) (2022-01-01)
 
 
