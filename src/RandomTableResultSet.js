@@ -1,6 +1,7 @@
 import { capitalize, defaultToJSON } from './r_helpers.js';
 import RandomTableResult from './RandomTableResult.js';
 import TableErrorResult from './TableErrorResult.js';
+import DisplayOptions from './DisplayOptions.js';
 
 /**
  * Set of table results.
@@ -9,7 +10,7 @@ export default class RandomTableResultSet {
     /**
      * @property {String} title Title from the RandomTable parent
      * @property {RandomTableResult[]} results Randomized results.
-     * @property {Map[DisplayOptions]} displayOptions Display settings from the RandomTable parent.
+     * @property {Map[DisplayOptions]|Object} displayOptions Display settings from the RandomTable parent.
      */
     constructor ({
         title = '',
@@ -25,6 +26,17 @@ export default class RandomTableResultSet {
             this.displayOptions = displayOptions;
         } else {
             this.displayOptions = new Map();
+            Object.keys(displayOptions).forEach((key) => {
+                const data = displayOptions[key];
+                const tableName = data.table || '';
+                if (tableName) {
+                    if (data instanceof DisplayOptions) {
+                        this.displayOptions.set(tableName, data);
+                        return;
+                    }
+                    this.displayOptions.set(tableName, new DisplayOptions(data));
+                }
+            });
         }
     }
     /**

@@ -5,8 +5,55 @@ import { expect } from 'chai';
 import DisplayOptions from '../src/DisplayOptions.js';
 import RandomTableResult from '../src/RandomTableResult.js';
 import RandomTableResultSet from '../src/RandomTableResultSet.js';
+import TableErrorResult from '../src/TableErrorResult.js';
 
 describe('RandomTableResultSet', function () {
+    it('should unserialize an object to the class props', function () {
+        const result1 = {
+            table: 'default',
+            result: 'blue'
+        };
+        const result2 = {
+            table: 'Error',
+            result: 'Ran out of room',
+            className: 'TableErrorResult'
+        };
+        const result3 = {
+            table: 'hue',
+            result: 'Cerulean',
+            desc: 'in some place',
+            className: 'RandomTableResult'
+        };
+        const displayOptionsObj = {
+            default: {
+                table: 'default',
+                hide_table: true,
+                className: 'DisplayOptions'
+            },
+            hue: new DisplayOptions({
+                table: 'hue',
+                hide_table: false
+            })
+        };
+
+        const resultSet = new RandomTableResultSet({
+            title: 'colors',
+            results: [
+                result1,
+                result2,
+                result3
+            ],
+            displayOptions: displayOptionsObj
+        });
+
+        expect(resultSet.title).to.equal('colors');
+        expect(resultSet.results[0]).to.be.instanceOf(RandomTableResult);
+        expect(resultSet.results[1]).to.be.instanceOf(TableErrorResult);
+        expect(resultSet.results[2]).to.be.instanceOf(RandomTableResult);
+        expect(resultSet.displayOptions.get('default')).to.be.instanceOf(DisplayOptions);
+        expect(resultSet.displayOptions.get('hue')).to.be.instanceOf(DisplayOptions);
+    });
+
     it('should output a string from the set with no display options', function () {
         const result1 = new RandomTableResult({
             table: 'default',
