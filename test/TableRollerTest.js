@@ -1,11 +1,11 @@
 'use strict';
 
+import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 
 import DisplayOptions from '../src/DisplayOptions.js';
 import RandomTable from '../src/RandomTable.js';
-import RandomTableEntry from '../src/RandomTableEntry.js';
 import RandomTableResult from '../src/RandomTableResult.js';
 import RandomTableResultSet from '../src/RandomTableResultSet.js';
 import TableError from '../src/TableError.js';

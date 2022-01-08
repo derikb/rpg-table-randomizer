@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 'use strict';
 
+import { describe, it } from 'mocha';
 import { expect } from 'chai';
 
 import { rollDie, DiceResult, getDiceResult } from '../src/dice_roller.js';

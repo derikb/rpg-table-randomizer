@@ -1,5 +1,6 @@
 'use strict';
 
+import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { stub } from 'sinon';
 
@@ -70,7 +71,6 @@ describe('RandomNameGenerator', function () {
         expect(dwarfType.getPersonalNameList('random')).to.deep.equal([
             'Thorin'
         ]);
-
 
         const generator = new RandomNameGenerator({
             namedata: [
@@ -188,7 +188,6 @@ describe('RandomNameGenerator', function () {
             'spike'
         ]);
     });
-
 
     it('it should return a name for createName', function () {
         const generator = new RandomNameGenerator({

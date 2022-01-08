@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-expressions */
 'use strict';
 
+import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import RandomTable from '../src/RandomTable.js';
 import RandomTableEntry from '../src/RandomTableEntry.js';
@@ -25,10 +27,10 @@ describe('RandomTable', function () {
 
     it('should normalize subtable data on creation', function () {
         expect(rtable.tables.default.length).to.equal(3);
-        expect(rtable.tables.default[2]).to.deep.equal(new RandomTableEntry({label: 'yellow'}));
+        expect(rtable.tables.default[2]).to.deep.equal(new RandomTableEntry({ label: 'yellow' }));
         expect(rtable.tables.secondary.length).to.equal(2);
-        expect(rtable.tables.secondary[0]).to.deep.equal(new RandomTableEntry({label: 'green'}));
-        expect(rtable.tables.secondary[1]).to.deep.equal(new RandomTableEntry({label: 'orange'}));
+        expect(rtable.tables.secondary[0]).to.deep.equal(new RandomTableEntry({ label: 'green' }));
+        expect(rtable.tables.secondary[1]).to.deep.equal(new RandomTableEntry({ label: 'orange' }));
         expect(rtable.tables.tertiary).to.be.an('array');
         expect(rtable.tables.tertiary).to.be.empty;
         expect(rtable.tables.hues).to.be.undefined;
