@@ -49,33 +49,13 @@ const initializeNewNPC = function (schemaKey, tableRoller, generateId = true) {
         throw Error('Invalid tableRoller');
     }
 
-    const fields = new Map();
-    schema.fields.forEach((field) => {
-        const key = field.key;
-        if (!isEmpty(field.starting_value)) {
-            fields.set(key, field.starting_value);
-            return;
-        }
-        if (!isEmpty(field.source)) {
-            if (field.type === 'array') {
-                const value = [];
-                const ct = (field.count) ? field.count : 1;
-                for (let i = 0; i < ct; i++) {
-                    value.push(tableRoller.convertToken(field.source));
-                }
-                fields.set(key, value);
-            } else {
-                fields.set(key, tableRoller.convertToken(field.source));
-            }
-            return;
-        }
-        fields.set(key, field.defaultEmpty);
-    });
-    return new NPC({
+    const npc = new NPC({
         schema: schemaKey,
-        fields: fields,
         id: (generateId ? null : '')
     });
+
+    applySchemaToNPC(schema, tableRoller, npc);
+    return npc;
 };
 /**
  * Apply a schema to an NPC.
