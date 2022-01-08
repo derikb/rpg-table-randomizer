@@ -1,4 +1,4 @@
-import { defaultToJSON } from './r_helpers.js';
+import { defaultToJSON, isObject } from './r_helpers.js';
 import NPCSchemaField from './NPCSchemaField.js';
 
 /**
@@ -23,14 +23,30 @@ export default class NPCSchema {
         this.fields = new Map();
         if (Array.isArray(fields)) {
             fields.forEach((obj) => {
-                if (obj instanceof NPCSchemaField) {
-                    this.fields.set(obj.key, obj);
-                    return;
-                }
-                const field = new NPCSchemaField(obj);
-                this.fields.set(field.key, field);
+                this._convertField(obj);
+            });
+        } else {
+            Object.keys(fields).forEach((key) => {
+                this._convertField(fields[key]);
             });
         }
+    }
+    _convertField (value) {
+        if (value instanceof NPCSchemaField) {
+            this.fields.set(value.key, value);
+            return;
+        }
+        if (isObject(value)) {
+            const field = new NPCSchemaField(value);
+            this.fields.set(field.key, field);
+        }
+    }
+    /**
+     * Get field keys as array.
+     * @returns String[]
+     */
+    getFieldKeys () {
+        return Array.from(this.fields.keys());
     }
     /**
      * Get a Field by the key.
