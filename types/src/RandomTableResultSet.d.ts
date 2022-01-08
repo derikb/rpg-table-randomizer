@@ -5,16 +5,16 @@ export default class RandomTableResultSet {
     /**
      * @property {String} title Title from the RandomTable parent
      * @property {RandomTableResult[]} results Randomized results.
-     * @property {Map[DisplayOptions]} displayOptions Display settings from the RandomTable parent.
+     * @property {Map[DisplayOptions]|Object} displayOptions Display settings from the RandomTable parent.
      */
     constructor({ title, results, displayOptions }: {
         title?: string;
         results?: any[];
-        displayOptions?: Map<any, any>;
+        displayOptions?: any;
     });
     title: string;
     results: any[];
-    displayOptions: Map<any, any>;
+    displayOptions: any;
     /**
      * Add a result to the set.
      * @param {RandomTableResult|TableErrorResult|object} data

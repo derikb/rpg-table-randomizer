@@ -17,7 +17,13 @@ export default class NPCSchema {
     key: string;
     name: string;
     author: string;
-    fields: Map<any, any>;
+    fields: any;
+    _convertField(value: any): void;
+    /**
+     * Get field keys as array.
+     * @returns String[]
+     */
+    getFieldKeys(): any;
     /**
      * Get a Field by the key.
      * @param {String} key

@@ -10,7 +10,7 @@ declare class RandomNameGenerator {
      * @param {Number} [markovOrder=3] Markov generator settings.
      */
     constructor({ namedata, markovOrder }: RandomNameType[]);
-    nameTypes: Map<any, any>;
+    nameTypes: any;
     _markov: MarkovGenerator;
     /**
      * Add some name data

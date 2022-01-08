@@ -46,7 +46,7 @@ export default class RandomTable {
     sequence: any[];
     macro: any[];
     dependencies: any;
-    display_opt: Map<any, any>;
+    display_opt: any;
     toString(): string;
     /**
      * Make sure table entries are all RandomTableEntry objects.

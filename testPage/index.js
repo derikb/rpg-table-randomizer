@@ -69,7 +69,7 @@ var DiceResult = class {
   }
   toJSON() {
     return {
-      className: "DiceRoller",
+      className: "DiceResult",
       die: this.die,
       value: this.value
     };
@@ -491,6 +491,17 @@ var RandomTableResultSet = class {
       this.displayOptions = displayOptions;
     } else {
       this.displayOptions = /* @__PURE__ */ new Map();
+      Object.keys(displayOptions).forEach((key) => {
+        const data = displayOptions[key];
+        const tableName = data.table || "";
+        if (tableName) {
+          if (data instanceof DisplayOptions) {
+            this.displayOptions.set(tableName, data);
+            return;
+          }
+          this.displayOptions.set(tableName, new DisplayOptions(data));
+        }
+      });
     }
   }
   addResult(data) {
@@ -888,8 +899,16 @@ var NPC = class {
     }
   }
   _convertFieldValue(value) {
+    if (typeof value === "undefined") {
+      return "";
+    }
     if (typeof value === "string") {
       return value;
+    }
+    if (Array.isArray("value")) {
+      return value.map((el) => {
+        return this._convertFieldValue(el);
+      });
     }
     if (value instanceof RandomTableResultSet || value instanceof RandomTableResult || value instanceof TableErrorResult || value instanceof DiceResult) {
       return value;
@@ -977,14 +996,26 @@ var NPCSchema = class {
     this.fields = /* @__PURE__ */ new Map();
     if (Array.isArray(fields)) {
       fields.forEach((obj) => {
-        if (obj instanceof NPCSchemaField) {
-          this.fields.set(obj.key, obj);
-          return;
-        }
-        const field = new NPCSchemaField(obj);
-        this.fields.set(field.key, field);
+        this._convertField(obj);
+      });
+    } else {
+      Object.keys(fields).forEach((key2) => {
+        this._convertField(fields[key2]);
       });
     }
+  }
+  _convertField(value) {
+    if (value instanceof NPCSchemaField) {
+      this.fields.set(value.key, value);
+      return;
+    }
+    if (isObject(value)) {
+      const field = new NPCSchemaField(value);
+      this.fields.set(field.key, field);
+    }
+  }
+  getFieldKeys() {
+    return Array.from(this.fields.keys());
   }
   getFieldByKey(key) {
     return this.fields.get(key);
@@ -1025,33 +1056,12 @@ var initializeNewNPC = function(schemaKey, tableRoller2, generateId = true) {
   if (!(tableRoller2 instanceof TableRoller_default)) {
     throw Error("Invalid tableRoller");
   }
-  const fields = /* @__PURE__ */ new Map();
-  schema.fields.forEach((field) => {
-    const key = field.key;
-    if (!isEmpty(field.starting_value)) {
-      fields.set(key, field.starting_value);
-      return;
-    }
-    if (!isEmpty(field.source)) {
-      if (field.type === "array") {
-        const value = [];
-        const ct = field.count ? field.count : 1;
-        for (let i = 0; i < ct; i++) {
-          value.push(tableRoller2.convertToken(field.source));
-        }
-        fields.set(key, value);
-      } else {
-        fields.set(key, tableRoller2.convertToken(field.source));
-      }
-      return;
-    }
-    fields.set(key, field.defaultEmpty);
-  });
-  return new NPC({
+  const npc = new NPC({
     schema: schemaKey,
-    fields,
     id: generateId ? null : ""
   });
+  applySchemaToNPC(schema, tableRoller2, npc);
+  return npc;
 };
 var applySchemaToNPC = function(schema, tableRoller2, npc) {
   if (!(npc instanceof NPC)) {

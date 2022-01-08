@@ -8,11 +8,11 @@ export default class NPC {
     constructor({ id, schema, fields }: {
         id?: any;
         schema?: string;
-        fields?: Map<any, any>;
+        fields?: any;
     });
     id: any;
     schema: string;
-    fields: Map<any, any>;
+    fields: any;
     _convertFieldValue(value: any): any;
     /**
      * Set field value.
