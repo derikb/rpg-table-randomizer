@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.3](https://github.com/derikb/rpg-table-randomizer/compare/v1.1.2...v1.1.3) (2022-01-08)
+
+
+### Bug Fixes
+
+* **diceresult:** Fix bad serialization ([8272922](https://github.com/derikb/rpg-table-randomizer/commit/82729224250787e5df4b637c1258ac392529ffb1))
+* **npc:** Fix for unserialization ([2c435fc](https://github.com/derikb/rpg-table-randomizer/commit/2c435fc8bb923bf6311e53660bca741b90be2dfd))
+* **npc:** Fix unserialization of NPCSchema ([491c33e](https://github.com/derikb/rpg-table-randomizer/commit/491c33e3867c6032815d6c345bbf2c76cb8f8439))
+* **RandomTableResultSet:** Fix bad unserialization of DisplayOptions ([35eeed2](https://github.com/derikb/rpg-table-randomizer/commit/35eeed29e93c21c119003b3632c7a3bcc54c2c0b)), closes [#52](https://github.com/derikb/rpg-table-randomizer/issues/52)
+
 ### [1.1.2](https://github.com/derikb/rpg-table-randomizer/compare/v1.1.1...v1.1.2) (2022-01-07)
 
 
