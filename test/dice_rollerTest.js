@@ -5,6 +5,23 @@ import { expect } from 'chai';
 
 import { rollDie, DiceResult, getDiceResult } from '../src/dice_roller.js';
 
+describe('DiceResult', function () {
+    it('should serialize and unserialize', function () {
+        const result = new DiceResult({
+            die: '2d6',
+            value: 5
+        });
+        expect(result.die).to.equal('2d6');
+        expect(result.value).to.equal(5);
+
+        expect(result.toJSON()).to.deep.equal({
+            die: '2d6',
+            value: 5,
+            className: 'DiceResult'
+        });
+    });
+});
+
 describe('rollDie', function () {
     it('should return value for the dice notation', function () {
         const actual = rollDie('1d6');

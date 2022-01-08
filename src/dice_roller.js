@@ -18,7 +18,7 @@ class DiceResult {
     }
     toJSON () {
         return {
-            className: 'DiceRoller',
+            className: 'DiceResult',
             die: this.die,
             value: this.value
         };
