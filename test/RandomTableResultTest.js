@@ -16,6 +16,7 @@ describe('RandomTableResult', function () {
         expect(resultObj.table).to.equal('colors');
         expect(resultObj.result).to.equal('blue');
         expect(resultObj.desc).to.equal('a primary');
+        expect(resultObj.isError).to.equal(false);
     });
 
     it('should serialize a class to an object', function () {

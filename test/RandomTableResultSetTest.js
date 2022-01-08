@@ -55,7 +55,7 @@ describe('RandomTableResultSet', function () {
         expect(resultSet.displayOptions.get('hue')).to.be.instanceOf(DisplayOptions);
     });
 
-    it('should output a string from the set with no display options', function () {
+    it('should return results for specific tables', function () {
         const result1 = new RandomTableResult({
             table: 'default',
             result: 'blue'
@@ -65,10 +65,9 @@ describe('RandomTableResultSet', function () {
             result: 'dark',
             desc: 'Powerful stuff'
         });
-        const result3 = new RandomTableResult({
+        const result3 = new TableErrorResult({
             table: 'Error',
-            result: 'Ran out of room',
-            desc: 'in some place'
+            result: 'Ran out of room'
         });
         const displayOptionsMap = new Map();
 
@@ -82,7 +81,44 @@ describe('RandomTableResultSet', function () {
             displayOptions: displayOptionsMap
         });
 
-        expect(resultSet.toString()).to.equal('Blue\nIntensity: Dark\nPowerful stuff\nError: Ran out of room\nin some place');
+        const actual = resultSet.findResultByTable('intensity');
+        expect(actual).to.equal(result2);
+
+        expect(resultSet.findResultByTable('foo')).to.be.null;
+    });
+
+    it('should output empty string for no results', function () {
+        const resultSet = new RandomTableResultSet({});
+        expect(resultSet.niceString()).to.equal('');
+    });
+
+    it('should output a string from the set with no display options', function () {
+        const result1 = new RandomTableResult({
+            table: 'default',
+            result: 'blue'
+        });
+        const result2 = new RandomTableResult({
+            table: 'intensity',
+            result: 'dark',
+            desc: 'Powerful stuff'
+        });
+        const result3 = new TableErrorResult({
+            table: 'Error',
+            result: 'Ran out of room'
+        });
+        const displayOptionsMap = new Map();
+
+        const resultSet = new RandomTableResultSet({
+            title: 'colors',
+            results: [
+                result1,
+                result2,
+                result3
+            ],
+            displayOptions: displayOptionsMap
+        });
+
+        expect(resultSet.toString()).to.equal('Blue\nIntensity: Dark\nPowerful stuff\nError: Ran out of room');
     });
 
     it('should output a string from the set with display options hide_table', function () {
