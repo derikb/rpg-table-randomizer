@@ -34,8 +34,16 @@ export default class NPC {
         }
     }
     _convertFieldValue (value) {
+        if (typeof value === 'undefined') {
+            return '';
+        }
         if (typeof value === 'string') {
             return value;
+        }
+        if (Array.isArray('value')) {
+            return value.map((el) => {
+                return this._convertFieldValue(el);
+            });
         }
         if (value instanceof RandomTableResultSet ||
             value instanceof RandomTableResult ||
