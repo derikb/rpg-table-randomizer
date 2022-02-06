@@ -84,6 +84,7 @@ describe('TableRoller', function () {
         it('should return error on invalid subtable', function () {
             const errorResult = roller._selectFromTable(colorTable, 'shades')[0];
             expect(errorResult).to.be.instanceOf(TableErrorResult);
+            expect(errorResult.key).to.equal(colorTable.key);
             expect(errorResult).to.deep.include({
                 table: 'shades',
                 result: 'Invalid subtable name.'
@@ -151,6 +152,7 @@ describe('TableRoller', function () {
             // table handler
             const actual = roller.convertToken('{{table:colors:primary}}');
             expect(actual).to.be.instanceOf(RandomTableResultSet);
+            expect(actual.key).to.equal(colorTable.key);
             expect(actual.results[0]).to.have.property('result', 'blue');
             // custom token handler
             expect(roller.convertToken('{{food:appetizer}}')).to.equal('food token');
@@ -218,7 +220,7 @@ describe('TableRoller', function () {
     describe('getTableResult', function () {
         it('should handle macros in tables', function () {
             const macroStub = stub(roller, '_getTableMacroResult');
-            const resultSet = new RandomTableResult({ table: 'macro' });
+            const resultSet = new RandomTableResult({ key: complicatedTable.key, table: 'macro' });
             macroStub.returns([resultSet]);
 
             expect(roller.getTableResult(complicatedTable)).to.deep.equal([resultSet]);
@@ -228,7 +230,7 @@ describe('TableRoller', function () {
 
         it('should handle no starting table', function () {
             const selectStub = stub(roller, '_selectFromTable');
-            const resultSet = new RandomTableResultSet({ title: 'colors' });
+            const resultSet = new RandomTableResultSet({ key: colorTable.key, title: 'colors' });
             selectStub.withArgs(colorTable, 'primary').returns(resultSet);
 
             expect(roller.getTableResult(colorTable)[0]).to.equal(resultSet);
@@ -238,7 +240,7 @@ describe('TableRoller', function () {
 
         it('should handle with starting table', function () {
             const selectStub = stub(roller, '_selectFromTable');
-            const resultSet = new RandomTableResultSet({ title: 'colors' });
+            const resultSet = new RandomTableResultSet({ key: colorTable.key, title: 'colors' });
             selectStub.withArgs(colorTable, 'secondary').returns(resultSet);
 
             expect(roller.getTableResult(colorTable, 'secondary')[0]).to.equal(resultSet);
@@ -248,8 +250,8 @@ describe('TableRoller', function () {
 
         it('should handle with multitable sequence', function () {
             const selectStub = stub(roller, '_selectFromTable');
-            const resultSet = new RandomTableResultSet({ title: 'colors' });
-            const resultSet2 = new RandomTableResultSet({ title: 'colors primary' });
+            const resultSet = new RandomTableResultSet({ key: colorTable.key, title: 'colors' });
+            const resultSet2 = new RandomTableResultSet({ key: colorTable.key, title: 'colors primary' });
             selectStub.withArgs(colorTable, 'secondary').returns(resultSet);
             selectStub.withArgs(colorTable, 'primary').returns(resultSet2);
 

@@ -38,6 +38,7 @@ describe('RandomTableResultSet', function () {
         };
 
         const resultSet = new RandomTableResultSet({
+            key: 'tkey',
             title: 'colors',
             results: [
                 result1,
@@ -47,6 +48,7 @@ describe('RandomTableResultSet', function () {
             displayOptions: displayOptionsObj
         });
 
+        expect(resultSet.key).to.equal('tkey');
         expect(resultSet.title).to.equal('colors');
         expect(resultSet.results[0]).to.be.instanceOf(RandomTableResult);
         expect(resultSet.results[1]).to.be.instanceOf(TableErrorResult);
@@ -84,7 +86,7 @@ describe('RandomTableResultSet', function () {
         const actual = resultSet.findResultByTable('intensity');
         expect(actual).to.equal(result2);
 
-        expect(resultSet.findResultByTable('foo')).to.be.null;
+        expect(resultSet.findResultByTable('foo')).to.equal(null);
     });
 
     it('should output empty string for no results', function () {

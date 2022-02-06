@@ -471,6 +471,7 @@ When cast to string it will just output the result prop.
 
 #### constructor (config)
 
+* @property {String} key Key for RandomTable.
 * @property {String} table Subtable name (can be default or Error).
 * @property {String} result Individual result label.
 * @property {String} [desc] Extra description of result
@@ -492,6 +493,7 @@ Cast to a string will return niceString method.
 
 #### constructor (config)
 
+* @property {String} key Key for RandomTable.
 * @property {String} title Title of the RandomTable.
 * @property {RandomTableResult[]} results Individual table results.
 * @property {Map[DisplayOptions]} displayOptions This is the display_opt prop of RandomTable

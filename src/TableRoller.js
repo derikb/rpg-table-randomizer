@@ -35,11 +35,13 @@ class TableRoller {
     /**
      * Return an error result
      * @param {String} error Error message
+     * @param {String} key RandomTable key where error occured.
      * @param {String} table Sub/table name if relevant.
      * @returns {TableErrorResult}
      */
-    _getErrorResult (error = '', table = '') {
+    _getErrorResult (error = '', key = '', table = '') {
         return new TableErrorResult({
+            key: key,
             table: table,
             result: error
         });
@@ -47,12 +49,14 @@ class TableRoller {
     /**
      * Return a result set with an error.
      * @param {String} error Error message
+     * @param {String} key RandomTable key where error occured.
      * @returns {RandomTableResultSet}
      */
-    _getErrorResultSet (error = '') {
+    _getErrorResultSet (error = '', key = '') {
         return new RandomTableResultSet({
+            key,
             results: [
-                this._getErrorResult(error)
+                this._getErrorResult(error, key)
             ]
         });
     }
@@ -72,14 +76,14 @@ class TableRoller {
         let o = []; // Results
         const entry = rtable.getRandomEntry(table);
         if (entry === null || !(entry instanceof RandomTableEntry)) {
-            return [this._getErrorResult('Invalid subtable name.', table)];
+            return [this._getErrorResult('Invalid subtable name.', rtable.key, table)];
         }
         // if print is false we suppress the output from this table
         // (good for top-level tables that have subtables prop set)
         if (entry.print) {
             // replace any tokens
             const t_result = this.findToken(entry.label, rtable);
-            o.push(new RandomTableResult({ table: table, result: t_result, desc: entry.description }));
+            o.push(new RandomTableResult({ key: rtable.key, table: table, result: t_result, desc: entry.description }));
         }
 
         // are there subtables to roll on?
@@ -109,7 +113,7 @@ class TableRoller {
                 const tableKey = parts[0];
                 const subtable = parts[1] || '';
                 if (tableKey === rtable.key) {
-                    throw new TableError(`Macros can't self reference.`);
+                    throw new TableError(`Macros can't self reference.`, rtable.key);
                 }
                 try {
                     const mtable = this.getTableByKey(tableKey);
@@ -118,7 +122,7 @@ class TableRoller {
                     results = results.concat(result);
                 } catch (e) {
                     if (e instanceof TableError) {
-                        results.push(this._getErrorResult(e.message, tableKey));
+                        results.push(this._getErrorResult(e.message, rtable.key, tableKey));
                     } else {
                         // Rethrow unexpected errors
                         throw e;
@@ -128,7 +132,7 @@ class TableRoller {
         } catch (e) {
             if (e instanceof RangeError) {
                 // This could be an infinite loop of table results referencing each other.
-                results.push(this._getErrorResult(e.message));
+                results.push(this._getErrorResult(e.message, rtable.key));
             } else {
                 throw e;
             }
@@ -166,7 +170,7 @@ class TableRoller {
         } catch (e) {
             // In case of infinite recursion
             if (e instanceof RangeError) {
-                results.push(this._getErrorResult(e.message));
+                results.push(this._getErrorResult(e.message, rtable.key));
             } else {
                 throw e;
             }
@@ -184,13 +188,14 @@ class TableRoller {
             const rtable = this.getTableByKey(tableKey);
             const results = this.getTableResult(rtable, table);
             return new RandomTableResultSet({
+                key: rtable.key,
                 title: rtable.title,
                 results: results,
                 displayOptions: rtable.display_opt
             });
         } catch (e) {
             if (e instanceof TableError) {
-                return this._getErrorResultSet(e.message);
+                return this._getErrorResultSet(e.message, e.key);
             } else {
                 // Rethrow unexpected errors
                 throw e;
@@ -209,6 +214,7 @@ class TableRoller {
         }
         const results = this.getTableResult(rtable, table);
         return new RandomTableResultSet({
+            key: rtable.key,
             title: rtable.title,
             results: results,
             displayOptions: rtable.display_opt
@@ -289,7 +295,7 @@ class TableRoller {
         }
         const table = this._customGetTableByKey(key);
         if (!table || !(table instanceof RandomTable)) {
-            throw new TableError(`No table found for key: ${key}`);
+            throw new TableError(`No table found for key: ${key}`, key);
         }
         return table;
     }

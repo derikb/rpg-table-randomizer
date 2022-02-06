@@ -8,11 +8,13 @@ import TableErrorResult from '../src/TableErrorResult.js';
 describe('TableErrorResult', function () {
     it('should unserialize an object to the class props', function () {
         const resultObj = new TableErrorResult({
+            key: 'tkey',
             table: 'error',
             result: '',
             desc: ''
         });
 
+        expect(resultObj.key).to.equal('tkey');
         expect(resultObj.table).to.equal('error');
         expect(resultObj.result).to.equal('');
         expect(resultObj.desc).to.equal('');
@@ -21,10 +23,12 @@ describe('TableErrorResult', function () {
 
     it('should serialize a class to an object', function () {
         const resultObj = new TableErrorResult({
+            key: 'tkey',
             table: 'error'
         });
 
         const serialized = resultObj.toJSON();
+        expect(serialized.key).to.equal('tkey');
         expect(serialized.table).to.equal('error');
         expect(serialized.result).to.equal('');
         expect(serialized.desc).to.equal('');

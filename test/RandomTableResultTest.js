@@ -8,11 +8,13 @@ import RandomTableResult from '../src/RandomTableResult.js';
 describe('RandomTableResult', function () {
     it('should unserialize an object to the class props', function () {
         const resultObj = new RandomTableResult({
+            key: 'tkey',
             table: 'colors',
             result: 'blue',
             desc: 'a primary'
         });
 
+        expect(resultObj.key).to.equal('tkey');
         expect(resultObj.table).to.equal('colors');
         expect(resultObj.result).to.equal('blue');
         expect(resultObj.desc).to.equal('a primary');
@@ -21,12 +23,14 @@ describe('RandomTableResult', function () {
 
     it('should serialize a class to an object', function () {
         const resultObj = new RandomTableResult({
+            key: 'tkey',
             table: 'colors',
             result: 'blue',
             desc: 'a primary'
         });
 
         const serialized = resultObj.toJSON();
+        expect(serialized.key).to.equal('tkey');
         expect(serialized.table).to.equal('colors');
         expect(serialized.result).to.equal('blue');
         expect(serialized.desc).to.equal('a primary');

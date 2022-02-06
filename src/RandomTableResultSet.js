@@ -8,15 +8,18 @@ import DisplayOptions from './DisplayOptions.js';
  */
 export default class RandomTableResultSet {
     /**
+     * @property {String} key RandomTable key
      * @property {String} title Title from the RandomTable parent
      * @property {RandomTableResult[]} results Randomized results.
      * @property {Map[DisplayOptions]|Object} displayOptions Display settings from the RandomTable parent.
      */
     constructor ({
+        key = '',
         title = '',
         results = [],
         displayOptions = new Map()
     }) {
+        this.key = key;
         this.title = title;
         this.results = [];
         results.forEach((r) => {
