@@ -54,5 +54,14 @@
   "c8": {
     "src": "./src",
     "all": true
+  },
+  "standard-version": {
+    "scripts": {
+      "postbump": "npm run compileTypes && npm run buildTest && git add ./testPage/index.js ./types/**"
+    },
+    "bumpFiles": [
+      "package.json",
+      "package-lock.json"
+    ]
   }
 }
