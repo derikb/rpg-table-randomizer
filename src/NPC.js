@@ -34,7 +34,7 @@ export default class NPC {
         }
     }
     _convertFieldValue (value) {
-        if (typeof value === 'undefined') {
+        if (value === null || typeof value === 'undefined') {
             return '';
         }
         if (typeof value === 'string') {
@@ -51,19 +51,18 @@ export default class NPC {
             value instanceof DiceResult) {
             return value;
         }
-        if (value.className === 'RandomTableResultSet') {
-            return new RandomTableResultSet(value);
+        switch (value.className) {
+            case 'RandomTableResultSet':
+                return new RandomTableResultSet(value);
+            case 'RandomTableResult':
+                return new RandomTableResult(value);
+            case 'TableErrorResult':
+                return new TableErrorResult(value);
+            case 'DiceResult':
+                return new DiceResult(value);
+            default:
+                return value;
         }
-        if (value.className === 'RandomTableResult') {
-            return new RandomTableResult(value);
-        }
-        if (value.className === 'TableErrorResult') {
-            return new TableErrorResult(value);
-        }
-        if (value.className === 'DiceResult') {
-            return new DiceResult(value);
-        }
-        return value;
     }
     /**
      * Set field value.
