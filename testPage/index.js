@@ -439,10 +439,12 @@ var RandomTable = class {
 // src/RandomTableResult.js
 var RandomTableResult = class {
   constructor({
+    key = "",
     table = "",
     result = "",
     desc = ""
   }) {
+    this.key = key;
     this.table = table;
     this.result = result;
     this.desc = desc;
@@ -478,10 +480,12 @@ var TableErrorResult = class extends RandomTableResult {
 // src/RandomTableResultSet.js
 var RandomTableResultSet = class {
   constructor({
+    key = "",
     title = "",
     results = [],
     displayOptions = /* @__PURE__ */ new Map()
   }) {
+    this.key = key;
     this.title = title;
     this.results = [];
     results.forEach((r) => {
@@ -491,8 +495,8 @@ var RandomTableResultSet = class {
       this.displayOptions = displayOptions;
     } else {
       this.displayOptions = /* @__PURE__ */ new Map();
-      Object.keys(displayOptions).forEach((key) => {
-        const data = displayOptions[key];
+      Object.keys(displayOptions).forEach((key2) => {
+        const data = displayOptions[key2];
         const tableName = data.table || "";
         if (tableName) {
           if (data instanceof DisplayOptions) {
@@ -583,8 +587,9 @@ var RandomTableResultSet = class {
 
 // src/TableError.js
 var TableError = class extends Error {
-  constructor(message) {
+  constructor(message, key = "") {
     super(message);
+    this.key = key;
     this.name = "TableError";
   }
 };
@@ -604,16 +609,18 @@ var TableRoller = class {
       this.token_types[token] = token_types[token];
     });
   }
-  _getErrorResult(error = "", table = "") {
+  _getErrorResult(error = "", key = "", table = "") {
     return new TableErrorResult({
+      key,
       table,
       result: error
     });
   }
-  _getErrorResultSet(error = "") {
+  _getErrorResultSet(error = "", key = "") {
     return new RandomTableResultSet({
+      key,
       results: [
-        this._getErrorResult(error)
+        this._getErrorResult(error, key)
       ]
     });
   }
@@ -624,11 +631,11 @@ var TableRoller = class {
     let o = [];
     const entry = rtable.getRandomEntry(table);
     if (entry === null || !(entry instanceof RandomTableEntry)) {
-      return [this._getErrorResult("Invalid subtable name.", table)];
+      return [this._getErrorResult("Invalid subtable name.", rtable.key, table)];
     }
     if (entry.print) {
       const t_result = this.findToken(entry.label, rtable);
-      o.push(new RandomTableResult({ table, result: t_result, desc: entry.description }));
+      o.push(new RandomTableResult({ key: rtable.key, table, result: t_result, desc: entry.description }));
     }
     if (entry.subtable.length === 0) {
       return o;
@@ -647,7 +654,7 @@ var TableRoller = class {
         const tableKey = parts[0];
         const subtable = parts[1] || "";
         if (tableKey === rtable.key) {
-          throw new TableError_default(`Macros can't self reference.`);
+          throw new TableError_default(`Macros can't self reference.`, rtable.key);
         }
         try {
           const mtable = this.getTableByKey(tableKey);
@@ -655,7 +662,7 @@ var TableRoller = class {
           results = results.concat(result);
         } catch (e) {
           if (e instanceof TableError_default) {
-            results.push(this._getErrorResult(e.message, tableKey));
+            results.push(this._getErrorResult(e.message, rtable.key, tableKey));
           } else {
             throw e;
           }
@@ -663,7 +670,7 @@ var TableRoller = class {
       });
     } catch (e) {
       if (e instanceof RangeError) {
-        results.push(this._getErrorResult(e.message));
+        results.push(this._getErrorResult(e.message, rtable.key));
       } else {
         throw e;
       }
@@ -691,7 +698,7 @@ var TableRoller = class {
       });
     } catch (e) {
       if (e instanceof RangeError) {
-        results.push(this._getErrorResult(e.message));
+        results.push(this._getErrorResult(e.message, rtable.key));
       } else {
         throw e;
       }
@@ -703,13 +710,14 @@ var TableRoller = class {
       const rtable = this.getTableByKey(tableKey);
       const results = this.getTableResult(rtable, table);
       return new RandomTableResultSet({
+        key: rtable.key,
         title: rtable.title,
         results,
         displayOptions: rtable.display_opt
       });
     } catch (e) {
       if (e instanceof TableError_default) {
-        return this._getErrorResultSet(e.message);
+        return this._getErrorResultSet(e.message, e.key);
       } else {
         throw e;
       }
@@ -721,6 +729,7 @@ var TableRoller = class {
     }
     const results = this.getTableResult(rtable, table);
     return new RandomTableResultSet({
+      key: rtable.key,
       title: rtable.title,
       results,
       displayOptions: rtable.display_opt
@@ -769,7 +778,7 @@ var TableRoller = class {
     }
     const table = this._customGetTableByKey(key);
     if (!table || !(table instanceof RandomTable)) {
-      throw new TableError_default(`No table found for key: ${key}`);
+      throw new TableError_default(`No table found for key: ${key}`, key);
     }
     return table;
   }
@@ -899,7 +908,7 @@ var NPC = class {
     }
   }
   _convertFieldValue(value) {
-    if (typeof value === "undefined") {
+    if (value === null || typeof value === "undefined") {
       return "";
     }
     if (typeof value === "string") {
@@ -913,19 +922,18 @@ var NPC = class {
     if (value instanceof RandomTableResultSet || value instanceof RandomTableResult || value instanceof TableErrorResult || value instanceof DiceResult) {
       return value;
     }
-    if (value.className === "RandomTableResultSet") {
-      return new RandomTableResultSet(value);
+    switch (value.className) {
+      case "RandomTableResultSet":
+        return new RandomTableResultSet(value);
+      case "RandomTableResult":
+        return new RandomTableResult(value);
+      case "TableErrorResult":
+        return new TableErrorResult(value);
+      case "DiceResult":
+        return new DiceResult(value);
+      default:
+        return value;
     }
-    if (value.className === "RandomTableResult") {
-      return new RandomTableResult(value);
-    }
-    if (value.className === "TableErrorResult") {
-      return new TableErrorResult(value);
-    }
-    if (value.className === "DiceResult") {
-      return new DiceResult(value);
-    }
-    return value;
   }
   setFieldValue(key, value) {
     this.fields.set(key, this._convertFieldValue(value));

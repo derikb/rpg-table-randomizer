@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.4](https://github.com/derikb/rpg-table-randomizer/compare/v1.1.3...v1.1.4) (2022-02-06)
+
+
+### Features
+
+* **TableRoller:** Add table key to results ([6f853e7](https://github.com/derikb/rpg-table-randomizer/commit/6f853e78dc997d9118ddea5534e9726168447ceb)), closes [#55](https://github.com/derikb/rpg-table-randomizer/issues/55)
+
+
+### Bug Fixes
+
+* **npc:** Fix error in field unserialization ([40dc2e4](https://github.com/derikb/rpg-table-randomizer/commit/40dc2e457e5202269aa8378e512718c649c5ab1a)), closes [#56](https://github.com/derikb/rpg-table-randomizer/issues/56)
+
 ### [1.1.3](https://github.com/derikb/rpg-table-randomizer/compare/v1.1.2...v1.1.3) (2022-01-08)
 
 

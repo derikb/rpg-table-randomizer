@@ -15,16 +15,18 @@ declare class TableRoller {
     /**
      * Return an error result
      * @param {String} error Error message
+     * @param {String} key RandomTable key where error occured.
      * @param {String} table Sub/table name if relevant.
      * @returns {TableErrorResult}
      */
-    _getErrorResult(error?: string, table?: string): TableErrorResult;
+    _getErrorResult(error?: string, key?: string, table?: string): TableErrorResult;
     /**
      * Return a result set with an error.
      * @param {String} error Error message
+     * @param {String} key RandomTable key where error occured.
      * @returns {RandomTableResultSet}
      */
-    _getErrorResultSet(error?: string): RandomTableResultSet;
+    _getErrorResultSet(error?: string, key?: string): RandomTableResultSet;
     /**
      * Get a result from a table/subtable in a RandomTable object
      * DANGER: you could theoretically put yourself in an endless loop if the data were poorly planned
