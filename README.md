@@ -254,6 +254,11 @@ Get a DiceResult object.
 * @prop {String} die Die notation.
 * @prop {Number} value Random roll for the die notation.
 
+#### DiceRoller
+
+Default class exported from dice_roller. This is an alternate way to access the dice rolling functionality (and potentially expand on it). (It also make testing a lot easier).
+
+It has both the `rollDie` and `getDiceResult` methods that work the same as the exports described above (both those methods use the DiceRoller class in their code).
 
 ### TableRoller
 
