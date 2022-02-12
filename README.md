@@ -834,7 +834,7 @@ I'm not going to document these now, but the methods are:
 - isUndefined
 - capitalize
 - defaultToJSON
-  - This is a custom toJSON function for classes that handles Maps and converts them to objects.
+  - This is a custom toJSON function for classes that handles Maps, Sets, and objects with custom toJSON methods and converts them to objects for serialization.
 
 
 ## Upgrading to v1
