@@ -52,8 +52,7 @@
     "uuid": "^8.3.2"
   },
   "c8": {
-    "src": "./src",
-    "all": true
+    "src": "./src"
   },
   "standard-version": {
     "scripts": {
