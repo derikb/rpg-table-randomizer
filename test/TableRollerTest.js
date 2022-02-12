@@ -1,7 +1,7 @@
 'use strict';
 
 import { describe, it } from 'mocha';
-import { expect } from 'chai';
+import { assert, expect } from 'chai';
 import { stub } from 'sinon';
 
 import DisplayOptions from '../src/DisplayOptions.js';
@@ -158,6 +158,11 @@ describe('TableRoller', function () {
             expect(roller.convertToken('{{food:appetizer}}')).to.equal('food token');
         });
 
+        it('should handle oneof token', function () {
+            const actual = roller.convertToken('{{oneof:dwarf|elf}}');
+            expect(actual).to.be.oneOf(['dwarf', 'elf']);
+        });
+
         it('should return token for empty token', function () {
             // empty token
             const token1 = '{{ }}';
@@ -261,6 +266,23 @@ describe('TableRoller', function () {
 
             colorTable.sequence = [];
             selectStub.restore();
+        });
+    });
+
+    describe('_defaultOneOfToken', function () {
+        it('should return token for no arguments', function () {
+            expect(roller._defaultOneOfToken(['oneof'], '{{oneof:}}'))
+                .to.equal('{{oneof:}}');
+        });
+
+        it('should return option if only one', function () {
+            expect(roller._defaultOneOfToken(['oneof', 'bread'], '{{oneof:bread}}'))
+                .to.equal('bread');
+        });
+
+        it('should return one of the options', function () {
+            expect(roller._defaultOneOfToken(['oneof', 'bread|water'], '{{oneof:bread}}'))
+                .to.be.oneOf(['bread', 'water']);
         });
     });
 });

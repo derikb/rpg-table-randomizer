@@ -7,6 +7,7 @@ import RandomTableResultSet from './RandomTableResultSet.js';
 import { getDiceResult } from './dice_roller.js';
 import TableError from './TableError.js';
 import TableErrorResult from './TableErrorResult.js';
+import { randomString } from './randomizer.js';
 
 /**
  * Define the regex to find tokens
@@ -26,7 +27,8 @@ class TableRoller {
     }) {
         this.token_types = {
             roll: this._defaultRollToken.bind(this),
-            table: this._defaultTableToken.bind(this)
+            table: this._defaultTableToken.bind(this),
+            oneof: this._defaultOneOfToken.bind(this)
         };
         Object.keys(token_types).forEach((token) => {
             this.token_types[token] = token_types[token];
@@ -367,6 +369,24 @@ class TableRoller {
             results.push(this.getResultSetForTable(rtable, subtable));
         }
         return results.length === 1 ? results[0] : results;
+    }
+    /**
+     * Simple pick one of the options token:
+     * {{oneof:dwarf|halfling|human pig|dog person}}
+     * @param {String[]} token_parts Token split by :
+     * @param {String} full_token Original token
+     * @param {RandomTable|null} curtable Current table or null.
+     * @returns {String} One of the options or empty.
+     */
+    _defaultOneOfToken (token_parts, full_token, curtable = null) {
+        if (isUndefined(token_parts[1])) {
+            return full_token;
+        }
+        const options = token_parts[1].split('|');
+        if (options.length === 1) {
+            return options.shift();
+        }
+        return randomString(options) || '';
     }
 }
 

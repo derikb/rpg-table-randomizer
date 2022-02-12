@@ -79,6 +79,11 @@
             const ordResult = tableRoller.getTableResultSetByKey('ordinal');
             printToScreen(ordResult);
             printToScreen(ordResult.niceString());
+
+            const dirResult = tableRoller.getTableResultSetByKey('directions');
+            printToScreen(dirResult);
+            printToScreen(dirResult.niceString());
+
             const companyResult = tableRoller.getTableResultSetByKey('colonial_companies');
             printToScreen(companyResult);
             printToScreen(companyResult.niceString());

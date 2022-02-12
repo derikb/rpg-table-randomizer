@@ -43,6 +43,10 @@ To roll on subtables of the current table use `{{table:this:SUBTABLE_NAME}}`
 
 `{{name:NAMETYPE:GENDER:STYLE}}` will insert a name into the table. `nametype` is required and should be one of the name lists keys ('flemish', 'dutch', etc. from RandomNameGenerator::getValidNameTypes) or "random". `gender` is optional and can be "mixed", "male", "female", or "random". If left blank, it will default to "mixed". `style` is optional and only accepts the value "first", in which case only a first name will be generated.
 
+### Simple Select
+
+`{{oneof:north|south|east|west}}` will insert one of the `|` delimited strings into the result. If you end the string with a `|` then an empty string will be a possible option (i.e. `{{oneof:Mr|Mrs|}}` will return "Mr", "Mrs", or nothing).
+
 ### Custom token
 
 You can register your own tokens with `randomizer.registerTokenType()`

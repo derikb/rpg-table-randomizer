@@ -4,10 +4,10 @@ export default [
         title: 'Directions',
         tables: {
             default: [
-                'North',
-                'South',
-                'East',
-                'West'
+                '{{oneof:Due|Sorta|}} North',
+                '{{oneof:Due|Sorta|}} South',
+                '{{oneof:Due|Sorta|}} East',
+                '{{oneof:Due|Sorta|}} West'
             ]
         }
     },
