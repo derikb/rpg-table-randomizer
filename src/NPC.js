@@ -35,7 +35,7 @@ export default class NPC {
     }
     _convertFieldValue (value) {
         if (value === null || typeof value === 'undefined') {
-            return '';
+            return null;
         }
         if (typeof value === 'string') {
             return value;
@@ -85,7 +85,11 @@ export default class NPC {
      * @returns {RandomTableResultSet|RandomTableResultSet[]|DiceResult|String|Any}
      */
     getFieldValue (key) {
-        return this.fields.get(key) || '';
+        const value = this.fields.get(key);
+        if (typeof value === 'undefined') {
+            return null;
+        }
+        return value;
     }
     /**
      * Custom JSON handler to strip empty props.

@@ -94,7 +94,7 @@ const defaultToJSON = function () {
     // We save the objects class name as a property
     // so we can recreate the right structure later
     // but it is done in each class as I can't find a good way
-    // to consistent get the class name.
+    // to consistently get the class name.
     const returnObj = {};
     for (const property in this) {
         const value = this[property];

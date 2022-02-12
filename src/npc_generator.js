@@ -10,6 +10,7 @@ const Schemas = {};
 /**
  * Add new schema to store.
  * @param {NPCSchema} schema
+ * @throws {Error} For invalid args.
  */
 const registerSchema = function (schema) {
     if (!(schema instanceof NPCSchema) || !schema.key || schema.key === 'base') {
@@ -39,6 +40,7 @@ const getSchemaByKey = function (key) {
  * @param {TableRoller} tableRoller
  * @param {Boolean} generateId Should the npc get a uuid.
  * @returns NPC
+ * @throws {Error} For invalid args.
  */
 const initializeNewNPC = function (schemaKey, tableRoller, generateId = true) {
     const schema = getSchemaByKey(schemaKey);
@@ -57,12 +59,26 @@ const initializeNewNPC = function (schemaKey, tableRoller, generateId = true) {
     applySchemaToNPC(schema, tableRoller, npc);
     return npc;
 };
+
+const typeResult = function (field, result) {
+    let value = null;
+    if (field.isString() || field.isText() || field.isModifier()) {
+        value = result.toString();
+    } else if (field.isNumber()) {
+        value = parseInt(result, 10);
+    } else {
+        value = result;
+    }
+    return value;
+};
+
 /**
  * Apply a schema to an NPC.
  * You could pass in children of NPC class here.
  * @param {NPCSchema} schema
  * @param {TableRoller} tableRoller
  * @param {NPC} npc With either blank schema or set to same key as schema arg
+ * @throws {Error} For invalid args.
  */
 const applySchemaToNPC = function (schema, tableRoller, npc) {
     if (!(npc instanceof NPC)) {
@@ -86,20 +102,22 @@ const applySchemaToNPC = function (schema, tableRoller, npc) {
             npc.setFieldValue(key, field.starting_value);
             return;
         }
-        if (!isEmpty(field.source)) {
-            if (field.type === 'array') {
-                const value = [];
-                const ct = (field.count) ? field.count : 1;
-                for (let i = 0; i < ct; i++) {
-                    value.push(tableRoller.convertToken(field.source));
-                }
-                npc.setFieldValue(key, value);
-            } else {
-                npc.setFieldValue(key, tableRoller.convertToken(field.source));
-            }
+        if (isEmpty(field.source)) {
+            npc.setFieldValue(key, field.defaultEmpty);
             return;
         }
-        npc.setFieldValue(key, field.defaultEmpty);
+        if (field.isArray()) {
+            const value = [];
+            const ct = (field.count) ? field.count : 1;
+            for (let i = 0; i < ct; i++) {
+                const result = tableRoller.convertToken(field.source);
+                value.push(typeResult(field, result));
+            }
+            npc.setFieldValue(key, value);
+            return;
+        }
+        const result = tableRoller.convertToken(field.source);
+        npc.setFieldValue(key, typeResult(field, result));
     });
 };
 

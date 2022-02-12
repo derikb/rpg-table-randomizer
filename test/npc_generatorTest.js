@@ -31,6 +31,18 @@ describe('npc_generator', function () {
                 western: schema
             });
         });
+
+        it('should throw on invalid schema', function () {
+            const schema = new NPCSchema({
+                key: ''
+            });
+            expect(() => { registerSchema(schema); }).to.throw(Error, 'Invalid schema');
+
+            schema.key = 'base';
+            expect(() => { registerSchema(schema); }).to.throw(Error, 'Invalid schema');
+
+            expect(() => { registerSchema({}); }).to.throw(Error, 'Invalid schema');
+        });
     });
 
     describe('initializeNewNPC', function () {
@@ -77,6 +89,12 @@ describe('npc_generator', function () {
 
             expect(() => { return initializeNewNPC('bad', tableRoller); }).to.throw('Schema not found.');
         });
+
+        it('should throw on invalid TablRoller', function () {
+            const tableRoller = {};
+
+            expect(() => { return initializeNewNPC('western', tableRoller); }).to.throw('Invalid tableRoller');
+        });
     });
 
     describe('applySchemaToNPC', function () {
@@ -87,7 +105,8 @@ describe('npc_generator', function () {
                 fields: [
                     new NPCSchemaField({
                         key: 'goal_long',
-                        source: 'goal:longterm'
+                        source: 'goal:longterm',
+                        type: 'result'
                     }),
                     new NPCSchemaField({
                         key: 'goal_short',
@@ -98,7 +117,17 @@ describe('npc_generator', function () {
                         key: 'secrets',
                         source: 'secret:one',
                         count: 2,
-                        type: 'array'
+                        type: 'text'
+                    }),
+                    new NPCSchemaField({
+                        key: 'strength',
+                        source: 'roll:3d6',
+                        type: 'number'
+                    }),
+                    new NPCSchemaField({
+                        key: 'nothing',
+                        source: '',
+                        type: 'note'
                     })
                 ]
             });
@@ -106,17 +135,43 @@ describe('npc_generator', function () {
             const convertToken = stub(tableRoller, 'convertToken');
             convertToken.withArgs('goal:longterm').returns('love');
             convertToken.withArgs('secret:one').returns('possessed');
+            convertToken.withArgs('roll:3d6').returns('15');
 
             const npc = new NPC({ id: '123-567' });
 
             applySchemaToNPC(schema, tableRoller, npc);
-            expect(convertToken.callCount).to.equal(3);
+            expect(convertToken.callCount).to.equal(4);
             expect(npc.schema).to.equal('western');
-            expect(npc.getFieldKeys()).to.deep.equal(['goal_long', 'goal_short', 'secrets']);
+            expect(npc.getFieldKeys()).to.deep.equal(['goal_long', 'goal_short', 'secrets', 'strength', 'nothing']);
             expect(npc.id).to.not.be.empty;
             expect(npc.getFieldValue('goal_long')).to.equal('love');
             expect(npc.getFieldValue('goal_short')).to.equal('money');
             expect(npc.getFieldValue('secrets')).to.deep.equal(['possessed', 'possessed']);
+            expect(npc.getFieldValue('strength')).to.equal(15);
+            expect(npc.getFieldValue('nothing')).to.equal(null);
+        });
+
+        it('should throw for a variety of errors', function () {
+            const tableRoller = new TableRoller({});
+            const schema = new NPCSchema({
+                key: 'western'
+            });
+            const npc = new NPC({ id: '123-567', schema: 'sci-fi' });
+            expect(() => {
+                applySchemaToNPC(schema, tableRoller, npc);
+            }).to.throw(Error, 'npc already has schema set.');
+
+            expect(() => {
+                applySchemaToNPC(schema, {}, npc);
+            }).to.throw(Error, 'Invalid tableRoller');
+
+            expect(() => {
+                applySchemaToNPC({}, tableRoller, npc);
+            }).to.throw(Error, 'schema object must be or inherit from NPCSchema class.');
+
+            expect(() => {
+                applySchemaToNPC(schema, tableRoller, {});
+            }).to.throw(Error, 'npc object must be or inherit from NPC class.');
         });
     });
 });

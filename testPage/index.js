@@ -8,6 +8,8 @@ var __export = (target, all) => {
 var dice_roller_exports = {};
 __export(dice_roller_exports, {
   DiceResult: () => DiceResult,
+  DiceRoller: () => DiceRoller,
+  default: () => dice_roller_default,
   getDiceResult: () => getDiceResult,
   rollDie: () => rollDie
 });
@@ -75,52 +77,103 @@ var DiceResult = class {
     };
   }
 };
-var parseDiceNotation = function(die = 6, number = 1, modifier = 0, mod_op = "+") {
-  modifier = parseInt(modifier, 10);
-  die = parseInt(die, 10);
-  if (number <= 0) {
-    number = 1;
-  } else {
-    number = parseInt(number, 10);
+var DiceRoller = class {
+  getSingleDieResult(die) {
+    return randomInteger(1, die);
   }
-  let sum = 0;
-  for (let i = 1; i <= number; i++) {
-    sum = sum + randomInteger(1, die);
+  applyDieMod(rolls, diemod) {
+    const m = diemod.match(/^([dklh]{2})([0-9]*)$/);
+    if (m === null) {
+      return rolls;
+    }
+    const count = !m[2] ? 1 : parseInt(m[2]);
+    switch (m[1]) {
+      case "dl":
+        rolls.sort((a, b) => a - b);
+        rolls.splice(0, count);
+        return rolls;
+      case "dh":
+        rolls.sort((a, b) => b - a);
+        rolls.splice(0, count);
+        return rolls;
+      case "kl":
+        rolls.sort((a, b) => a - b);
+        return rolls.slice(0, count);
+      case "kh":
+        rolls.sort((a, b) => b - a);
+        return rolls.slice(0, count);
+      default:
+        return rolls;
+    }
   }
-  if (modifier === 0) {
-    return sum;
+  _parseDiceNotation(die = 6, number = 1, modifier = 0, mod_op = "+", diemod = "") {
+    modifier = parseInt(modifier, 10);
+    die = parseInt(die, 10);
+    if (number <= 0) {
+      number = 1;
+    } else {
+      number = parseInt(number, 10);
+    }
+    let rolls = [];
+    for (let i = 1; i <= number; i++) {
+      rolls.push(this.getSingleDieResult(die));
+    }
+    if (diemod !== "") {
+      rolls = this.applyDieMod(rolls, diemod);
+    }
+    let sum = 0;
+    if (rolls.length > 0) {
+      sum = rolls.reduce((total, cur) => {
+        return total + cur;
+      });
+    }
+    if (modifier === 0) {
+      return sum;
+    }
+    switch (mod_op) {
+      case "*":
+        sum = sum * modifier;
+        break;
+      case "-":
+        sum = sum - modifier;
+        break;
+      case "/":
+        sum = sum / modifier;
+        break;
+      case "+":
+      default:
+        sum = sum + modifier;
+        break;
+    }
+    return Math.round(sum);
   }
-  switch (mod_op) {
-    case "*":
-      sum = sum * modifier;
-      break;
-    case "-":
-      sum = sum - modifier;
-      break;
-    case "/":
-      sum = sum / modifier;
-      break;
-    case "+":
-    default:
-      sum = sum + modifier;
-      break;
+  rollDie(string = "") {
+    string = string.trim();
+    const m = string.match(/^([0-9]*)d([0-9]+)([dklh]{2}[0-9]*)*(?:([\+\-\*\/])([0-9]+))*$/);
+    if (!m) {
+      return "";
+    }
+    return this._parseDiceNotation(m[2], m[1], m[5], m[4], m[3]);
   }
-  return Math.round(sum);
+  getDiceResult(die = "") {
+    return new DiceResult({
+      die,
+      value: this.rollDie(die)
+    });
+  }
 };
 var rollDie = function(string = "") {
-  string = string.trim();
-  const m = string.match(/^([0-9]*)d([0-9]+)(?:([\+\-\*\/])([0-9]+))*$/);
-  if (!m) {
-    return "";
-  }
-  return parseDiceNotation(m[2], m[1], m[4], m[3]);
+  const roller = new DiceRoller();
+  return roller.rollDie(string);
 };
 var getDiceResult = function(die = "") {
+  const roller = new DiceRoller();
   return new DiceResult({
     die,
-    value: rollDie(die)
+    value: roller.rollDie(die)
   });
 };
+var dice_roller_default = DiceRoller;
 
 // src/DisplayOptions.js
 var DisplayOptions = class {
@@ -909,7 +962,7 @@ var NPC = class {
   }
   _convertFieldValue(value) {
     if (value === null || typeof value === "undefined") {
-      return "";
+      return null;
     }
     if (typeof value === "string") {
       return value;
@@ -942,7 +995,11 @@ var NPC = class {
     return Array.from(this.fields.keys());
   }
   getFieldValue(key) {
-    return this.fields.get(key) || "";
+    const value = this.fields.get(key);
+    if (typeof value === "undefined") {
+      return null;
+    }
+    return value;
   }
   toJSON() {
     const obj = defaultToJSON.call(this);
@@ -951,37 +1008,80 @@ var NPC = class {
   }
 };
 
+// src/NPCConstants.js
+var NPCFieldTypeConst = Object.freeze({
+  FIELD_TYPE_STRING: "string",
+  FIELD_TYPE_TEXT: "text",
+  FIELD_TYPE_NUMBER: "number",
+  FIELD_TYPE_NOTE: "note",
+  FIELD_TYPE_RESULTSET: "resultset",
+  FIELD_TYPE_MODIFIER: "modifier"
+});
+
 // src/NPCSchemaField.js
 var NPCSchemaField = class {
   constructor({
     key = "",
     label = "",
-    type = "string",
+    type = NPCFieldTypeConst.FIELD_TYPE_STRING,
     source = "",
     count = 1,
     starting_value = null
   }) {
     this.key = key;
     this.label = label;
-    this.type = type;
+    this.type = type.toLowerCase();
     this.source = source;
     this.count = count;
+    if (!this.count || this.count <= 0) {
+      this.count = 1;
+    }
     if (starting_value !== null) {
       this.starting_value = starting_value;
     }
   }
   get defaultEmpty() {
+    if (this.count > 1) {
+      return [];
+    }
     switch (this.type) {
-      case "string":
-      case "text":
+      case NPCFieldTypeConst.FIELD_TYPE_STRING:
+      case NPCFieldTypeConst.FIELD_TYPE_TEXT:
         return "";
+      case NPCFieldTypeConst.FIELD_TYPE_NOTE:
+      case NPCFieldTypeConst.FIELD_TYPE_RESULTSET:
+        return null;
+      case NPCFieldTypeConst.FIELD_TYPE_NUMBER:
+      case NPCFieldTypeConst.FIELD_TYPE_MODIFIER:
+        return 0;
       case "array":
         return [];
-      case "number":
-      case "modifier":
-        return 0;
     }
     return null;
+  }
+  isString() {
+    return this.type === NPCFieldTypeConst.FIELD_TYPE_STRING;
+  }
+  isText() {
+    return this.type === NPCFieldTypeConst.FIELD_TYPE_TEXT;
+  }
+  isNumber() {
+    return this.type === NPCFieldTypeConst.FIELD_TYPE_NUMBER;
+  }
+  isModifier() {
+    return this.type === NPCFieldTypeConst.FIELD_TYPE_MODIFIER;
+  }
+  isNote() {
+    return this.type === NPCFieldTypeConst.FIELD_TYPE_NOTE;
+  }
+  isResult() {
+    return this.type === NPCFieldTypeConst.FIELD_TYPE_RESULTSET;
+  }
+  isArray() {
+    if (this.type === "array") {
+      return true;
+    }
+    return this.count > 1;
   }
   toJSON() {
     const obj = defaultToJSON.call(this);
@@ -1071,6 +1171,17 @@ var initializeNewNPC = function(schemaKey, tableRoller2, generateId = true) {
   applySchemaToNPC(schema, tableRoller2, npc);
   return npc;
 };
+var typeResult = function(field, result) {
+  let value = null;
+  if (field.isString() || field.isText() || field.isModifier()) {
+    value = result.toString();
+  } else if (field.isNumber()) {
+    value = parseInt(result, 10);
+  } else {
+    value = result;
+  }
+  return value;
+};
 var applySchemaToNPC = function(schema, tableRoller2, npc) {
   if (!(npc instanceof NPC)) {
     throw Error("npc object must be or inherit from NPC class.");
@@ -1093,20 +1204,22 @@ var applySchemaToNPC = function(schema, tableRoller2, npc) {
       npc.setFieldValue(key, field.starting_value);
       return;
     }
-    if (!isEmpty(field.source)) {
-      if (field.type === "array") {
-        const value = [];
-        const ct = field.count ? field.count : 1;
-        for (let i = 0; i < ct; i++) {
-          value.push(tableRoller2.convertToken(field.source));
-        }
-        npc.setFieldValue(key, value);
-      } else {
-        npc.setFieldValue(key, tableRoller2.convertToken(field.source));
-      }
+    if (isEmpty(field.source)) {
+      npc.setFieldValue(key, field.defaultEmpty);
       return;
     }
-    npc.setFieldValue(key, field.defaultEmpty);
+    if (field.isArray()) {
+      const value = [];
+      const ct = field.count ? field.count : 1;
+      for (let i = 0; i < ct; i++) {
+        const result2 = tableRoller2.convertToken(field.source);
+        value.push(typeResult(field, result2));
+      }
+      npc.setFieldValue(key, value);
+      return;
+    }
+    const result = tableRoller2.convertToken(field.source);
+    npc.setFieldValue(key, typeResult(field, result));
   });
 };
 

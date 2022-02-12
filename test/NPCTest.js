@@ -69,7 +69,7 @@ describe('NPC', function () {
         expect(npc.getFieldValue('three')).to.be.instanceOf(RandomTableResult);
         expect(npc.getFieldValue('four')).to.be.instanceOf(TableErrorResult);
         expect(npc.getFieldValue('five')).to.be.instanceOf(DiceResult);
-        expect(npc.getFieldValue('six')).to.be.equal('');
+        expect(npc.getFieldValue('six')).to.be.equal(null);
         expect(npc.getFieldValue('seven')).to.deep.property('foo', 'bar');
         expect(npc.getFieldKeys()).to.deep.equal([
             'one',

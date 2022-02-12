@@ -44,6 +44,13 @@ describe('NPCSchemaField', function () {
         expect(field.starting_value).to.equal('black');
     });
 
+    it('should handle default constructor settings', function () {
+        let field = new NPCSchemaField({ count: -2 });
+        expect(field.count).to.equal(1);
+        field = new NPCSchemaField({ count: null });
+        expect(field.count).to.equal(1);
+    });
+
     it('should return defaultEmpty for each type', function () {
         const field = new NPCSchemaField({
             type: 'string'
@@ -62,7 +69,53 @@ describe('NPCSchemaField', function () {
         field.type = 'modifier';
         expect(field.defaultEmpty).to.equal(0);
 
+        field.type = 'note';
+        expect(field.defaultEmpty).to.equal(null);
+
+        field.type = 'resultset';
+        expect(field.defaultEmpty).to.equal(null);
+
         field.type = 'something else';
         expect(field.defaultEmpty).to.equal(null);
+
+        field.count = 2;
+        expect(field.defaultEmpty).to.deep.equal([]);
+    });
+
+    it('should return true for specific type checks', function () {
+        const field = new NPCSchemaField({
+            type: 'string'
+        });
+        expect(field.isString()).to.be.true;
+
+        field.type = 'text';
+        expect(field.isText()).to.be.true;
+
+        field.type = 'array';
+        expect(field.isArray()).to.be.true;
+
+        field.type = 'number';
+        expect(field.isNumber()).to.be.true;
+
+        field.type = 'modifier';
+        expect(field.isModifier()).to.be.true;
+
+        field.type = 'note';
+        expect(field.isNote()).to.be.true;
+
+        field.type = 'resultset';
+        expect(field.isResult()).to.be.true;
+
+        field.type = 'something else';
+        expect(field.isString()).to.be.false;
+        expect(field.isText()).to.be.false;
+        expect(field.isNumber()).to.be.false;
+        expect(field.isModifier()).to.be.false;
+        expect(field.isNote()).to.be.false;
+        expect(field.isResult()).to.be.false;
+        expect(field.isArray()).to.be.false;
+
+        field.count = 2;
+        expect(field.isArray()).to.be.true;
     });
 });
