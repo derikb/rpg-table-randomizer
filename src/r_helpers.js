@@ -1,5 +1,6 @@
 /**
  * Is it empty (stolen from Underscore)
+ * NOTE: this doesn't handle numbers well...
  * @param {Object|String|?} obj some type of things
  * @return {Boolean} is it empty?
  */
@@ -9,6 +10,9 @@ const isEmpty = function (obj) {
     }
     if (Array.isArray(obj) || isString(obj)) {
         return obj.length === 0;
+    }
+    if (obj instanceof Set || obj instanceof Map) {
+        return obj.size === 0;
     }
     return Object.keys(obj).length === 0;
 };
@@ -27,6 +31,11 @@ const isString = function (obj) {
  * @return {Boolean} is it an object?
  */
 const isObject = function (obj) {
+    if (Array.isArray(obj) ||
+        obj instanceof Set ||
+        obj instanceof Map) {
+        return false;
+    }
     const type = typeof obj;
     return (type === 'function' || type === 'object') && !!obj;
 };
@@ -53,7 +62,9 @@ const capitalize = function (string) {
  * @returns {Any} Though not Map or any class/object with a toJSON method.
  */
 const serializeValue = function (value) {
-    if (value === null || typeof value === 'undefined') {
+    if (value === null ||
+        typeof value === 'undefined' ||
+        typeof value === 'function') {
         return;
     }
     if (isString(value)) {
@@ -68,6 +79,7 @@ const serializeValue = function (value) {
     if (typeof value.toJSON === 'function') {
         return value.toJSON();
     }
+    // Convert Maps to plain objects
     if (value instanceof Map) {
         const obj = {};
         value.forEach(function (val, key) {
@@ -75,11 +87,9 @@ const serializeValue = function (value) {
         });
         return obj;
     }
-    if (typeof value === 'function') {
-        return;
-    }
-    if (typeof value === 'undefined') {
-        return;
+    // Convert Set to Array
+    if (value instanceof Set) {
+        return Array.from(value).map((el) => serializeValue(el));
     }
     // a plain Object would just return itself, no matter its property values
     // not sure if I use any in the classes that it is a concern
