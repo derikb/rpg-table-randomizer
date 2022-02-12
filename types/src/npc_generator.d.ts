@@ -1,6 +1,7 @@
 /**
  * Add new schema to store.
  * @param {NPCSchema} schema
+ * @throws {Error} For invalid args.
  */
 export function registerSchema(schema: NPCSchema): void;
 /**
@@ -20,6 +21,7 @@ export function getSchemaByKey(key: string): NPCSchema | null;
  * @param {TableRoller} tableRoller
  * @param {Boolean} generateId Should the npc get a uuid.
  * @returns NPC
+ * @throws {Error} For invalid args.
  */
 export function initializeNewNPC(schemaKey: string, tableRoller: TableRoller, generateId?: boolean): NPC;
 /**
@@ -28,6 +30,7 @@ export function initializeNewNPC(schemaKey: string, tableRoller: TableRoller, ge
  * @param {NPCSchema} schema
  * @param {TableRoller} tableRoller
  * @param {NPC} npc With either blank schema or set to same key as schema arg
+ * @throws {Error} For invalid args.
  */
 export function applySchemaToNPC(schema: NPCSchema, tableRoller: TableRoller, npc: NPC): void;
 import NPCSchema from "./NPCSchema.js";

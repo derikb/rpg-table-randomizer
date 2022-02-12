@@ -1,5 +1,6 @@
 /**
  * Is it empty (stolen from Underscore)
+ * NOTE: this doesn't handle numbers well...
  * @param {Object|String|?} obj some type of things
  * @return {Boolean} is it empty?
  */

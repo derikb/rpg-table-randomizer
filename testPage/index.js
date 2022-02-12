@@ -224,12 +224,18 @@ var isEmpty = function(obj) {
   if (Array.isArray(obj) || isString(obj)) {
     return obj.length === 0;
   }
+  if (obj instanceof Set || obj instanceof Map) {
+    return obj.size === 0;
+  }
   return Object.keys(obj).length === 0;
 };
 var isString = function(obj) {
   return toString.call(obj) === "[object String]";
 };
 var isObject = function(obj) {
+  if (Array.isArray(obj) || obj instanceof Set || obj instanceof Map) {
+    return false;
+  }
   const type = typeof obj;
   return (type === "function" || type === "object") && !!obj;
 };
@@ -240,7 +246,7 @@ var capitalize = function(string) {
   return isEmpty(string) ? string : string.charAt(0).toUpperCase() + string.slice(1);
 };
 var serializeValue = function(value) {
-  if (value === null || typeof value === "undefined") {
+  if (value === null || typeof value === "undefined" || typeof value === "function") {
     return;
   }
   if (isString(value)) {
@@ -262,11 +268,8 @@ var serializeValue = function(value) {
     });
     return obj;
   }
-  if (typeof value === "function") {
-    return;
-  }
-  if (typeof value === "undefined") {
-    return;
+  if (value instanceof Set) {
+    return Array.from(value).map((el) => serializeValue(el));
   }
   return value;
 };

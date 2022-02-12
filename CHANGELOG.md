@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/derikb/rpg-table-randomizer/compare/v1.1.4...v1.2.0) (2022-02-12)
+
+
+### Features
+
+* **dice:** Add drop/keep die syntax ([a4495b1](https://github.com/derikb/rpg-table-randomizer/commit/a4495b1dcbdb112871291b04bba2068d75d7c517)), closes [#46](https://github.com/derikb/rpg-table-randomizer/issues/46)
+* **npc:** Improve Field typings ([f6f3937](https://github.com/derikb/rpg-table-randomizer/commit/f6f3937b81376c1a8ac8077c70d688ec6027b05c)), closes [#53](https://github.com/derikb/rpg-table-randomizer/issues/53)
+
+
+### Bug Fixes
+
+* **r_helpers:** Handle Map/Set/etc better ([3c3d6b5](https://github.com/derikb/rpg-table-randomizer/commit/3c3d6b5a3c7abb39df7fc2ee936ba4b05624743c)), closes [#58](https://github.com/derikb/rpg-table-randomizer/issues/58)
+
 ### [1.1.4](https://github.com/derikb/rpg-table-randomizer/compare/v1.1.3...v1.1.4) (2022-02-06)
 
 
