@@ -11,6 +11,7 @@ declare class TableRoller {
     token_types: {
         roll: any;
         table: any;
+        oneof: any;
     };
     /**
      * Return an error result
@@ -117,6 +118,15 @@ declare class TableRoller {
      * @returns {RandomTableResultSet|RandomTableResultSet[]} One or more result sets.
      */
     _defaultTableToken(token_parts: string[], full_token: string, curtable?: RandomTable | null): RandomTableResultSet | RandomTableResultSet[];
+    /**
+     * Simple pick one of the options token:
+     * {{oneof:dwarf|halfling|human pig|dog person}}
+     * @param {String[]} token_parts Token split by :
+     * @param {String} full_token Original token
+     * @param {RandomTable|null} curtable Current table or null.
+     * @returns {String} One of the options or empty.
+     */
+    _defaultOneOfToken(token_parts: string[], full_token: string, curtable?: RandomTable | null): string;
 }
 import TableErrorResult from "./TableErrorResult.js";
 import RandomTableResultSet from "./RandomTableResultSet.js";

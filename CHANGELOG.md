@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/derikb/rpg-table-randomizer/compare/v1.2.0...v1.3.0) (2022-02-13)
+
+
+### Features
+
+* **tables:** Add oneof token for simple select ([6268d44](https://github.com/derikb/rpg-table-randomizer/commit/6268d4433b718aa8bf1bf557c42f92521b2f5375)), closes [#59](https://github.com/derikb/rpg-table-randomizer/issues/59)
+
 ## [1.2.0](https://github.com/derikb/rpg-table-randomizer/compare/v1.1.4...v1.2.0) (2022-02-12)
 
 
