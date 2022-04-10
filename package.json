@@ -37,16 +37,16 @@
   "devDependencies": {
     "c8": "^7.11.0",
     "chai": "^4.3.6",
-    "esbuild": "^0.14.21",
-    "eslint": "^8.9.0",
+    "esbuild": "^0.14.34",
+    "eslint": "^8.13.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.0.0",
-    "mocha": "^9.2.0",
+    "mocha": "^9.2.2",
     "sinon": "^13.0.1",
     "standard-version": "^9.3.2",
-    "typescript": "^4.5.5"
+    "typescript": "^4.6.3"
   },
   "dependencies": {
     "uuid": "^8.3.2"
