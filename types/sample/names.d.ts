@@ -1,4 +1,4 @@
-declare var _default: {
+declare const _default: {
     key: string;
     label: string;
     male: string[];

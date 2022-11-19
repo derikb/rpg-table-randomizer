@@ -14,7 +14,7 @@ export default class NPCSchemaField {
     constructor({ key, label, type, source, count, starting_value }: {
         key?: string;
         label?: string;
-        type?: string;
+        type?: "string";
         source?: string;
         count?: number;
         starting_value?: any;
@@ -28,7 +28,7 @@ export default class NPCSchemaField {
     /**
      * Default value for this field by type if empty.
      */
-    get defaultEmpty(): any[] | "" | 0;
+    get defaultEmpty(): any[] | 0 | "";
     isString(): boolean;
     isText(): boolean;
     isNumber(): boolean;
