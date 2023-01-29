@@ -78,9 +78,20 @@ var DiceResult = class {
   }
 };
 var DiceRoller = class {
+  /**
+   *
+   * @param {Number} die Die type
+   * @returns {Number}
+   */
   getSingleDieResult(die) {
     return randomInteger(1, die);
   }
+  /**
+   * Apply a modifier to the number of dice retained.
+   * @param {Number[]} rolls
+   * @param {String} diemod Modifier to dice (drop/keep high/low count).
+   * @returns
+   */
   applyDieMod(rolls, diemod) {
     const m = diemod.match(/^([dklh]{2})([0-9]*)$/);
     if (m === null) {
@@ -106,6 +117,15 @@ var DiceRoller = class {
         return rolls;
     }
   }
+  /**
+   * Dice rolling simulator
+   * @param {Number} [die=6] Die type
+   * @param {Number} [number=1] Number of times to roll the die
+   * @param {Number} [modifier=0] Numeric modifier to dice total
+   * @param {String} [mod_op=+] Operator for the modifier (+,-,/,*)
+   * @param {String} [diemod=''] Modifier to the dice (like keep/drop high/low die)
+   * @returns {Number} Number rolled (die*number [mod_op][modifier])
+   */
   _parseDiceNotation(die = 6, number = 1, modifier = 0, mod_op = "+", diemod = "") {
     modifier = parseInt(modifier, 10);
     die = parseInt(die, 10);
@@ -147,6 +167,11 @@ var DiceRoller = class {
     }
     return Math.round(sum);
   }
+  /**
+   * takes a string like '3d6+2', 'd6', '2d6', parses it, and puts it through roll
+   * @params {String} string a die roll notation
+   * @returns {Number} the result of the roll
+   */
   rollDie(string = "") {
     string = string.trim();
     const m = string.match(/^([0-9]*)d([0-9]+)([dklh]{2}[0-9]*)*(?:([\+\-\*\/])([0-9]+))*$/);
@@ -155,6 +180,11 @@ var DiceRoller = class {
     }
     return this._parseDiceNotation(m[2], m[1], m[5], m[4], m[3]);
   }
+  /**
+   * Return a dice result.
+   * @param {String} die Die roll notation.
+   * @returns {DiceResult}
+   */
   getDiceResult(die = "") {
     return new DiceResult({
       die,
@@ -177,6 +207,13 @@ var dice_roller_default = DiceRoller;
 
 // src/DisplayOptions.js
 var DisplayOptions = class {
+  /**
+   *
+   * @property {String} table Subtable name.
+   * @property {Boolean} hide_table Hide the subtable name.
+   * @property {Boolean} hide_result Hide the result.
+   * @property {Boolean} hide_desc Hide the description field.
+   */
   constructor({
     table = "",
     hide_table = false,
@@ -188,6 +225,10 @@ var DisplayOptions = class {
     this.hide_result = hide_result === true || hide_result === "1" || hide_result === 1;
     this.hide_desc = hide_desc === true || hide_desc === "1" || hide_desc === 1;
   }
+  /**
+   * Custom JSON handler to strip defaults.
+   * @returns {Object}
+   */
   toJSON() {
     const returnObj = {
       className: "DisplayOptions",
@@ -288,6 +329,14 @@ var defaultToJSON = function() {
 
 // src/RandomTableEntry.js
 var RandomTableEntry = class {
+  /**
+   *
+   * @property {String} label Basic string label. Only required field. Can include tokens.
+   * @property {Boolean} [print=true] Should the result be included in the output.
+   * @property {String} [description] Extra description for the label.
+   * @property {String[]} [subtable] Other tables to roll on.
+   * @property {Number} [weight=1] Number to weight entry relative to other entries.
+   */
   constructor({
     label = "",
     print = true,
@@ -310,6 +359,10 @@ var RandomTableEntry = class {
       });
     }
   }
+  /**
+   * Custom JSON handler because Map doesn't JSON stringify automatically.
+   * @returns {Object}
+   */
   toJSON() {
     const obj = defaultToJSON.call(this);
     obj.className = "RandomTableEntry";
@@ -319,6 +372,25 @@ var RandomTableEntry = class {
 
 // src/RandomTable.js
 var RandomTable = class {
+  /**
+   * The primary attributes of this table
+   * @property {String} id id for the table, primary key for database if used
+   * @property {String} key identifier for the table
+   * @property {String} [title] title of the table
+   * @property {String} [author] author of the table
+   * @property {String} [description] description of the table
+   * @property {String} [source] source of the table
+   * @property {String[]} [tags] subject tags
+   * @property {String[]} [sequence] tables to roll on as default.
+   * @property {String[]|Object[]} [table] default table. array of strings or objects. removed after initialization.
+   * @property {Object} [tables] a property for each subtables.
+   * @property {RandomTableEntries[]} tables[subtablename] Entries for subtables.
+   * @property {String[]} [macro] for tables that are only used to aggregate result from other tables, this array consists of table keys and optionsl subtables to be rolled on in order
+   * @property {Map[DisplayOptions]} [display_opt] Display options for the subtables.
+   * @property {Array} [dependencies] table keys that are needed to get full results from this table
+   *
+   * Note the Constructor args are not exactly the same as the properties. Some type changes are made to convert data.
+   */
   constructor({
     id = 0,
     key = null,
@@ -361,6 +433,11 @@ var RandomTable = class {
   toString() {
     return this.title;
   }
+  /**
+   * Make sure table entries are all RandomTableEntry objects.
+   * @param {Array} data
+   * @returns RandomTableEntry[]
+   */
   _normalizeTable(data) {
     const entries = [];
     data.forEach((d) => {
@@ -383,6 +460,12 @@ var RandomTable = class {
     });
     return entries;
   }
+  /**
+   * Normalize the tables/table constructor data.
+   * @param {Object} tables
+   * @param {Array} table
+   * @returns
+   */
   _normalizeTables(tables, table) {
     if (isEmpty(tables) && isEmpty(table)) {
       return;
@@ -402,6 +485,12 @@ var RandomTable = class {
       });
     }
   }
+  /**
+   * Basic sequence of table rolls.
+   * Either the start, the default sequence, the default table, or just the first one.
+   * @param {String} start Subtable name to start with.
+   * @returns {String[]}
+   */
   getSequence(start = "") {
     if (start !== "") {
       return [start];
@@ -417,12 +506,26 @@ var RandomTable = class {
     }
     return this.sequence;
   }
+  /**
+   * All the subtable names.
+   * @returns {String[]}
+   */
   get subtableNames() {
     return Object.keys(this.tables);
   }
+  /**
+   * Get entries for a specific subtable.
+   * @param {String} [name=default] Subtable name.
+   * @returns {RandomTableEntry[]}
+   */
   getSubtableEntries(name = "default") {
     return this.tables[name] || [];
   }
+  /**
+   * Get a random entry from a subtable.
+   * @param {String} subtableName
+   * @returns {RandomTableEntry|null}
+   */
   getRandomEntry(subtableName) {
     const entries = this.getSubtableEntries(subtableName);
     if (entries.length === 0) {
@@ -436,6 +539,12 @@ var RandomTable = class {
     });
     return getWeightedRandom(values, weights);
   }
+  /**
+   * Get an entry in case we only have the label and need other data from it
+   * @param {String} label The item we are looking for
+   * @param {String} [table=default] the table to search
+   * @returns {RandomTableEntry|null}
+   */
   findEntry(label, table = "default") {
     const t = this.tables[table];
     if (!t) {
@@ -449,6 +558,10 @@ var RandomTable = class {
     }
     return entry;
   }
+  /**
+   * Find the dependent tables to get full results for this table
+   * @return {Array} table keys
+   */
   findDependencies() {
     if (this.dependencies !== null) {
       return this.dependencies;
@@ -485,6 +598,10 @@ var RandomTable = class {
     this.dependencies = dep;
     return dep;
   }
+  /**
+   * Custom JSON handler because Map doesn't JSON stringify automatically.
+   * @returns {Object}
+   */
   toJSON() {
     const obj = defaultToJSON.call(this);
     obj.className = "RandomTable";
@@ -494,6 +611,12 @@ var RandomTable = class {
 
 // src/RandomTableResult.js
 var RandomTableResult = class {
+  /**
+   * @property {String} key Key for RandomTable.
+   * @property {String} table Title of subtable.
+   * @property {String} result Randomized result label.
+   * @property {String} desc Extra result description.
+   */
   constructor({
     key = "",
     table = "",
@@ -505,15 +628,25 @@ var RandomTableResult = class {
     this.result = result;
     this.desc = desc;
   }
+  /**
+   * Is this from the "default" table.
+   */
   get isDefault() {
     return this.table === "default";
   }
+  /**
+   * Is this an error result.
+   */
   get isError() {
     return false;
   }
   toString() {
     return this.result;
   }
+  /**
+   * Custom JSON handler to strip empty props.
+   * @returns {Object}
+   */
   toJSON() {
     const obj = defaultToJSON.call(this);
     obj.className = "RandomTableResult";
@@ -523,9 +656,16 @@ var RandomTableResult = class {
 
 // src/TableErrorResult.js
 var TableErrorResult = class extends RandomTableResult {
+  /**
+   * Is this an error result.
+   */
   get isError() {
     return true;
   }
+  /**
+   * Custom JSON handler to strip empty props.
+   * @returns {Object}
+   */
   toJSON() {
     const obj = super.toJSON();
     obj.className = "TableErrorResult";
@@ -535,6 +675,12 @@ var TableErrorResult = class extends RandomTableResult {
 
 // src/RandomTableResultSet.js
 var RandomTableResultSet = class {
+  /**
+   * @property {String} key RandomTable key
+   * @property {String} title Title from the RandomTable parent
+   * @property {RandomTableResult[]} results Randomized results.
+   * @property {Map[DisplayOptions]|Object} displayOptions Display settings from the RandomTable parent.
+   */
   constructor({
     key = "",
     title = "",
@@ -564,6 +710,11 @@ var RandomTableResultSet = class {
       });
     }
   }
+  /**
+   * Add a result to the set.
+   * @param {RandomTableResult|TableErrorResult|object} data
+   * @returns
+   */
   addResult(data) {
     if (data instanceof RandomTableResult || data instanceof TableErrorResult) {
       this.results.push(data);
@@ -578,12 +729,22 @@ var RandomTableResultSet = class {
   get isSimple() {
     return this.results.length === 1;
   }
+  /**
+   * Find the result for a specific table/subtable
+   * @param {String} table The table to look for
+   * @returns {RandomTableResult|null}
+   */
   findResultByTable(table = "default") {
     const obj = this.results.find((v) => {
       return v.table === table;
     });
     return !obj ? null : obj;
   }
+  /**
+   * Output the set as a string.
+   * @param {Boolean} simple Simplify the output (just the result labels)
+   * @returns
+   */
   niceString(simple = false) {
     if (this.results.length === 0) {
       return "";
@@ -631,9 +792,16 @@ var RandomTableResultSet = class {
     });
     return output.trim();
   }
+  /**
+   * Simple base output of result set.
+   */
   toString() {
     return this.niceString();
   }
+  /**
+   * Custom JSON handler because Map doesn't JSON stringify automatically.
+   * @returns {Object}
+   */
   toJSON() {
     const obj = defaultToJSON.call(this);
     obj.className = "RandomTableResultSet";
@@ -666,6 +834,13 @@ var TableRoller = class {
       this.token_types[token] = token_types[token];
     });
   }
+  /**
+   * Return an error result
+   * @param {String} error Error message
+   * @param {String} key RandomTable key where error occured.
+   * @param {String} table Sub/table name if relevant.
+   * @returns {TableErrorResult}
+   */
   _getErrorResult(error = "", key = "", table = "") {
     return new TableErrorResult({
       key,
@@ -673,6 +848,12 @@ var TableRoller = class {
       result: error
     });
   }
+  /**
+   * Return a result set with an error.
+   * @param {String} error Error message
+   * @param {String} key RandomTable key where error occured.
+   * @returns {RandomTableResultSet}
+   */
   _getErrorResultSet(error = "", key = "") {
     return new RandomTableResultSet({
       key,
@@ -681,6 +862,14 @@ var TableRoller = class {
       ]
     });
   }
+  /**
+   * Get a result from a table/subtable in a RandomTable object
+   * DANGER: you could theoretically put yourself in an endless loop if the data were poorly planned
+   * Calling method try to catch RangeError to handle that possibility.
+   * @param {RandomTable} rtable the RandomTable object
+   * @param {String} table table to roll on
+   * @returns {RandomTableResult[]}
+   */
   _selectFromTable(rtable, table) {
     if (!(rtable instanceof RandomTable)) {
       return [this._getErrorResult("Invalid table.")];
@@ -703,6 +892,11 @@ var TableRoller = class {
     });
     return o;
   }
+  /**
+   * Get results array for macro setting of a table.
+   * @param {RandomTable} rtable Table with macro set.
+   * @returns {RandomTableResult[]}
+   */
   _getTableMacroResult(rtable) {
     let results = [];
     try {
@@ -734,6 +928,12 @@ var TableRoller = class {
     }
     return results;
   }
+  /**
+   * Generate a result from a RandomTable object
+   * @param {RandomTable} rtable the RandomTable
+   * @param {String} [start=''] subtable to roll on
+   * @return {RandomTableResult[]}
+   */
   getTableResult(rtable, start = "") {
     if (!(rtable instanceof RandomTable)) {
       return [
@@ -762,6 +962,12 @@ var TableRoller = class {
     }
     return results;
   }
+  /**
+   * Get result set from a table based on the key.
+   * @param {String} tableKey
+   * @param {String} table
+   * @returns {RandomTableResultSet}
+   */
   getTableResultSetByKey(tableKey, table = "") {
     try {
       const rtable = this.getTableByKey(tableKey);
@@ -780,6 +986,12 @@ var TableRoller = class {
       }
     }
   }
+  /**
+   * Get result set from a table based on the key.
+   * @param {RandomTable} rtable Main table object.
+   * @param {String} [table] Subtable
+   * @returns {RandomTableResultSet}
+   */
   getResultSetForTable(rtable, table = "") {
     if (!(rtable instanceof RandomTable)) {
       return this._getErrorResultSet(`Invalid table data.`);
@@ -792,6 +1004,12 @@ var TableRoller = class {
       displayOptions: rtable.display_opt
     });
   }
+  /**
+   * Perform token replacement.  Only table and roll actions are accepted
+   * @param {String} token A value passed from findToken containing a token(s) {{SOME OPERATION}} Tokens are {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{roll:1d6+2}} (etc) (i.e. {{table:colonial_occupations:laborer}} {{table:color}} also generate names with {{name:flemish}} (surname only) {{name:flemish:male}} {{name:dutch:female}}
+   * @param {RandomTable|null} curtable RandomTable the string is from (needed for "this" tokens) or null
+   * @returns {RandomTableResultSet|RandomTableResultSet[]|DiceResult|String|Any} The result of the token or else just the token (in case it was a mistake or at least to make the error clearer)
+   */
   convertToken(token, curtable = null) {
     let parts = token.replace("{{", "").replace("}}", "").split(":");
     parts = parts.map((el) => {
@@ -814,6 +1032,12 @@ var TableRoller = class {
       }
     }
   }
+  /**
+   * Look for tokens to perform replace action on them.
+   * @param {String} entryLabel Usually a label from a RandomTableEntry
+   * @param {RandomTable|null} curtable RandomTable the string is from (needed for "this" tokens) or null
+   * @returns {String} String with tokens replaced (if applicable)
+   */
   findToken(entryLabel, curtable = null) {
     if (isEmpty(entryLabel)) {
       return "";
@@ -823,12 +1047,29 @@ var TableRoller = class {
     });
     return newstring;
   }
+  /**
+   * Since tables are stored outside of this module, this function allows for the setting of a function which will be used to lookup a table by it's key
+   * @param {Function} lookup a function that takes a table key and returns a RandomTable or null
+   */
   setTableKeyLookup(lookup) {
     this._customGetTableByKey = lookup;
   }
+  /**
+   * Placeholder that should be replaced by a function outside this module
+   * @param {String} key human readable table identifier
+   * @return {null} nothing, when replaced this function should return a table object
+   */
   _customGetTableByKey(key) {
     return null;
   }
+  /**
+   * Return a table based on it's key.
+   * This requires calling setTableKeyLookup and setting a lookup method
+   * That returns a RandomTable object or null.
+   * @param {String} key human readable table identifier
+   * @returns {RandomTable}
+   * @throws {TableError}
+   */
   getTableByKey(key) {
     if (!key) {
       throw new TableError_default("No table key.");
@@ -839,12 +1080,29 @@ var TableRoller = class {
     }
     return table;
   }
+  /**
+   * Add a token variable
+   * @param {String} name Name of the token (used as first element).
+   * @param {Function} process Function to return token replacement value function is passed the token_parts (token split by ":"),  original full_token, current table name
+   */
   registerTokenType(name, process) {
     this.token_types[name] = process;
   }
+  /**
+   * Dice roll token.
+   * @returns {DiceResult}
+   */
   _defaultRollToken(token_parts, full_token = "", curtable = null) {
     return getDiceResult(token_parts[1]);
   }
+  /**
+   * Table token lookup in the form:
+   * {{table:SOMETABLE}} {{table:SOMETABLE:SUBTABLE}} {{table:SOMETABLE*3}} (roll that table 3 times) {{table:SOMETABLE:SUBTABLE*2}} (roll subtable 2 times)
+   * @param {String[]} token_parts Token split by :
+   * @param {String} full_token Original token
+   * @param {RandomTable|null} curtable Current table or null.
+   * @returns {RandomTableResultSet|RandomTableResultSet[]} One or more result sets.
+   */
   _defaultTableToken(token_parts, full_token, curtable = null) {
     if (isUndefined(token_parts[1])) {
       return full_token;
@@ -884,6 +1142,14 @@ var TableRoller = class {
     }
     return results.length === 1 ? results[0] : results;
   }
+  /**
+   * Simple pick one of the options token:
+   * {{oneof:dwarf|halfling|human pig|dog person}}
+   * @param {String[]} token_parts Token split by :
+   * @param {String} full_token Original token
+   * @param {RandomTable|null} curtable Current table or null.
+   * @returns {String} One of the options or empty.
+   */
   _defaultOneOfToken(token_parts, full_token, curtable = null) {
     if (isUndefined(token_parts[1])) {
       return full_token;
@@ -995,12 +1261,26 @@ var NPC = class {
         return value;
     }
   }
+  /**
+   * Set field value.
+   * @param {String} key Field key.
+   * @param {Any} value Value for field.
+   */
   setFieldValue(key, value) {
     this.fields.set(key, this._convertFieldValue(value));
   }
+  /**
+   * Get field keys as array.
+   * @returns {String[]}
+   */
   getFieldKeys() {
     return Array.from(this.fields.keys());
   }
+  /**
+   * Get value by field key.
+   * @param {String} key NPCSchemaField.key
+   * @returns {RandomTableResultSet|RandomTableResultSet[]|DiceResult|String|Any}
+   */
   getFieldValue(key) {
     const value = this.fields.get(key);
     if (typeof value === "undefined") {
@@ -1008,6 +1288,10 @@ var NPC = class {
     }
     return value;
   }
+  /**
+   * Custom JSON handler to strip empty props.
+   * @returns {Object}
+   */
   toJSON() {
     const obj = defaultToJSON.call(this);
     obj.className = "NPC";
@@ -1027,6 +1311,15 @@ var NPCFieldTypeConst = Object.freeze({
 
 // src/NPCSchemaField.js
 var NPCSchemaField = class {
+  /**
+   *
+   * @property {String} key Identifying key
+   * @property {String} label Readable label for field.
+   * @property {String} [type=string] Type of data in field. Valid: see NPCFieldTypeConst.
+   * @property {String} [source=''] Source of data for TableRoller in the form of a token (see TableRoller, ex: "name:french", "table:color", etc.)
+   * @property {Number} [count=1] Number of entries for array types.
+   * @property {Array|String|Number} starting_value An optional starting value.
+   */
   constructor({
     key = "",
     label = "",
@@ -1047,6 +1340,9 @@ var NPCSchemaField = class {
       this.starting_value = starting_value;
     }
   }
+  /**
+   * Default value for this field by type if empty.
+   */
   get defaultEmpty() {
     if (this.count > 1) {
       return [];
@@ -1084,12 +1380,20 @@ var NPCSchemaField = class {
   isResult() {
     return this.type === NPCFieldTypeConst.FIELD_TYPE_RESULTSET;
   }
+  /**
+   * Is this some sort of array type.
+   * @returns {Boolean}
+   */
   isArray() {
     if (this.type === "array") {
       return true;
     }
     return this.count > 1;
   }
+  /**
+   * Custom JSON handler to strip empty props.
+   * @returns {Object}
+   */
   toJSON() {
     const obj = defaultToJSON.call(this);
     obj.className = "NPCSchemaField";
@@ -1099,6 +1403,12 @@ var NPCSchemaField = class {
 
 // src/NPCSchema.js
 var NPCSchema = class {
+  /**
+   * @property {String} key Identifying key
+   * @property {String} name Name of schema.
+   * @property {String} author Name of author.
+   * @property {Map<String, NPCSchemaField>} fields Data fields will be converted to NPCSchemaField if necessary.
+   */
   constructor({
     key = "",
     name = "",
@@ -1129,12 +1439,26 @@ var NPCSchema = class {
       this.fields.set(field.key, field);
     }
   }
+  /**
+   * Get field keys as array.
+   * @returns String[]
+   */
   getFieldKeys() {
     return Array.from(this.fields.keys());
   }
+  /**
+   * Get a Field by the key.
+   * @param {String} key
+   * @returns {NPCSchemaField|undefined}
+   */
   getFieldByKey(key) {
     return this.fields.get(key);
   }
+  /**
+   * Get field label by the key.
+   * @param {String} key
+   * @returns {String}
+   */
   getFieldLabelByKey(key) {
     const field = this.getFieldByKey(key);
     if (!field) {
@@ -1142,6 +1466,10 @@ var NPCSchema = class {
     }
     return field.label;
   }
+  /**
+   * Custom JSON handler to strip empty props.
+   * @returns {Object}
+   */
   toJSON() {
     const obj = defaultToJSON.call(this);
     obj.className = "NPCSchema";
@@ -1241,6 +1569,12 @@ var RandomNameError_default = RandomNameError;
 
 // src/MarkovGenerator.js
 var MarkovGenerator = class {
+  /**
+   *
+   * @param {Object} memory the "memory" where the language parts go
+   * @param {String} separator If you want to delimit the generated parts
+   * @param {Number} order How many... something... to something.... oh it's been too long I don't remember how this works...
+   */
   constructor({
     memory = {},
     separator = "",
@@ -1250,15 +1584,34 @@ var MarkovGenerator = class {
     this.separator = separator;
     this.order = order;
   }
+  /**
+   * Is the memory key already set.
+   * @param {String} key
+   */
   isMemoryKeySet(key) {
     return !!this.memory[key];
   }
+  /**
+   * Generate a starting array for the chain based on the order number
+   * @return {Array} just an empty array of length=order
+   */
   genInitial() {
     return Array(this.order).fill("");
   }
+  /**
+   * Get a random array element
+   * @param {Array} arr an array
+   * @return {String|Object} random value
+   */
   getRandomValue(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   }
+  /**
+   * Chunk the word or phrase
+   * @param {String} txt the text to chunk
+   * @param {Function} cb callback function
+   * @return {null} null
+   */
   breakText(txt, cb) {
     const parts = txt.split(this.separator);
     const prev = this.genInitial();
@@ -1270,6 +1623,12 @@ var MarkovGenerator = class {
     });
     cb(prev, "");
   }
+  /**
+   * Feed text to memory
+   * @param {String} key key for the chain (so we can store multiple memories)
+   * @param {String} txt word or phrase
+   * @return {null} null
+   */
   learn(key, txt) {
     const mem = this.memory[key] ? this.memory[key] : {};
     this.breakText(txt, (key2, value) => {
@@ -1281,6 +1640,12 @@ var MarkovGenerator = class {
     });
     this.memory[key] = mem;
   }
+  /**
+   * Iterate through, calls self
+   * @param {Array} state array of most recent x(x=order) elements in chain
+   * @param {Array} ret the chain
+   * @return {Array}
+   */
   step(state, ret) {
     const nextAvailable = this.memory[this.cur_key][state] || [""];
     const next = this.getRandomValue(nextAvailable);
@@ -1292,6 +1657,11 @@ var MarkovGenerator = class {
     nextState.push(next);
     return this.step(nextState, ret);
   }
+  /**
+   * Return a generated response
+   * @param {String} key key for the chain (so we can store multiples
+   * @param {Array} seed letters to start the response (?)
+   */
   generate(key, seed) {
     if (!seed) {
       seed = this.genInitial();
@@ -1304,6 +1674,14 @@ var MarkovGenerator_default = MarkovGenerator;
 
 // src/RandomNameType.js
 var RandomNameType = class {
+  /**
+   *
+   * @param {String} key Key to identify uniquely in tokens and methods.
+   * @param {String} label Human readable label.
+   * @param {String[]} male Names.
+   * @param {String[]} female Names.
+   * @param {String[]} surname Names.
+   */
   constructor({
     key = "",
     label = "",
@@ -1317,9 +1695,18 @@ var RandomNameType = class {
     this.female = Array.isArray(female) ? female : [];
     this.surname = Array.isArray(surname) ? surname : [];
   }
+  /**
+   * Returns all personal names.
+   * @returns {String[]}
+   */
   getAllPersonalNames() {
     return Array.prototype.concat(this.male, this.female);
   }
+  /**
+   * Return a personal name list.
+   * @param {String} gender Mixed, random, male, female
+   * @returns {String[]}
+   */
   getPersonalNameList(gender = "random") {
     if (gender === "mixed" || gender === "") {
       return this.getAllPersonalNames();
@@ -1343,6 +1730,10 @@ var RandomNameType = class {
     gender = randomString(randomList);
     return this[gender];
   }
+  /**
+   * Custom JSON handler because Map doesn't JSON stringify automatically.
+   * @returns {Object}
+   */
   toJSON() {
     const obj = defaultToJSON.call(this);
     obj.className = "RandomNameType";
@@ -1363,6 +1754,11 @@ var capitalizeName = function(name) {
   return upper_parts.join(" ");
 };
 var RandomNameGenerator = class {
+  /**
+   * Random name generation.
+   * @param {RandomNameType[]} namedata
+   * @param {Number} [markovOrder=3] Markov generator settings.
+   */
   constructor({
     namedata = [],
     markovOrder = 3
@@ -1375,6 +1771,12 @@ var RandomNameGenerator = class {
     }
     this._markov = new MarkovGenerator_default({ order: markovOrder });
   }
+  /**
+   * Add some name data
+   * Note: you can overwrite existing name_types if you want
+   * @param {RandomNameType} type
+   * @throws {RandomNameError}
+   */
   registerNameType(type) {
     if (!(type instanceof RandomNameType)) {
       throw new RandomNameError_default("Must be instance of RandomNameType");
@@ -1390,6 +1792,12 @@ var RandomNameGenerator = class {
     }
     this.nameTypes.set(type.key, type);
   }
+  /**
+   * Make sure namedata is set.
+   * @param {String} name_type
+   * @param {String} [subtype=''] Subtype like a gender or 'surname'
+   * @throws RandomNameError
+   */
   _validateNameType(name_type, subtype = "") {
     const type = this.nameTypes.get(name_type);
     if (!type) {
@@ -1402,12 +1810,26 @@ var RandomNameGenerator = class {
       throw new RandomNameError_default(`${name_type} type does not have subtype ${subtype}`);
     }
   }
+  /**
+   * Keys of the name types that are set.
+   * @returns {String[]}
+   */
   getValidNameTypes() {
     return Array.from(this.nameTypes.keys());
   }
+  /**
+   * Get a random name type from the available types.
+   * @returns {String}
+   */
   getRandomNameType() {
     return randomString(Array.from(this.nameTypes.keys())) || "";
   }
+  /**
+   * Get the name type
+   * @param {String} name_type Name type key or random.
+   * @returns {RandomNameType}
+   * @throws {RandomNameError}
+   */
   _getNameType(name_type) {
     if (name_type === "random") {
       name_type = this.getRandomNameType();
@@ -1418,6 +1840,12 @@ var RandomNameGenerator = class {
     }
     return nameType;
   }
+  /**
+   * Get a name list
+   * @param {String} name_type
+   * @param {String} subtype
+   * @returns {String[]}
+   */
   _getNameList(name_type = "random", subtype = "mixed") {
     const nameType = this._getNameType(name_type);
     if (subtype === "surname") {
@@ -1432,14 +1860,35 @@ var RandomNameGenerator = class {
     }
     return list;
   }
+  /**
+   * Select a personal name from one of the lists.
+   * @param {String} name_type what list/process to use, else random
+   * @param {String} gender
+   * @returns {String}
+   * @throws {RandomNameError}
+   */
   selectPersonalName(name_type = "random", gender = "random") {
     const nameList = this._getNameList(name_type, gender);
     return capitalizeName(randomString(nameList));
   }
+  /**
+   * Select a sur/last name only from one of the lists
+   * @param {String} name_type what list/process to use, else random
+   * @returns {String} a name
+   * @throws {RandomNameError}
+   */
   selectSurname(name_type = "random") {
     const nameList = this._getNameList(name_type, "surname");
     return capitalizeName(randomString(nameList));
   }
+  /**
+   * Select a name from one of the lists
+   * @param {String} name_type What name list/process to use else random
+   * @param {String} gender male, female, random, ''
+   * @param {String} style first=first name only, else full name
+   * @returns {String} a name
+   * @throws {RandomNameError}
+   */
   selectName(name_type = "random", gender = "random", style = "") {
     const nameType = this._getNameType(name_type);
     const personalNameList = nameType.getPersonalNameList(gender);
@@ -1452,6 +1901,13 @@ var RandomNameGenerator = class {
     }
     return name.trim();
   }
+  /**
+   * Create a personal name using markov chains.
+   * @param {String} name_type what list/process to use, else random
+   * @param {String} gender
+   * @returns {String}
+   * @throws {RandomNameError}
+   */
   createPersonalName(name_type = "random", gender = "random") {
     const nameType = this._getNameType(name_type);
     const namelist = nameType.getPersonalNameList(gender);
@@ -1466,6 +1922,12 @@ var RandomNameGenerator = class {
     }
     return capitalizeName(this._markov.generate(mkey).trim());
   }
+  /**
+   * Create a sur/last name using markov chains.
+   * @param {String} name_type what list/process to use, else random
+   * @returns {String} a name
+   * @throws {RandomNameError}
+   */
   createSurName(name_type = "random") {
     const nameType = this._getNameType(name_type);
     const namelist = nameType.surname;
@@ -1480,6 +1942,14 @@ var RandomNameGenerator = class {
     }
     return capitalizeName(this._markov.generate(skey).trim());
   }
+  /**
+   * Create a name using Markov chains
+   * @param {String} [name_type=random] what list/process to use
+   * @param {String} [gender=random] male or female or both
+   * @param {String} style first=first name only, else full name
+   * @returns {String} a name
+   * @throws {RandomNameError}
+   */
   createName(name_type = "random", gender = "random", style = "") {
     if (name_type === "random") {
       name_type = this.getRandomNameType();
@@ -1490,6 +1960,14 @@ var RandomNameGenerator = class {
     }
     return name.trim();
   }
+  /**
+   * Generate a bunch of names, half male, half female
+   * @param {Number} [number=10] number of names in the list (half will be male, half will be female)
+   * @param {String} [name_type] type of name or else it will randomly select
+   * @param {Bool} [create=false] new names or just pick from list
+   * @return {Object} arrays of names inside male/female property
+   * @throws {RandomNameError}
+   */
   generateList(number = 10, name_type = "random", create = false) {
     const names = { male: [], female: [] };
     for (let i = 1; i <= number; i++) {
@@ -1502,6 +1980,18 @@ var RandomNameGenerator = class {
     }
     return names;
   }
+  /**
+   * Callback for the TableRoller to generate names from a token.
+   * Token parts will be:
+   * 0: "name" literally
+   * 1: type of name (often a nationality/language/ethnicity/etc)
+   * 2: gender ("male"/"female" for which name list to pick from, defaults to randomizing between them).
+   * 3: style ("first" for a first name, else a full name will be returned)
+   * @param {String[]} token_parts Parts of a token: 0 will be the action (name in most cases.)
+   * @param {String} full_token Full token wrapped in double braces.
+   * @param {RandomTable|null} curtable Current table token was found in (helpful if `this` token is found) or null
+   * @returns {String}
+   */
   nameTokenCallback(token_parts, full_token = "", curtable = null) {
     let string = "";
     if (!token_parts[1]) {
