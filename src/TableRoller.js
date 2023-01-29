@@ -43,8 +43,8 @@ class TableRoller {
      */
     _getErrorResult (error = '', key = '', table = '') {
         return new TableErrorResult({
-            key: key,
-            table: table,
+            key,
+            table,
             result: error
         });
     }
@@ -85,7 +85,7 @@ class TableRoller {
         if (entry.print) {
             // replace any tokens
             const t_result = this.findToken(entry.label, rtable);
-            o.push(new RandomTableResult({ key: rtable.key, table: table, result: t_result, desc: entry.description }));
+            o.push(new RandomTableResult({ key: rtable.key, table, result: t_result, desc: entry.description }));
         }
 
         // are there subtables to roll on?
@@ -192,7 +192,7 @@ class TableRoller {
             return new RandomTableResultSet({
                 key: rtable.key,
                 title: rtable.title,
-                results: results,
+                results,
                 displayOptions: rtable.display_opt
             });
         } catch (e) {
@@ -218,7 +218,7 @@ class TableRoller {
         return new RandomTableResultSet({
             key: rtable.key,
             title: rtable.title,
-            results: results,
+            results,
             displayOptions: rtable.display_opt
         });
     }

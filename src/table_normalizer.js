@@ -75,7 +75,7 @@ const parseText = function (text) {
             // console.log(parse);
             let label = parse[3].trim();
             label = label.replace(/^[-*]\s?/, '');
-            l[k] = { label: label };
+            l[k] = { label };
 
             if (!isUndefined(parse[1])) {
                 let weight = 1;
