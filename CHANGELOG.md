@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.3.3](https://github.com/derikb/rpg-table-randomizer/compare/v1.3.2...v1.3.3) (2023-07-23)
+
 ## [1.3.2](https://github.com/derikb/rpg-table-randomizer/compare/v1.3.1...v1.3.2) (2023-01-29)
 
 ### [1.3.1](https://github.com/derikb/rpg-table-randomizer/compare/v1.3.0...v1.3.1) (2022-11-19)
