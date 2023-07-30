@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.4.0](https://github.com/derikb/rpg-table-randomizer/compare/v1.3.3...v1.4.0) (2023-07-30)
+
+
+### Features
+
+* **names:** Add italian names ([26b65f4](https://github.com/derikb/rpg-table-randomizer/commit/26b65f457ae289237aa1c01a61b7b1f1679b2386))
+
 ## [1.3.3](https://github.com/derikb/rpg-table-randomizer/compare/v1.3.2...v1.3.3) (2023-07-23)
 
 ## [1.3.2](https://github.com/derikb/rpg-table-randomizer/compare/v1.3.1...v1.3.2) (2023-01-29)
