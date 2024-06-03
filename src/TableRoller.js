@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 import { isEmpty, isUndefined } from './r_helpers.js';
 import RandomTable from './RandomTable.js';
 import RandomTableEntry from './RandomTableEntry.js';
@@ -313,7 +312,7 @@ class TableRoller {
      * Dice roll token.
      * @returns {DiceResult}
      */
-    _defaultRollToken (token_parts, full_token = '', curtable = null) {
+    _defaultRollToken (token_parts) {
         return getDiceResult(token_parts[1]);
     }
     /**
@@ -375,10 +374,9 @@ class TableRoller {
      * {{oneof:dwarf|halfling|human pig|dog person}}
      * @param {String[]} token_parts Token split by :
      * @param {String} full_token Original token
-     * @param {RandomTable|null} curtable Current table or null.
      * @returns {String} One of the options or empty.
      */
-    _defaultOneOfToken (token_parts, full_token, curtable = null) {
+    _defaultOneOfToken (token_parts, full_token) {
         if (isUndefined(token_parts[1])) {
             return full_token;
         }
