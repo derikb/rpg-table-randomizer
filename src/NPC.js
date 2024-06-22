@@ -1,13 +1,18 @@
 import { defaultToJSON, isObject } from './r_helpers.js';
-import { v4 as uuidv4 } from 'uuid';
 import { DiceResult } from './dice_roller.js';
 import RandomTableResultSet from './RandomTableResultSet.js';
 import RandomTableResult from './RandomTableResult.js';
 import TableErrorResult from './TableErrorResult.js';
+let crypto = null;
+if (typeof window === 'undefined') {
+    crypto = await import('crypto');
+} else {
+    crypto = window.crypto;
+}
 
 /**
  * Class for NPCs
- * @param {String} id Some kind of indentifier.
+ * @param {String} id Some kind of identifier.
  * @param {String} schema Key for a NPCSchema used for this NPC.
  * @param {Map<String, Any>} fields Field values indexed by NPCSchemaField key.
  */
@@ -19,7 +24,7 @@ export default class NPC {
     }) {
         // if null, generate a uuid
         if (id === null) {
-            this.id = uuidv4();
+            this.id = crypto.randomUUID();
         } else {
             this.id = id;
         }
