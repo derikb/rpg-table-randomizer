@@ -5,8 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "eslint": "./node_modules/.bin/eslint ",
-    "eslint:src": "./node_modules/.bin/eslint src/",
+    "eslint": "eslint src/",
     "build": "",
     "release": "commit-and-tag-version -a",
     "serve": "http-server ./ -a localhost",
