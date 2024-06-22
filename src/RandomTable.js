@@ -171,7 +171,7 @@ export default class RandomTable {
         }
         const values = [];
         const weights = [];
-        entries.forEach((entry, k, l) => {
+        entries.forEach((entry) => {
             weights.push(entry.weight);
             values.push(entry);
         });

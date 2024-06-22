@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.5.0](https://github.com/derikb/rpg-table-randomizer/compare/v1.4.0...v1.5.0) (2024-06-22)
+
+
+### Features
+
+* remove bundling for test page ([eba5add](https://github.com/derikb/rpg-table-randomizer/commit/eba5addb01b871858a1b6573166e7c3b23084e7d))
+* remove typescript test ([1c8df30](https://github.com/derikb/rpg-table-randomizer/commit/1c8df30b148b47c78c3d091065f1ef360925e6d9))
+* remove unnecessary dependencies/scripts ([441d153](https://github.com/derikb/rpg-table-randomizer/commit/441d1531909b7b0e3ea73fcf0f8d30662bef5752))
+* use native crypto in browser and node for uuids ([7654617](https://github.com/derikb/rpg-table-randomizer/commit/7654617c5f4835bb5982588bbee177968e0e6ed9))
+
 ## [1.4.0](https://github.com/derikb/rpg-table-randomizer/compare/v1.3.3...v1.4.0) (2023-07-30)
 
 

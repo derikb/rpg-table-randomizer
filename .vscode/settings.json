@@ -1,0 +1,6 @@
+{
+    "eslint.useFlatConfig": true,
+    "eslint.validate": [
+        "javascript"
+    ]
+}
