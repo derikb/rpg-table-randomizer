@@ -8,14 +8,11 @@
     "eslint": "./node_modules/.bin/eslint ",
     "eslint:src": "./node_modules/.bin/eslint src/",
     "build": "",
-    "buildTest": "esbuild ./src/index.js --outdir=./testPage --bundle --format=esm",
     "release": "commit-and-tag-version -a",
     "serve": "http-server ./ -a localhost",
-    "compileTypes": "npx tsc",
     "mocha": "c8 mocha ",
     "mocha-no-coverage": "mocha "
   },
-  "types": "./types/*",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/derikb/rpg-table-randomizer.git"
@@ -36,26 +33,18 @@
   "homepage": "https://github.com/derikb/rpg-table-randomizer#readme",
   "devDependencies": {
     "@stylistic/eslint-plugin-js": "^2.1.0",
-    "c8": "^9.1.0",
+    "c8": "^10.1.0",
     "chai": "^5.1.1",
     "commit-and-tag-version": "^12.4.0",
-    "esbuild": "^0.21",
     "eslint": "^9.4.0",
     "globals": "^15.3.0",
     "mocha": "^10.2.0",
-    "sinon": "^18.0.0",
-    "typescript": "^5.4"
-  },
-  "dependencies": {
-    "uuid": "^9.0.0"
+    "sinon": "^18.0.0"
   },
   "c8": {
     "src": "./src"
   },
   "commit-and-tag-version": {
-    "scripts": {
-      "postbump": "npm run compileTypes && npm run buildTest && git add ./testPage/index.js ./types/**"
-    },
     "bumpFiles": [
       "package.json",
       "package-lock.json"
