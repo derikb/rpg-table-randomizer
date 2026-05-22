@@ -1,8 +1,7 @@
 'use strict';
 
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
-import { stub } from 'sinon';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import RandomNameGenerator from '../src/RandomNameGenerator.js';
 import RandomNameType from '../src/RandomNameType.js';
@@ -38,37 +37,35 @@ const dwarfType = new RandomNameType({
 
 describe('RandomNameGenerator', function () {
     it('it should register name type data', function () {
-        expect(orcType.getAllPersonalNames()).to.deep.equal([
+        assert.deepStrictEqual(orcType.getAllPersonalNames(), [
             'oog',
             'boog',
             'oosh',
             'boosh'
         ]);
-        expect(orcType.getPersonalNameList('male')).to.deep.equal([
+        assert.deepStrictEqual(orcType.getPersonalNameList('male'), [
             'oog',
             'boog'
         ]);
-        expect(orcType.getPersonalNameList('female')).to.deep.equal([
+        assert.deepStrictEqual(orcType.getPersonalNameList('female'), [
             'oosh',
             'boosh'
         ]);
-        expect(orcType.getPersonalNameList('mixed')).to.deep.equal([
+        assert.deepStrictEqual(orcType.getPersonalNameList('mixed'), [
             'oog',
             'boog',
             'oosh',
             'boosh'
         ]);
-        expect(orcType.getPersonalNameList('random')).to.be.deep.oneOf([
-            [
-                'oog',
-                'boog'
-            ],
-            [
-                'oosh',
-                'boosh'
-            ]
-        ]);
-        expect(dwarfType.getPersonalNameList('random')).to.deep.equal([
+
+        const randomResult = orcType.getPersonalNameList('random');
+        assert.ok(
+            [['oog', 'boog'], ['oosh', 'boosh']].some(option => {
+                try { assert.deepStrictEqual(randomResult, option); return true; }
+                catch { return false; }
+            })
+        );
+        assert.deepStrictEqual(dwarfType.getPersonalNameList('random'), [
             'Thorin'
         ]);
 
@@ -77,26 +74,26 @@ describe('RandomNameGenerator', function () {
                 orcType
             ]
         });
-        expect(generator.getValidNameTypes()).to.deep.equal(['orc']);
-        expect(generator.getRandomNameType()).to.equal('orc');
+        assert.deepStrictEqual(generator.getValidNameTypes(), ['orc']);
+        assert.strictEqual(generator.getRandomNameType(), 'orc');
     });
 
     it('it should throw on invalid name type data for registerNameType', function () {
         const generator = new RandomNameGenerator({});
-        expect(() => { generator.registerNameType('hello'); }).to.throw(RandomNameError, 'instance');
+        assert.throws(() => { generator.registerNameType('hello'); }, { name: 'RandomNameError', message: /instance/ });
 
         const type1 = new RandomNameType({});
-        expect(() => { generator.registerNameType(type1); }).to.throw(RandomNameError, 'key');
+        assert.throws(() => { generator.registerNameType(type1); }, { name: 'RandomNameError', message: /key/ });
 
         const type2 = new RandomNameType({
             key: 'random'
         });
-        expect(() => { generator.registerNameType(type2); }).to.throw(RandomNameError, 'reserved');
+        assert.throws(() => { generator.registerNameType(type2); }, { name: 'RandomNameError', message: /reserved/ });
 
         const type3 = new RandomNameType({
             key: 'orc'
         });
-        expect(() => { generator.registerNameType(type3); }).to.throw(RandomNameError, 'lists');
+        assert.throws(() => { generator.registerNameType(type3); }, { name: 'RandomNameError', message: /lists/ });
     });
 
     it('it should return a name for selectPersonalName', function () {
@@ -107,13 +104,13 @@ describe('RandomNameGenerator', function () {
             ]
         });
 
-        expect(generator.selectPersonalName('dwarf', 'male')).to.equal('Thorin');
-        expect(generator.selectPersonalName('orc', 'male')).to.be.oneOf(['Oog', 'Boog']);
-        expect(generator.selectPersonalName('orc', 'female')).to.be.oneOf(['Oosh', 'Boosh']);
-        expect(generator.selectPersonalName('orc')).to.be.oneOf(['Oog', 'Boog', 'Oosh', 'Boosh']);
+        assert.strictEqual(generator.selectPersonalName('dwarf', 'male'), 'Thorin');
+        assert.ok(['Oog', 'Boog'].includes(generator.selectPersonalName('orc', 'male')));
+        assert.ok(['Oosh', 'Boosh'].includes(generator.selectPersonalName('orc', 'female')));
+        assert.ok(['Oog', 'Boog', 'Oosh', 'Boosh'].includes(generator.selectPersonalName('orc')));
         // Invalid types
-        expect(() => { generator.selectPersonalName('elf'); }).to.throw(RandomNameError, 'Invalid name type');
-        expect(() => { generator.selectPersonalName('dwarf', 'female'); }).to.throw(RandomNameError, 'does not have subtype');
+        assert.throws(() => { generator.selectPersonalName('elf'); }, { name: 'RandomNameError', message: /Invalid name type/ });
+        assert.throws(() => { generator.selectPersonalName('dwarf', 'female'); }, { name: 'RandomNameError', message: /does not have subtype/ });
     });
 
     it('it should return a name for selectSurname', function () {
@@ -124,9 +121,9 @@ describe('RandomNameGenerator', function () {
             ]
         });
 
-        expect(generator.selectSurname('dwarf')).to.equal('Hammer');
-        expect(generator.selectSurname('orc')).to.be.oneOf(['Spike', 'Flame']);
-        expect(() => { generator.selectSurname('elf'); }).to.throw(RandomNameError, 'Invalid name type');
+        assert.strictEqual(generator.selectSurname('dwarf'), 'Hammer');
+        assert.ok(['Spike', 'Flame'].includes(generator.selectSurname('orc')));
+        assert.throws(() => { generator.selectSurname('elf'); }, { name: 'RandomNameError', message: /Invalid name type/ });
     });
 
     it('it should return a name for selectName', function () {
@@ -137,102 +134,96 @@ describe('RandomNameGenerator', function () {
             ]
         });
 
-        expect(generator.selectName('orc', 'male')).to.be.oneOf(['Oog Spike', 'Oog Flame', 'Boog Spike', 'Boog Flame']);
-        expect(generator.selectName('orc', 'female', 'first')).to.be.oneOf(['Oosh', 'Boosh']);
-        expect(generator.selectName('dwarf', 'random', 'first')).to.equal('Thorin');
-        expect(() => { generator.selectName('elf'); }).to.throw(RandomNameError, 'Invalid name type');
+        assert.ok(['Oog Spike', 'Oog Flame', 'Boog Spike', 'Boog Flame'].includes(generator.selectName('orc', 'male')));
+        assert.ok(['Oosh', 'Boosh'].includes(generator.selectName('orc', 'female', 'first')));
+        assert.strictEqual(generator.selectName('dwarf', 'random', 'first'), 'Thorin');
+        assert.throws(() => { generator.selectName('elf'); }, { name: 'RandomNameError', message: /Invalid name type/ });
     });
 
-    it('it should return a name for createPersonalName', function () {
+    it('it should return a name for createPersonalName', (t) => {
         const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
             ]
         });
-        const isMemoryKeySet = stub(generator._markov, 'isMemoryKeySet');
-        isMemoryKeySet.withArgs('orc_male').returns(false);
-        const learn = stub(generator._markov, 'learn');
+        t.mock.method(generator._markov, 'isMemoryKeySet', (key) => key !== 'orc_male');
+        const learnMock = t.mock.method(generator._markov, 'learn', () => {});
+        t.mock.method(generator._markov, 'generate', (key) => key === 'orc_male' ? 'new orc name' : '');
 
-        const generate = stub(generator._markov, 'generate');
-        generate.withArgs('orc_male').returns('new orc name');
+        assert.strictEqual(generator.createPersonalName('orc', 'male'), 'New Orc Name');
 
-        expect(generator.createPersonalName('orc', 'male')).to.equal('New Orc Name');
-
-        expect(learn.callCount).to.equal(2);
-        expect(learn.firstCall.args).to.deep.equal([
+        assert.strictEqual(learnMock.mock.callCount(), 2);
+        assert.deepStrictEqual(learnMock.mock.calls[0].arguments, [
             'orc_male',
             'oog'
         ]);
     });
 
-    it('it should return a name for createSurName', function () {
+    it('it should return a name for createSurName', (t) => {
         const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
             ]
         });
-        const isMemoryKeySet = stub(generator._markov, 'isMemoryKeySet');
-        isMemoryKeySet.withArgs('orc_surname').returns(false);
-        const learn = stub(generator._markov, 'learn');
+        t.mock.method(generator._markov, 'isMemoryKeySet', (key) => key !== 'orc_surname');
+        const learnMock = t.mock.method(generator._markov, 'learn', () => {});
+        t.mock.method(generator._markov, 'generate', (key) => key === 'orc_surname' ? 'new orc name' : '');
 
-        const generate = stub(generator._markov, 'generate');
-        generate.withArgs('orc_surname').returns('new orc name');
+        assert.strictEqual(generator.createSurName('orc'), 'New Orc Name');
 
-        expect(generator.createSurName('orc')).to.equal('New Orc Name');
-
-        expect(learn.callCount).to.equal(2);
-        expect(learn.firstCall.args).to.deep.equal([
+        assert.strictEqual(learnMock.mock.callCount(), 2);
+        assert.deepStrictEqual(learnMock.mock.calls[0].arguments, [
             'orc_surname',
             'spike'
         ]);
     });
 
-    it('it should return a name for createName', function () {
+    it('it should return a name for createName', (t) => {
         const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
             ]
         });
-        const createPersonalName = stub(generator, 'createPersonalName');
-        createPersonalName.withArgs('orc', 'male').returns('New Orc');
-        const createSurName = stub(generator, 'createSurName');
-        createSurName.withArgs('orc').returns('Name');
+        t.mock.method(generator, 'createPersonalName', (type, gender) => (type === 'orc' && gender === 'male') ? 'New Orc' : '');
+        t.mock.method(generator, 'createSurName', (type) => type === 'orc' ? 'Name' : '');
 
-        expect(generator.createName('orc', 'male')).to.equal('New Orc Name');
+        assert.strictEqual(generator.createName('orc', 'male'), 'New Orc Name');
     });
 
-    it('it should return names for generateList', function () {
+    it('it should return names for generateList', (t) => {
         const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
             ]
         });
-        const selectName = stub(generator, 'selectName');
-        selectName.withArgs('orc', 'male').returns('oof');
-        selectName.withArgs('orc', 'female').returns('boof');
+        t.mock.method(generator, 'selectName', (type, gender) => {
+            if (type === 'orc' && gender === 'male') return 'oof';
+            if (type === 'orc' && gender === 'female') return 'boof';
+        });
 
-        expect(generator.generateList(2, 'orc')).to.deep.equal({
+        assert.deepStrictEqual(generator.generateList(2, 'orc'), {
             male: ['oof'],
             female: ['boof']
         });
     });
 
-    it('it should create names for generateList', function () {
+    it('it should create names for generateList', (t) => {
         const generator = new RandomNameGenerator({
             namedata: [
                 orcType,
                 dwarfType
             ]
         });
-        const createName = stub(generator, 'createName');
-        createName.withArgs('orc', 'male').returns('oof');
-        createName.withArgs('orc', 'female').returns('boof');
+        t.mock.method(generator, 'createName', (type, gender) => {
+            if (type === 'orc' && gender === 'male') return 'oof';
+            if (type === 'orc' && gender === 'female') return 'boof';
+        });
 
-        expect(generator.generateList(2, 'orc', true)).to.deep.equal({
+        assert.deepStrictEqual(generator.generateList(2, 'orc', true), {
             male: ['oof'],
             female: ['boof']
         });
@@ -246,7 +237,7 @@ describe('RandomNameGenerator', function () {
             ]
         });
 
-        expect(generator.nameTokenCallback(['name', 'orc', 'male', 'first'])).to.be.oneOf(['Oog', 'Boog']);
-        expect(generator.nameTokenCallback(['name', 'dwarf', 'female'])).to.equal('');
+        assert.ok(['Oog', 'Boog'].includes(generator.nameTokenCallback(['name', 'orc', 'male', 'first'])));
+        assert.strictEqual(generator.nameTokenCallback(['name', 'dwarf', 'female']), '');
     });
 });

@@ -1,7 +1,7 @@
 'use strict';
 
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import RandomNameType from '../src/RandomNameType.js';
 
@@ -16,12 +16,12 @@ describe('RandomNameType', function () {
         });
 
         const obj = type.toJSON();
-        expect(obj.key).to.equal('western');
-        expect(obj.label).to.equal('Western Names');
-        expect(obj.male).to.deep.equal(['Seth', 'Al']);
-        expect(obj.female).to.deep.equal(['Alma', 'Jane']);
-        expect(obj.surname).to.deep.equal(['Dougherty', 'Cochran']);
-        expect(obj.className).to.equal('RandomNameType');
+        assert.strictEqual(obj.key, 'western');
+        assert.strictEqual(obj.label, 'Western Names');
+        assert.deepStrictEqual(obj.male, ['Seth', 'Al']);
+        assert.deepStrictEqual(obj.female, ['Alma', 'Jane']);
+        assert.deepStrictEqual(obj.surname, ['Dougherty', 'Cochran']);
+        assert.strictEqual(obj.className, 'RandomNameType');
     });
 
     it('should unserialize an object to the class', function () {
@@ -35,11 +35,11 @@ describe('RandomNameType', function () {
         };
 
         const type = new RandomNameType(obj);
-        expect(type.key).to.equal('western');
-        expect(type.label).to.equal('Western Names');
-        expect(type.male).to.deep.equal(['Seth', 'Al']);
-        expect(type.female).to.deep.equal(['Alma', 'Jane']);
-        expect(type.surname).to.deep.equal(['Dougherty', 'Cochran']);
+        assert.strictEqual(type.key, 'western');
+        assert.strictEqual(type.label, 'Western Names');
+        assert.deepStrictEqual(type.male, ['Seth', 'Al']);
+        assert.deepStrictEqual(type.female, ['Alma', 'Jane']);
+        assert.deepStrictEqual(type.surname, ['Dougherty', 'Cochran']);
     });
 
     it('should return all personal names list', function () {
@@ -51,7 +51,7 @@ describe('RandomNameType', function () {
             surname: ['Dougherty', 'Cochran']
         });
 
-        expect(type.getAllPersonalNames()).to.deep.equal([
+        assert.deepStrictEqual(type.getAllPersonalNames(), [
             'Seth', 'Al',
             'Alma', 'Jane'
         ]);
@@ -66,24 +66,29 @@ describe('RandomNameType', function () {
             surname: ['Dougherty', 'Cochran']
         });
 
-        expect(type.getPersonalNameList('mixed')).to.deep.equal([
+        assert.deepStrictEqual(type.getPersonalNameList('mixed'), [
             'Seth', 'Al',
             'Alma', 'Jane'
         ]);
 
-        expect(type.getPersonalNameList('female')).to.deep.equal([
+        assert.deepStrictEqual(type.getPersonalNameList('female'), [
             'Alma', 'Jane'
         ]);
 
-        expect(type.getPersonalNameList('male')).to.deep.equal([
+        assert.deepStrictEqual(type.getPersonalNameList('male'), [
             'Seth', 'Al'
         ]);
-        expect([type.male, type.female]).to.deep.include(
-            type.getPersonalNameList('random')
+
+        const randomResult = type.getPersonalNameList('random');
+        assert.ok(
+            [type.male, type.female].some(option => {
+                try { assert.deepStrictEqual(randomResult, option); return true; }
+                catch { return false; }
+            })
         );
 
         type.male = [];
         type.female = [];
-        expect(type.getPersonalNameList('random')).to.deep.equal([]);
+        assert.deepStrictEqual(type.getPersonalNameList('random'), []);
     });
 });

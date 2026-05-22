@@ -1,7 +1,7 @@
 'use strict';
 
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import NPC from '../src/NPC.js';
 import RandomTableResultSet from '../src/RandomTableResultSet.js';
@@ -25,14 +25,14 @@ describe('NPC', function () {
         });
 
         const serialized = npc.toJSON();
-        expect(serialized.id).to.equal('123-abc-789');
-        expect(serialized.schema).to.equal('ose');
-        expect(serialized.className).to.equal('NPC');
-        expect(serialized.fields.one).to.equal('a string');
-        expect(serialized.fields.two.className).to.equal('RandomTableResultSet');
-        expect(serialized.fields.three.className).to.equal('RandomTableResult');
-        expect(serialized.fields.four.className).to.equal('TableErrorResult');
-        expect(serialized.fields.five.className).to.equal('DiceResult');
+        assert.strictEqual(serialized.id, '123-abc-789');
+        assert.strictEqual(serialized.schema, 'ose');
+        assert.strictEqual(serialized.className, 'NPC');
+        assert.strictEqual(serialized.fields.one, 'a string');
+        assert.strictEqual(serialized.fields.two.className, 'RandomTableResultSet');
+        assert.strictEqual(serialized.fields.three.className, 'RandomTableResult');
+        assert.strictEqual(serialized.fields.four.className, 'TableErrorResult');
+        assert.strictEqual(serialized.fields.five.className, 'DiceResult');
     });
 
     it('should unserialize an object to class', function () {
@@ -62,16 +62,16 @@ describe('NPC', function () {
         };
 
         const npc = new NPC(obj);
-        expect(npc.id).to.equal('123-abc-789');
-        expect(npc.schema).to.equal('ose');
-        expect(npc.getFieldValue('one')).to.equal('a string');
-        expect(npc.getFieldValue('two')).to.be.instanceOf(RandomTableResultSet);
-        expect(npc.getFieldValue('three')).to.be.instanceOf(RandomTableResult);
-        expect(npc.getFieldValue('four')).to.be.instanceOf(TableErrorResult);
-        expect(npc.getFieldValue('five')).to.be.instanceOf(DiceResult);
-        expect(npc.getFieldValue('six')).to.be.equal(null);
-        expect(npc.getFieldValue('seven')).to.deep.property('foo', 'bar');
-        expect(npc.getFieldKeys()).to.deep.equal([
+        assert.strictEqual(npc.id, '123-abc-789');
+        assert.strictEqual(npc.schema, 'ose');
+        assert.strictEqual(npc.getFieldValue('one'), 'a string');
+        assert.ok(npc.getFieldValue('two') instanceof RandomTableResultSet);
+        assert.ok(npc.getFieldValue('three') instanceof RandomTableResult);
+        assert.ok(npc.getFieldValue('four') instanceof TableErrorResult);
+        assert.ok(npc.getFieldValue('five') instanceof DiceResult);
+        assert.strictEqual(npc.getFieldValue('six'), null);
+        assert.strictEqual(npc.getFieldValue('seven').foo, 'bar');
+        assert.deepStrictEqual(npc.getFieldKeys(), [
             'one',
             'two',
             'three',

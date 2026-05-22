@@ -1,7 +1,7 @@
 'use strict';
 
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import NPCSchemaField from '../src/NPCSchemaField.js';
 
@@ -17,12 +17,12 @@ describe('NPCSchemaField', function () {
         });
 
         const serialized = field.toJSON();
-        expect(serialized.key).to.equal('haircolor');
-        expect(serialized.label).to.equal('Hair Color');
-        expect(serialized.type).to.equal('string');
-        expect(serialized.count).to.equal(1);
-        expect(serialized.starting_value).to.equal('black');
-        expect(serialized.className).to.equal('NPCSchemaField');
+        assert.strictEqual(serialized.key, 'haircolor');
+        assert.strictEqual(serialized.label, 'Hair Color');
+        assert.strictEqual(serialized.type, 'string');
+        assert.strictEqual(serialized.count, 1);
+        assert.strictEqual(serialized.starting_value, 'black');
+        assert.strictEqual(serialized.className, 'NPCSchemaField');
     });
 
     it('should unserialize an object to class with field objects', function () {
@@ -37,85 +37,85 @@ describe('NPCSchemaField', function () {
         };
 
         const field = new NPCSchemaField(obj);
-        expect(field.key).to.equal('haircolor');
-        expect(field.label).to.equal('Hair Color');
-        expect(field.type).to.equal('string');
-        expect(field.count).to.equal(1);
-        expect(field.starting_value).to.equal('black');
+        assert.strictEqual(field.key, 'haircolor');
+        assert.strictEqual(field.label, 'Hair Color');
+        assert.strictEqual(field.type, 'string');
+        assert.strictEqual(field.count, 1);
+        assert.strictEqual(field.starting_value, 'black');
     });
 
     it('should handle default constructor settings', function () {
         let field = new NPCSchemaField({ count: -2 });
-        expect(field.count).to.equal(1);
+        assert.strictEqual(field.count, 1);
         field = new NPCSchemaField({ count: null });
-        expect(field.count).to.equal(1);
+        assert.strictEqual(field.count, 1);
     });
 
     it('should return defaultEmpty for each type', function () {
         const field = new NPCSchemaField({
             type: 'string'
         });
-        expect(field.defaultEmpty).to.equal('');
+        assert.strictEqual(field.defaultEmpty, '');
 
         field.type = 'text';
-        expect(field.defaultEmpty).to.equal('');
+        assert.strictEqual(field.defaultEmpty, '');
 
         field.type = 'array';
-        expect(field.defaultEmpty).to.deep.equal([]);
+        assert.deepStrictEqual(field.defaultEmpty, []);
 
         field.type = 'number';
-        expect(field.defaultEmpty).to.equal(0);
+        assert.strictEqual(field.defaultEmpty, 0);
 
         field.type = 'modifier';
-        expect(field.defaultEmpty).to.equal(0);
+        assert.strictEqual(field.defaultEmpty, 0);
 
         field.type = 'note';
-        expect(field.defaultEmpty).to.equal(null);
+        assert.strictEqual(field.defaultEmpty, null);
 
         field.type = 'resultset';
-        expect(field.defaultEmpty).to.equal(null);
+        assert.strictEqual(field.defaultEmpty, null);
 
         field.type = 'something else';
-        expect(field.defaultEmpty).to.equal(null);
+        assert.strictEqual(field.defaultEmpty, null);
 
         field.count = 2;
-        expect(field.defaultEmpty).to.deep.equal([]);
+        assert.deepStrictEqual(field.defaultEmpty, []);
     });
 
     it('should return true for specific type checks', function () {
         const field = new NPCSchemaField({
             type: 'string'
         });
-        expect(field.isString()).to.be.true;
+        assert.strictEqual(field.isString(), true);
 
         field.type = 'text';
-        expect(field.isText()).to.be.true;
+        assert.strictEqual(field.isText(), true);
 
         field.type = 'array';
-        expect(field.isArray()).to.be.true;
+        assert.strictEqual(field.isArray(), true);
 
         field.type = 'number';
-        expect(field.isNumber()).to.be.true;
+        assert.strictEqual(field.isNumber(), true);
 
         field.type = 'modifier';
-        expect(field.isModifier()).to.be.true;
+        assert.strictEqual(field.isModifier(), true);
 
         field.type = 'note';
-        expect(field.isNote()).to.be.true;
+        assert.strictEqual(field.isNote(), true);
 
         field.type = 'resultset';
-        expect(field.isResult()).to.be.true;
+        assert.strictEqual(field.isResult(), true);
 
         field.type = 'something else';
-        expect(field.isString()).to.be.false;
-        expect(field.isText()).to.be.false;
-        expect(field.isNumber()).to.be.false;
-        expect(field.isModifier()).to.be.false;
-        expect(field.isNote()).to.be.false;
-        expect(field.isResult()).to.be.false;
-        expect(field.isArray()).to.be.false;
+        assert.strictEqual(field.isString(), false);
+        assert.strictEqual(field.isText(), false);
+        assert.strictEqual(field.isNumber(), false);
+        assert.strictEqual(field.isModifier(), false);
+        assert.strictEqual(field.isNote(), false);
+        assert.strictEqual(field.isResult(), false);
+        assert.strictEqual(field.isArray(), false);
 
         field.count = 2;
-        expect(field.isArray()).to.be.true;
+        assert.strictEqual(field.isArray(), true);
     });
 });
