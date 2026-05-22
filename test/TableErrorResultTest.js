@@ -1,7 +1,7 @@
 'use strict';
 
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import TableErrorResult from '../src/TableErrorResult.js';
 
@@ -14,11 +14,11 @@ describe('TableErrorResult', function () {
             desc: ''
         });
 
-        expect(resultObj.key).to.equal('tkey');
-        expect(resultObj.table).to.equal('error');
-        expect(resultObj.result).to.equal('');
-        expect(resultObj.desc).to.equal('');
-        expect(resultObj.isError).to.equal(true);
+        assert.strictEqual(resultObj.key, 'tkey');
+        assert.strictEqual(resultObj.table, 'error');
+        assert.strictEqual(resultObj.result, '');
+        assert.strictEqual(resultObj.desc, '');
+        assert.strictEqual(resultObj.isError, true);
     });
 
     it('should serialize a class to an object', function () {
@@ -28,10 +28,10 @@ describe('TableErrorResult', function () {
         });
 
         const serialized = resultObj.toJSON();
-        expect(serialized.key).to.equal('tkey');
-        expect(serialized.table).to.equal('error');
-        expect(serialized.result).to.equal('');
-        expect(serialized.desc).to.equal('');
-        expect(serialized.className).to.equal('TableErrorResult');
+        assert.strictEqual(serialized.key, 'tkey');
+        assert.strictEqual(serialized.table, 'error');
+        assert.strictEqual(serialized.result, '');
+        assert.strictEqual(serialized.desc, '');
+        assert.strictEqual(serialized.className, 'TableErrorResult');
     });
 });

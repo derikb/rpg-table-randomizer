@@ -1,7 +1,7 @@
 'use strict';
 
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import RandomTableEntry from '../src/RandomTableEntry.js';
 
@@ -19,15 +19,15 @@ describe('RandomTableEntry', function () {
         });
 
         const serialized = entry.toJSON();
-        expect(serialized.label).to.equal('Orc');
-        expect(serialized.print).to.equal(false);
-        expect(serialized.description).to.equal('Selling swords');
-        expect(serialized.subtable).to.deep.equal([
+        assert.strictEqual(serialized.label, 'Orc');
+        assert.strictEqual(serialized.print, false);
+        assert.strictEqual(serialized.description, 'Selling swords');
+        assert.deepStrictEqual(serialized.subtable, [
             'occupation',
             'disposition'
         ]);
-        expect(serialized.weight).to.equal(2);
-        expect(serialized.className).to.equal('RandomTableEntry');
+        assert.strictEqual(serialized.weight, 2);
+        assert.strictEqual(serialized.className, 'RandomTableEntry');
     });
 
     it('should unserialize an object to class with field objects', function () {
@@ -44,13 +44,13 @@ describe('RandomTableEntry', function () {
         };
 
         const entry = new RandomTableEntry(obj);
-        expect(entry.label).to.equal('Orc');
-        expect(entry.print).to.equal(false);
-        expect(entry.description).to.equal('Selling swords');
-        expect(entry.subtable).to.deep.equal([
+        assert.strictEqual(entry.label, 'Orc');
+        assert.strictEqual(entry.print, false);
+        assert.strictEqual(entry.description, 'Selling swords');
+        assert.deepStrictEqual(entry.subtable, [
             'occupation',
             'disposition'
         ]);
-        expect(entry.weight).to.equal(2);
+        assert.strictEqual(entry.weight, 2);
     });
 });

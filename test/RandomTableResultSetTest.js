@@ -1,7 +1,7 @@
 'use strict';
 
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import DisplayOptions from '../src/DisplayOptions.js';
 import RandomTableResult from '../src/RandomTableResult.js';
@@ -48,13 +48,13 @@ describe('RandomTableResultSet', function () {
             displayOptions: displayOptionsObj
         });
 
-        expect(resultSet.key).to.equal('tkey');
-        expect(resultSet.title).to.equal('colors');
-        expect(resultSet.results[0]).to.be.instanceOf(RandomTableResult);
-        expect(resultSet.results[1]).to.be.instanceOf(TableErrorResult);
-        expect(resultSet.results[2]).to.be.instanceOf(RandomTableResult);
-        expect(resultSet.displayOptions.get('default')).to.be.instanceOf(DisplayOptions);
-        expect(resultSet.displayOptions.get('hue')).to.be.instanceOf(DisplayOptions);
+        assert.strictEqual(resultSet.key, 'tkey');
+        assert.strictEqual(resultSet.title, 'colors');
+        assert.ok(resultSet.results[0] instanceof RandomTableResult);
+        assert.ok(resultSet.results[1] instanceof TableErrorResult);
+        assert.ok(resultSet.results[2] instanceof RandomTableResult);
+        assert.ok(resultSet.displayOptions.get('default') instanceof DisplayOptions);
+        assert.ok(resultSet.displayOptions.get('hue') instanceof DisplayOptions);
     });
 
     it('should return results for specific tables', function () {
@@ -84,14 +84,14 @@ describe('RandomTableResultSet', function () {
         });
 
         const actual = resultSet.findResultByTable('intensity');
-        expect(actual).to.equal(result2);
+        assert.strictEqual(actual, result2);
 
-        expect(resultSet.findResultByTable('foo')).to.equal(null);
+        assert.strictEqual(resultSet.findResultByTable('foo'), null);
     });
 
     it('should output empty string for no results', function () {
         const resultSet = new RandomTableResultSet({});
-        expect(resultSet.niceString()).to.equal('');
+        assert.strictEqual(resultSet.niceString(), '');
     });
 
     it('should output a string from the set with no display options', function () {
@@ -120,7 +120,7 @@ describe('RandomTableResultSet', function () {
             displayOptions: displayOptionsMap
         });
 
-        expect(resultSet.toString()).to.equal('Blue\nIntensity: Dark\nPowerful stuff\nError: Ran out of room');
+        assert.strictEqual(resultSet.toString(), 'Blue\nIntensity: Dark\nPowerful stuff\nError: Ran out of room');
     });
 
     it('should output a string from the set with display options hide_table', function () {
@@ -159,7 +159,7 @@ describe('RandomTableResultSet', function () {
             displayOptions: displayOptionsMap
         });
 
-        expect(resultSet.toString()).to.equal('Blue\nIntensity: Dark\n(Powerful stuff)');
+        assert.strictEqual(resultSet.toString(), 'Blue\nIntensity: Dark\n(Powerful stuff)');
     });
 
     it('should output a string from the set with display options hide_result', function () {
@@ -198,7 +198,7 @@ describe('RandomTableResultSet', function () {
             displayOptions: displayOptionsMap
         });
 
-        expect(resultSet.toString()).to.equal('Default: Blue\nIntensity:');
+        assert.strictEqual(resultSet.toString(), 'Default: Blue\nIntensity:');
     });
 
     it('should output a string from the set with display options hide_desc', function () {
@@ -237,7 +237,7 @@ describe('RandomTableResultSet', function () {
             displayOptions: displayOptionsMap
         });
 
-        expect(resultSet.toString()).to.equal('Default: Blue\n(the color)\nIntensity: Dark');
+        assert.strictEqual(resultSet.toString(), 'Default: Blue\n(the color)\nIntensity: Dark');
     });
 
     it('should output a string from the set with the simple option', function () {
@@ -276,6 +276,6 @@ describe('RandomTableResultSet', function () {
             displayOptions: displayOptionsMap
         });
 
-        expect(resultSet.niceString(true)).to.equal('blue dark');
+        assert.strictEqual(resultSet.niceString(true), 'blue dark');
     });
 });

@@ -1,7 +1,7 @@
 'use strict';
 
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import DisplayOptions from '../src/DisplayOptions.js';
 
@@ -14,11 +14,11 @@ describe('DisplayOptions', function () {
             hide_desc: '1'
         });
 
-        expect(opts.hide_table).to.be.true;
-        expect(opts.hide_result).to.be.true;
-        expect(opts.hide_desc).to.be.true;
+        assert.strictEqual(opts.hide_table, true);
+        assert.strictEqual(opts.hide_result, true);
+        assert.strictEqual(opts.hide_desc, true);
 
-        expect(opts.toJSON()).to.deep.equal({
+        assert.deepStrictEqual(opts.toJSON(), {
             table: 'colors',
             hide_table: true,
             hide_result: true,
@@ -35,11 +35,11 @@ describe('DisplayOptions', function () {
             hide_desc: 'no'
         });
 
-        expect(opts.hide_table).to.be.false;
-        expect(opts.hide_result).to.be.false;
-        expect(opts.hide_desc).to.be.false;
+        assert.strictEqual(opts.hide_table, false);
+        assert.strictEqual(opts.hide_result, false);
+        assert.strictEqual(opts.hide_desc, false);
 
-        expect(opts.toJSON()).to.deep.equal({
+        assert.deepStrictEqual(opts.toJSON(), {
             table: 'colors',
             className: 'DisplayOptions'
         });

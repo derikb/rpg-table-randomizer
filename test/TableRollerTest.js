@@ -1,8 +1,7 @@
 'use strict';
 
-import { describe, it } from 'mocha';
-import { assert, expect } from 'chai';
-import { stub } from 'sinon';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import DisplayOptions from '../src/DisplayOptions.js';
 import RandomTable from '../src/RandomTable.js';
@@ -75,55 +74,44 @@ describe('TableRoller', function () {
     describe('getTableByKey', function () {
         it('should return error for no table lookup', function () {
             const roller_error = new TableRoller({});
-            expect(() => { roller_error.getTableByKey(); }).to.throw(TableError, 'No table key');
-            expect(() => { roller_error.getTableByKey('colors'); }).to.throw(TableError, 'No table found');
+            assert.throws(() => { roller_error.getTableByKey(); }, { name: 'TableError', message: /No table key/ });
+            assert.throws(() => { roller_error.getTableByKey('colors'); }, { name: 'TableError', message: /No table found/ });
         });
     });
 
     describe('_selectFromTable', function () {
         it('should return error on invalid subtable', function () {
             const errorResult = roller._selectFromTable(colorTable, 'shades')[0];
-            expect(errorResult).to.be.instanceOf(TableErrorResult);
-            expect(errorResult.key).to.equal(colorTable.key);
-            expect(errorResult).to.deep.include({
-                table: 'shades',
-                result: 'Invalid subtable name.'
-            });
+            assert.ok(errorResult instanceof TableErrorResult);
+            assert.strictEqual(errorResult.key, colorTable.key);
+            assert.strictEqual(errorResult.table, 'shades');
+            assert.strictEqual(errorResult.result, 'Invalid subtable name.');
         });
 
         it('should return result for no subtables', function () {
-            expect(roller._selectFromTable(colorTable, 'primary')[0]).to.deep.include({
-                table: 'primary',
-                result: 'blue'
-            });
+            const result = roller._selectFromTable(colorTable, 'primary')[0];
+            assert.strictEqual(result.table, 'primary');
+            assert.strictEqual(result.result, 'blue');
         });
 
         it('should return result for subtables', function () {
             const results = roller._selectFromTable(complicatedTable, 'sequence');
-            expect(results.length).to.equal(2);
-            expect(results[0]).to.deep.include({
-                table: 'foo',
-                result: 'bar'
-            });
-            expect(results[1]).to.deep.include({
-                table: 'mark',
-                result: 'down'
-            });
+            assert.strictEqual(results.length, 2);
+            assert.strictEqual(results[0].table, 'foo');
+            assert.strictEqual(results[0].result, 'bar');
+            assert.strictEqual(results[1].table, 'mark');
+            assert.strictEqual(results[1].result, 'down');
         });
     });
 
     describe('_getTableMacroResult', function () {
         it('should return result for macro list', function () {
             const results = roller._getTableMacroResult(complicatedTable);
-            expect(results.length).to.equal(2);
-            expect(results[0]).to.deep.include({
-                table: 'secondary',
-                result: 'green'
-            });
-            expect(results[1]).to.deep.include({
-                table: 'nonexistent',
-                result: 'No table found for key: nonexistent'
-            });
+            assert.strictEqual(results.length, 2);
+            assert.strictEqual(results[0].table, 'secondary');
+            assert.strictEqual(results[0].result, 'green');
+            assert.strictEqual(results[1].table, 'nonexistent');
+            assert.strictEqual(results[1].result, 'No table found for key: nonexistent');
         });
 
         it('should throw error for self reference', function () {
@@ -131,19 +119,19 @@ describe('TableRoller', function () {
                 key: 'self',
                 macro: ['colors', 'self']
             });
-            expect(() => { roller._getTableMacroResult(selfTable); }).to.throw(TableError, 'self reference');
+            assert.throws(() => { roller._getTableMacroResult(selfTable); }, { name: 'TableError', message: /self reference/ });
         });
     });
 
     describe('findToken', function () {
         it('should find dice tokens and convert them', function () {
-            expect(roller.findToken('{{roll:1d1}}')).to.equal('1');
+            assert.strictEqual(roller.findToken('{{roll:1d1}}'), '1');
 
-            expect(roller.findToken('from {{roll:1d1}} to {{roll:1d2/2}}')).to.equal('from 1 to 1');
+            assert.strictEqual(roller.findToken('from {{roll:1d1}} to {{roll:1d2/2}}'), 'from 1 to 1');
         });
 
         it('should return the token for unknown tokens', function () {
-            expect(roller.findToken('{{foo:bar}}')).to.equal('{{foo:bar}}');
+            assert.strictEqual(roller.findToken('{{foo:bar}}'), '{{foo:bar}}');
         });
     });
 
@@ -151,138 +139,132 @@ describe('TableRoller', function () {
         it('should convert tokens', function () {
             // table handler
             const actual = roller.convertToken('{{table:colors:primary}}');
-            expect(actual).to.be.instanceOf(RandomTableResultSet);
-            expect(actual.key).to.equal(colorTable.key);
-            expect(actual.results[0]).to.have.property('result', 'blue');
+            assert.ok(actual instanceof RandomTableResultSet);
+            assert.strictEqual(actual.key, colorTable.key);
+            assert.strictEqual(actual.results[0].result, 'blue');
             // custom token handler
-            expect(roller.convertToken('{{food:appetizer}}')).to.equal('food token');
+            assert.strictEqual(roller.convertToken('{{food:appetizer}}'), 'food token');
         });
 
         it('should handle oneof token', function () {
             const actual = roller.convertToken('{{oneof:dwarf|elf}}');
-            expect(actual).to.be.oneOf(['dwarf', 'elf']);
+            assert.ok(['dwarf', 'elf'].includes(actual));
         });
 
         it('should return token for empty token', function () {
             // empty token
             const token1 = '{{ }}';
-            expect(roller.convertToken(token1)).to.equal(token1);
+            assert.strictEqual(roller.convertToken(token1), token1);
         });
 
         it('should return token for unknown token type', function () {
             // unknown token type
             const token2 = '{{foo:bar:gamma}}';
-            expect(roller.convertToken(token2)).to.equal(token2);
+            assert.strictEqual(roller.convertToken(token2), token2);
         });
 
         it('should return Error ResultSet for thrown range error', function () {
             // Catch RangeError
             const errorResult = roller.convertToken('{{range_error:foo:bar}}');
-            expect(errorResult.results[0]).to.be.instanceOf(TableErrorResult);
-            expect(errorResult.results[0]).to.deep.include({
-                result: 'out of memory'
-            });
+            assert.ok(errorResult.results[0] instanceof TableErrorResult);
+            assert.strictEqual(errorResult.results[0].result, 'out of memory');
         });
     });
 
     describe('getResultSetForTable', function () {
         it('should return error set on invalid table', function () {
             const errorResult = roller.getResultSetForTable('table_string');
-            expect(errorResult.results[0]).to.be.instanceOf(TableErrorResult);
-            expect(errorResult.results[0]).to.deep.include({
-                result: 'Invalid table data.'
-            });
+            assert.ok(errorResult.results[0] instanceof TableErrorResult);
+            assert.strictEqual(errorResult.results[0].result, 'Invalid table data.');
         });
 
         it('should return result set on valid table', function () {
             const resultSet = roller.getResultSetForTable(colorTable);
-            expect(resultSet.title).to.equal('Color Wheel');
-            expect(resultSet.displayOptions.get('secondary')).to.be.an.instanceOf(DisplayOptions);
-            expect(resultSet.results[0]).to.deep.include({
-                table: 'primary',
-                result: 'blue'
-            });
+            assert.strictEqual(resultSet.title, 'Color Wheel');
+            assert.ok(resultSet.displayOptions.get('secondary') instanceof DisplayOptions);
+            assert.strictEqual(resultSet.results[0].table, 'primary');
+            assert.strictEqual(resultSet.results[0].result, 'blue');
         });
     });
 
     describe('getTableResultSetByKey', function () {
         it('should return error result on bad table', function () {
             const errorResult = roller.getTableResultSetByKey('table_string');
-            expect(errorResult.results[0]).to.be.instanceOf(TableErrorResult);
+            assert.ok(errorResult.results[0] instanceof TableErrorResult);
         });
 
         it('should return result set', function () {
             const resultSet = roller.getTableResultSetByKey('colors', 'primary');
-            expect(resultSet.title).to.equal('Color Wheel');
-            expect(resultSet.displayOptions.get('secondary')).to.be.an.instanceOf(DisplayOptions);
-            expect(resultSet.results[0]).to.deep.include({
-                table: 'primary',
-                result: 'blue'
-            });
+            assert.strictEqual(resultSet.title, 'Color Wheel');
+            assert.ok(resultSet.displayOptions.get('secondary') instanceof DisplayOptions);
+            assert.strictEqual(resultSet.results[0].table, 'primary');
+            assert.strictEqual(resultSet.results[0].result, 'blue');
         });
     });
 
     describe('getTableResult', function () {
-        it('should handle macros in tables', function () {
-            const macroStub = stub(roller, '_getTableMacroResult');
+        it('should handle macros in tables', (t) => {
             const resultSet = new RandomTableResult({ key: complicatedTable.key, table: 'macro' });
-            macroStub.returns([resultSet]);
+            t.mock.method(roller, '_getTableMacroResult', () => [resultSet]);
 
-            expect(roller.getTableResult(complicatedTable)).to.deep.equal([resultSet]);
-
-            macroStub.restore();
+            assert.deepStrictEqual(roller.getTableResult(complicatedTable), [resultSet]);
         });
 
-        it('should handle no starting table', function () {
-            const selectStub = stub(roller, '_selectFromTable');
+        it('should handle no starting table', (t) => {
             const resultSet = new RandomTableResultSet({ key: colorTable.key, title: 'colors' });
-            selectStub.withArgs(colorTable, 'primary').returns(resultSet);
+            t.mock.method(roller, '_selectFromTable', (table, subtable) => {
+                if (table === colorTable && subtable === 'primary') return resultSet;
+            });
 
-            expect(roller.getTableResult(colorTable)[0]).to.equal(resultSet);
-
-            selectStub.restore();
+            assert.strictEqual(roller.getTableResult(colorTable)[0], resultSet);
         });
 
-        it('should handle with starting table', function () {
-            const selectStub = stub(roller, '_selectFromTable');
+        it('should handle with starting table', (t) => {
             const resultSet = new RandomTableResultSet({ key: colorTable.key, title: 'colors' });
-            selectStub.withArgs(colorTable, 'secondary').returns(resultSet);
+            t.mock.method(roller, '_selectFromTable', (table, subtable) => {
+                if (table === colorTable && subtable === 'secondary') return resultSet;
+            });
 
-            expect(roller.getTableResult(colorTable, 'secondary')[0]).to.equal(resultSet);
-
-            selectStub.restore();
+            assert.strictEqual(roller.getTableResult(colorTable, 'secondary')[0], resultSet);
         });
 
-        it('should handle with multitable sequence', function () {
-            const selectStub = stub(roller, '_selectFromTable');
+        it('should handle with multitable sequence', (t) => {
             const resultSet = new RandomTableResultSet({ key: colorTable.key, title: 'colors' });
             const resultSet2 = new RandomTableResultSet({ key: colorTable.key, title: 'colors primary' });
-            selectStub.withArgs(colorTable, 'secondary').returns(resultSet);
-            selectStub.withArgs(colorTable, 'primary').returns(resultSet2);
+            t.mock.method(roller, '_selectFromTable', (table, subtable) => {
+                if (table === colorTable && subtable === 'secondary') return resultSet;
+                if (table === colorTable && subtable === 'primary') return resultSet2;
+            });
 
             colorTable.sequence = ['secondary', 'primary'];
 
-            expect(roller.getTableResult(colorTable)).to.deep.equal([resultSet, resultSet2]);
+            assert.deepStrictEqual(roller.getTableResult(colorTable), [resultSet, resultSet2]);
 
             colorTable.sequence = [];
-            selectStub.restore();
         });
     });
 
     describe('_defaultOneOfToken', function () {
         it('should return token for no arguments', function () {
-            expect(roller._defaultOneOfToken(['oneof'], '{{oneof:}}'))
-                .to.equal('{{oneof:}}');
+            assert.strictEqual(
+                roller._defaultOneOfToken(['oneof'], '{{oneof:}}'),
+                '{{oneof:}}'
+            );
         });
 
         it('should return option if only one', function () {
-            expect(roller._defaultOneOfToken(['oneof', 'bread'], '{{oneof:bread}}'))
-                .to.equal('bread');
+            assert.strictEqual(
+                roller._defaultOneOfToken(['oneof', 'bread'], '{{oneof:bread}}'),
+                'bread'
+            );
         });
 
         it('should return one of the options', function () {
-            expect(roller._defaultOneOfToken(['oneof', 'bread|water'], '{{oneof:bread}}'))
-                .to.be.oneOf(['bread', 'water']);
+            assert.ok(
+                ['bread', 'water'].includes(
+                    roller._defaultOneOfToken(['oneof', 'bread|water'], '{{oneof:bread}}')
+                )
+            );
         });
     });
 });

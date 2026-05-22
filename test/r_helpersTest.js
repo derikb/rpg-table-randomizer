@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-expressions */
 'use strict';
 
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import { defaultToJSON, isEmpty, isObject, capitalize } from '../src/r_helpers.js';
 
@@ -21,7 +20,8 @@ describe('defaultToJSON', function () {
         testClass.two = null;
         testClass.three = function () {};
 
-        expect(JSON.stringify(testClass)).to.equal(
+        assert.strictEqual(
+            JSON.stringify(testClass),
             '{"zero":"foo"}'
         );
     });
@@ -32,7 +32,8 @@ describe('defaultToJSON', function () {
         testClass.one = 123; // number
         testClass.two = [1, 'two'];
 
-        expect(JSON.stringify(testClass)).to.equal(
+        assert.strictEqual(
+            JSON.stringify(testClass),
             '{"zero":"foo","one":123,"two":[1,"two"]}'
         );
     });
@@ -48,7 +49,8 @@ describe('defaultToJSON', function () {
             testClass2
         ];
 
-        expect(JSON.stringify(testClass)).to.equal(
+        assert.strictEqual(
+            JSON.stringify(testClass),
             '{"zero":"foo","one":["two",{"foo":["bar"]}]}'
         );
     });
@@ -61,7 +63,8 @@ describe('defaultToJSON', function () {
         testMap.set('two', ['array']);
         testClass.one = testMap;
 
-        expect(JSON.stringify(testClass)).to.equal(
+        assert.strictEqual(
+            JSON.stringify(testClass),
             '{"zero":"foo","one":{"one":1,"two":["array"]}}'
         );
     });
@@ -74,7 +77,8 @@ describe('defaultToJSON', function () {
         testSet.add(['array']);
         testClass.one = testSet;
 
-        expect(JSON.stringify(testClass)).to.equal(
+        assert.strictEqual(
+            JSON.stringify(testClass),
             '{"zero":"foo","one":[1,["array"]]}'
         );
     });
@@ -88,7 +92,8 @@ describe('defaultToJSON', function () {
         };
         testClass.one = testObj;
 
-        expect(JSON.stringify(testClass)).to.equal(
+        assert.strictEqual(
+            JSON.stringify(testClass),
             '{"zero":"foo","one":{"one":1,"two":["array"]}}'
         );
     });
@@ -96,53 +101,53 @@ describe('defaultToJSON', function () {
 
 describe('isEmpty', function () {
     it('should return true', function () {
-        expect(isEmpty()).to.be.true;
-        expect(isEmpty(null)).to.be.true;
-        expect(isEmpty('')).to.be.true;
-        expect(isEmpty([])).to.be.true;
-        expect(isEmpty({})).to.be.true;
-        expect(isEmpty(new Set())).to.be.true;
-        expect(isEmpty(new Map())).to.be.true;
+        assert.strictEqual(isEmpty(), true);
+        assert.strictEqual(isEmpty(null), true);
+        assert.strictEqual(isEmpty(''), true);
+        assert.strictEqual(isEmpty([]), true);
+        assert.strictEqual(isEmpty({}), true);
+        assert.strictEqual(isEmpty(new Set()), true);
+        assert.strictEqual(isEmpty(new Map()), true);
     });
 
     it('should return false', function () {
-        expect(isEmpty('a')).to.be.false;
-        expect(isEmpty(['a'])).to.be.false;
-        expect(isEmpty({ a: 'a' })).to.be.false;
+        assert.strictEqual(isEmpty('a'), false);
+        assert.strictEqual(isEmpty(['a']), false);
+        assert.strictEqual(isEmpty({ a: 'a' }), false);
         const set = new Set();
         set.add('a');
-        expect(isEmpty(set)).to.be.false;
+        assert.strictEqual(isEmpty(set), false);
         const map = new Map();
         map.set('a', 'b');
-        expect(isEmpty(map)).to.be.false;
+        assert.strictEqual(isEmpty(map), false);
     });
 });
 
 describe('isObject', function () {
     it('should return true', function () {
-        expect(isObject({})).to.be.true;
-        expect(isObject(new TestClass())).to.be.true;
+        assert.strictEqual(isObject({}), true);
+        assert.strictEqual(isObject(new TestClass()), true);
     });
 
     it('should return false', function () {
-        expect(isObject()).to.be.false;
-        expect(isObject(null)).to.be.false;
-        expect(isObject(1)).to.be.false;
-        expect(isObject('a')).to.be.false;
-        expect(isObject(['a'])).to.be.false;
+        assert.strictEqual(isObject(), false);
+        assert.strictEqual(isObject(null), false);
+        assert.strictEqual(isObject(1), false);
+        assert.strictEqual(isObject('a'), false);
+        assert.strictEqual(isObject(['a']), false);
         const set = new Set();
         set.add('a');
-        expect(isObject(set)).to.be.false;
+        assert.strictEqual(isObject(set), false);
         const map = new Map();
         map.set('a', 'b');
-        expect(isObject(map)).to.be.false;
+        assert.strictEqual(isObject(map), false);
     });
 });
 
 describe('capitalize', function () {
     it('should capitalize a string', function () {
-        expect(capitalize('hello dear.')).to.equal('Hello dear.');
-        expect(capitalize('Hello dear.')).to.equal('Hello dear.');
-        expect(capitalize('')).to.equal('');
+        assert.strictEqual(capitalize('hello dear.'), 'Hello dear.');
+        assert.strictEqual(capitalize('Hello dear.'), 'Hello dear.');
+        assert.strictEqual(capitalize(''), '');
     });
 });

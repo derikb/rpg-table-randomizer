@@ -1,9 +1,7 @@
-/* eslint-disable no-unused-expressions */
 'use strict';
 
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
-import { stub } from 'sinon';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import NPC from '../src/NPC.js';
 import NPCSchema from '../src/NPCSchema.js';
@@ -26,8 +24,8 @@ describe('npc_generator', function () {
             });
             registerSchema(schema);
 
-            expect(getSchemaByKey('western')).to.equal(schema);
-            expect(getAllSchemas()).to.deep.equal({
+            assert.strictEqual(getSchemaByKey('western'), schema);
+            assert.deepStrictEqual(getAllSchemas(), {
                 western: schema
             });
         });
@@ -36,17 +34,17 @@ describe('npc_generator', function () {
             const schema = new NPCSchema({
                 key: ''
             });
-            expect(() => { registerSchema(schema); }).to.throw(Error, 'Invalid schema');
+            assert.throws(() => { registerSchema(schema); }, { message: /Invalid schema/ });
 
             schema.key = 'base';
-            expect(() => { registerSchema(schema); }).to.throw(Error, 'Invalid schema');
+            assert.throws(() => { registerSchema(schema); }, { message: /Invalid schema/ });
 
-            expect(() => { registerSchema({}); }).to.throw(Error, 'Invalid schema');
+            assert.throws(() => { registerSchema({}); }, { message: /Invalid schema/ });
         });
     });
 
     describe('initializeNewNPC', function () {
-        it('should initialize a new npc and return it', function () {
+        it('should initialize a new npc and return it', (t) => {
             const schema = new NPCSchema({
                 key: 'western',
                 name: 'Western',
@@ -70,35 +68,36 @@ describe('npc_generator', function () {
             });
             registerSchema(schema);
             const tableRoller = new TableRoller({});
-            const convertToken = stub(tableRoller, 'convertToken');
-            convertToken.withArgs('goal:longterm').returns('love');
-            convertToken.withArgs('secret:one').returns('possessed');
+            const convertTokenMock = t.mock.method(tableRoller, 'convertToken', (token) => {
+                if (token === 'goal:longterm') return 'love';
+                if (token === 'secret:one') return 'possessed';
+            });
 
             const npc = initializeNewNPC('western', tableRoller, true);
-            expect(convertToken.callCount).to.equal(3);
-            expect(npc).to.be.instanceOf(NPC);
-            expect(npc.getFieldKeys()).to.deep.equal(['goal_long', 'goal_short', 'secrets']);
-            expect(npc.id).to.not.be.empty;
-            expect(npc.getFieldValue('goal_long')).to.equal('love');
-            expect(npc.getFieldValue('goal_short')).to.equal('money');
-            expect(npc.getFieldValue('secrets')).to.deep.equal(['possessed', 'possessed']);
+            assert.strictEqual(convertTokenMock.mock.callCount(), 3);
+            assert.ok(npc instanceof NPC);
+            assert.deepStrictEqual(npc.getFieldKeys(), ['goal_long', 'goal_short', 'secrets']);
+            assert.ok(npc.id.length > 0);
+            assert.strictEqual(npc.getFieldValue('goal_long'), 'love');
+            assert.strictEqual(npc.getFieldValue('goal_short'), 'money');
+            assert.deepStrictEqual(npc.getFieldValue('secrets'), ['possessed', 'possessed']);
         });
 
         it('should throw on unknown schema', function () {
             const tableRoller = new TableRoller({});
 
-            expect(() => { return initializeNewNPC('bad', tableRoller); }).to.throw('Schema not found.');
+            assert.throws(() => { return initializeNewNPC('bad', tableRoller); }, /Schema not found\./);
         });
 
         it('should throw on invalid TablRoller', function () {
             const tableRoller = {};
 
-            expect(() => { return initializeNewNPC('western', tableRoller); }).to.throw('Invalid tableRoller');
+            assert.throws(() => { return initializeNewNPC('western', tableRoller); }, /Invalid tableRoller/);
         });
     });
 
     describe('applySchemaToNPC', function () {
-        it('should apply schema to npc', function () {
+        it('should apply schema to npc', (t) => {
             const schema = new NPCSchema({
                 key: 'western',
                 name: 'Western',
@@ -132,23 +131,24 @@ describe('npc_generator', function () {
                 ]
             });
             const tableRoller = new TableRoller({});
-            const convertToken = stub(tableRoller, 'convertToken');
-            convertToken.withArgs('goal:longterm').returns('love');
-            convertToken.withArgs('secret:one').returns('possessed');
-            convertToken.withArgs('roll:3d6').returns('15');
+            const convertTokenMock = t.mock.method(tableRoller, 'convertToken', (token) => {
+                if (token === 'goal:longterm') return 'love';
+                if (token === 'secret:one') return 'possessed';
+                if (token === 'roll:3d6') return '15';
+            });
 
             const npc = new NPC({ id: '123-567' });
 
             applySchemaToNPC(schema, tableRoller, npc);
-            expect(convertToken.callCount).to.equal(4);
-            expect(npc.schema).to.equal('western');
-            expect(npc.getFieldKeys()).to.deep.equal(['goal_long', 'goal_short', 'secrets', 'strength', 'nothing']);
-            expect(npc.id).to.not.be.empty;
-            expect(npc.getFieldValue('goal_long')).to.equal('love');
-            expect(npc.getFieldValue('goal_short')).to.equal('money');
-            expect(npc.getFieldValue('secrets')).to.deep.equal(['possessed', 'possessed']);
-            expect(npc.getFieldValue('strength')).to.equal(15);
-            expect(npc.getFieldValue('nothing')).to.equal(null);
+            assert.strictEqual(convertTokenMock.mock.callCount(), 4);
+            assert.strictEqual(npc.schema, 'western');
+            assert.deepStrictEqual(npc.getFieldKeys(), ['goal_long', 'goal_short', 'secrets', 'strength', 'nothing']);
+            assert.ok(npc.id.length > 0);
+            assert.strictEqual(npc.getFieldValue('goal_long'), 'love');
+            assert.strictEqual(npc.getFieldValue('goal_short'), 'money');
+            assert.deepStrictEqual(npc.getFieldValue('secrets'), ['possessed', 'possessed']);
+            assert.strictEqual(npc.getFieldValue('strength'), 15);
+            assert.strictEqual(npc.getFieldValue('nothing'), null);
         });
 
         it('should throw for a variety of errors', function () {
@@ -157,21 +157,21 @@ describe('npc_generator', function () {
                 key: 'western'
             });
             const npc = new NPC({ id: '123-567', schema: 'sci-fi' });
-            expect(() => {
+            assert.throws(() => {
                 applySchemaToNPC(schema, tableRoller, npc);
-            }).to.throw(Error, 'npc already has schema set.');
+            }, { message: /npc already has schema set\./ });
 
-            expect(() => {
+            assert.throws(() => {
                 applySchemaToNPC(schema, {}, npc);
-            }).to.throw(Error, 'Invalid tableRoller');
+            }, { message: /Invalid tableRoller/ });
 
-            expect(() => {
+            assert.throws(() => {
                 applySchemaToNPC({}, tableRoller, npc);
-            }).to.throw(Error, 'schema object must be or inherit from NPCSchema class.');
+            }, { message: /schema object must be or inherit from NPCSchema class\./ });
 
-            expect(() => {
+            assert.throws(() => {
                 applySchemaToNPC(schema, tableRoller, {});
-            }).to.throw(Error, 'npc object must be or inherit from NPC class.');
+            }, { message: /npc object must be or inherit from NPC class\./ });
         });
     });
 });

@@ -1,7 +1,7 @@
 'use strict';
 
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
 import RandomTableResult from '../src/RandomTableResult.js';
 
@@ -14,11 +14,11 @@ describe('RandomTableResult', function () {
             desc: 'a primary'
         });
 
-        expect(resultObj.key).to.equal('tkey');
-        expect(resultObj.table).to.equal('colors');
-        expect(resultObj.result).to.equal('blue');
-        expect(resultObj.desc).to.equal('a primary');
-        expect(resultObj.isError).to.equal(false);
+        assert.strictEqual(resultObj.key, 'tkey');
+        assert.strictEqual(resultObj.table, 'colors');
+        assert.strictEqual(resultObj.result, 'blue');
+        assert.strictEqual(resultObj.desc, 'a primary');
+        assert.strictEqual(resultObj.isError, false);
     });
 
     it('should serialize a class to an object', function () {
@@ -30,10 +30,10 @@ describe('RandomTableResult', function () {
         });
 
         const serialized = resultObj.toJSON();
-        expect(serialized.key).to.equal('tkey');
-        expect(serialized.table).to.equal('colors');
-        expect(serialized.result).to.equal('blue');
-        expect(serialized.desc).to.equal('a primary');
-        expect(serialized.className).to.equal('RandomTableResult');
+        assert.strictEqual(serialized.key, 'tkey');
+        assert.strictEqual(serialized.table, 'colors');
+        assert.strictEqual(serialized.result, 'blue');
+        assert.strictEqual(serialized.desc, 'a primary');
+        assert.strictEqual(serialized.className, 'RandomTableResult');
     });
 });
